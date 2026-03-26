@@ -15,11 +15,28 @@ export const AUTH = {
     REGISTER_SUBTITLE: 'Empieza a encontrar tu roomie ideal',
     REGISTER_SUBMIT: 'Crear cuenta',
     OAUTH_DIVIDER: 'o continúa con',
+    LABEL_EMAIL: 'Email',
+    LABEL_PASSWORD: 'Contraseña',
+    LABEL_FULL_NAME: 'Nombre completo',
+    FORGOT_PASSWORD: '¿Olvidaste tu contraseña?',
+    NO_ACCOUNT: '¿No tienes cuenta? ',
+    ALREADY_HAVE_ACCOUNT: '¿Ya tienes cuenta? ',
+    LINK_LOGIN: 'Inicia sesión',
+    LINK_REGISTER: 'Regístrate',
+    GOOGLE: 'Google',
+  },
+  ROLES: {
+    SEEKER: 'seeker',
+    OWNER: 'owner',
+    ADMIN: 'admin',
   },
   PLACEHOLDERS: {
     EMAIL: 'tu@email.com',
     PASSWORD: '••••••••',
     PASSWORD_HINT: 'Mínimo 8 caracteres',
     FULL_NAME: 'Ana García',
+  },
+  ERROR_KEYS: {
+    ROOT: 'root',
   },
 } as const

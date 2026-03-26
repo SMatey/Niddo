@@ -1,18 +1,17 @@
+import { THEME, type ThemeVariant, type ThemeSize } from '@/shared/constants/theme.constants'
+import { ACCESSIBILITY } from '@/shared/constants/accessibility.constants'
 import styles from './Button.module.css'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-type ButtonSize = 'sm' | 'md' | 'lg'
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant
-  size?: ButtonSize
+  variant?: ThemeVariant
+  size?: ThemeSize
   isLoading?: boolean
   fullWidth?: boolean
 }
 
 export function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = THEME.VARIANTS.PRIMARY,
+  size = THEME.SIZES.MD,
   isLoading = false,
   fullWidth = false,
   children,
@@ -32,7 +31,7 @@ export function Button({
 
   return (
     <button className={classes} disabled={disabled || isLoading} {...props}>
-      {isLoading ? <span className={styles.spinner} aria-hidden="true" /> : null}
+      {isLoading ? <span className={styles.spinner} aria-hidden={ACCESSIBILITY.ARIA.HIDDEN} /> : null}
       {children}
     </button>
   )

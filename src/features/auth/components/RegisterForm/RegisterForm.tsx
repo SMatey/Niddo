@@ -2,22 +2,14 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
+import { registerSchema, type RegisterValues } from '@/features/auth/schemas/register.schema'
 import styles from './RegisterForm.module.css'
-
-const registerSchema = z.object({
-  fullName: z.string().min(2, AUTH.VALIDATION.NAME_TOO_SHORT),
-  email: z.string().email(AUTH.VALIDATION.EMAIL_INVALID),
-  password: z.string().min(8, AUTH.VALIDATION.PASSWORD_MIN_8),
-})
-
-type RegisterValues = z.infer<typeof registerSchema>
+import { AUTH } from '@/features/auth/constants/auth.constants'
 
 export function RegisterForm() {
   const { signUp, isLoading } = useAuth()
@@ -31,7 +23,7 @@ export function RegisterForm() {
   const onSubmit = async (values: RegisterValues) => {
     const { error } = await signUp(values.email, values.password, values.fullName)
     if (error) {
-      setError('root', { message: error })
+      setError(AUTH.ERROR_KEYS.ROOT, { message: error })
     }
   }
 
@@ -43,30 +35,30 @@ export function RegisterForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
           <Input
-            label="Nombre completo"
+            label={AUTH.UI.LABEL_FULL_NAME}
             type="text"
             placeholder={AUTH.PLACEHOLDERS.FULL_NAME}
             error={errors.fullName?.message}
             {...register('fullName')}
           />
           <Input
-            label="Email"
+            label={AUTH.UI.LABEL_EMAIL}
             type="email"
             placeholder={AUTH.PLACEHOLDERS.EMAIL}
             error={errors.email?.message}
             {...register('email')}
           />
           <Input
-            label="Contraseña"
+            label={AUTH.UI.LABEL_PASSWORD}
             type="password"
             placeholder={AUTH.PLACEHOLDERS.PASSWORD_HINT}
             error={errors.password?.message}
             {...register('password')}
           />
 
-          {errors.root ? (
+          {errors.root && (
             <p className={styles.formError}>{errors.root.message}</p>
-          ) : null}
+          )}
 
           <Button type="submit" fullWidth isLoading={isLoading}>
             {AUTH.UI.REGISTER_SUBMIT}
@@ -75,9 +67,9 @@ export function RegisterForm() {
 
         <div className={styles.footer}>
           <p>
-            ¿Ya tienes cuenta?{' '}
+            {AUTH.UI.ALREADY_HAVE_ACCOUNT}
             <Link href={ROUTES.LOGIN} className={styles.link}>
-              Inicia sesión
+              {AUTH.UI.LINK_LOGIN}
             </Link>
           </p>
         </div>

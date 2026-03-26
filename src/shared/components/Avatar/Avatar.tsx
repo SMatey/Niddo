@@ -1,4 +1,6 @@
 import Image from 'next/image'
+import { THEME, type ThemeSize } from '@/shared/constants/theme.constants'
+import { ACCESSIBILITY } from '@/shared/constants/accessibility.constants'
 import styles from './Avatar.module.css'
 
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
@@ -10,14 +12,14 @@ interface AvatarProps {
   className?: string
 }
 
-const sizeMap: Record<AvatarSize, number> = {
+const sizeMap: Record<ThemeSize, number> = {
   sm: 32,
   md: 40,
   lg: 56,
   xl: 80,
 }
 
-export function Avatar({ src, alt, size = 'md', className }: AvatarProps) {
+export function Avatar({ src, alt, size = THEME.SIZES.MD, className }: AvatarProps) {
   const px = sizeMap[size]
   const initials = alt
     .split(' ')
@@ -34,7 +36,7 @@ export function Avatar({ src, alt, size = 'md', className }: AvatarProps) {
       {src ? (
         <Image src={src} alt={alt} width={px} height={px} className={styles.image} />
       ) : (
-        <span className={styles.initials} aria-hidden="true">
+        <span className={styles.initials} aria-hidden={ACCESSIBILITY.ARIA.HIDDEN}>
           {initials}
         </span>
       )}

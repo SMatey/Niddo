@@ -1,21 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ROUTES } from '@/shared/constants/routes.constants'
 
-export function useAuth() {
+interface AuthCallbacks {
+  onSignIn?: () => void
+  onSignUp?: () => void
+  onSignOut?: () => void
+}
+
+export function useAuth(callbacks?: AuthCallbacks) {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setIsLoading(false)
-    if (!error) router.push(ROUTES.DASHBOARD)
-    return { error: error?.message ?? null }
+    if (!error) callbacks?.onSignIn?.()
+    return { error: error?.message ?? null, success: !error }
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
@@ -27,8 +30,8 @@ export function useAuth() {
       options: { data: { full_name: fullName } },
     })
     setIsLoading(false)
-    if (!error) router.push(ROUTES.VERIFY_EMAIL)
-    return { error: error?.message ?? null }
+    if (!error) callbacks?.onSignUp?.()
+    return { error: error?.message ?? null, success: !error }
   }
 
   const signOut = async () => {
@@ -36,7 +39,7 @@ export function useAuth() {
     const supabase = createClient()
     await supabase.auth.signOut()
     setIsLoading(false)
-    router.push(ROUTES.LOGIN)
+    callbacks?.onSignOut?.()
   }
 
   return { signIn, signUp, signOut, isLoading }

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import { DOM } from '@/shared/constants/dom.constants'
+import { COMMON_UI } from '@/shared/constants/ui.constants'
 import styles from './Modal.module.css'
 
 const CLOSE_KEY = 'Escape'
@@ -18,13 +20,13 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     if (!isOpen) return
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === CLOSE_KEY) onClose()
+      if (e.key === DOM.KEYS.ESCAPE) onClose()
     }
-    document.addEventListener('keydown', handleKey)
-    document.body.style.overflow = 'hidden'
+    document.addEventListener(DOM.EVENTS.KEYDOWN, handleKey)
+    document.body.style.overflow = DOM.STYLE.HIDDEN
     return () => {
-      document.removeEventListener('keydown', handleKey)
-      document.body.style.overflow = ''
+      document.removeEventListener(DOM.EVENTS.KEYDOWN, handleKey)
+      document.body.style.overflow = DOM.STYLE.EMPTY
     }
   }, [isOpen, onClose])
 
@@ -36,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         {title ? (
           <div className={styles.header}>
             <h2 className={styles.title}>{title}</h2>
-            <button className={styles.closeButton} onClick={onClose} aria-label={CLOSE_ARIA_LABEL}>
+            <button className={styles.closeButton} onClick={onClose} aria-label={COMMON_UI.ACTIONS.CLOSE}>
               {CLOSE_ICON}
             </button>
           </div>

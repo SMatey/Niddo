@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Message } from '@/types'
-import { INBOX } from '@/features/inbox/constants/inbox.constants'
+import { INBOX } from '../constants/inbox.constants'
 
 export function useRealtimeChat(conversationId: string) {
   const [messages, setMessages] = useState<Message[]>([])
@@ -11,9 +11,10 @@ export function useRealtimeChat(conversationId: string) {
 
   useEffect(() => {
     if (!conversationId) return
+    const channelName = INBOX.CHANNELS.CONVERSATION(conversationId)
     const channel = supabase
-      .channel(`${INBOX.REALTIME.CHANNEL_PREFIX}${conversationId}`)
-      .on(INBOX.REALTIME.EVENT_TYPE, { event: INBOX.REALTIME.MESSAGE_EVENT }, ({ payload }) => {
+      .channel(channelName)
+      .on(INBOX.CONFIG.BROADCAST as 'broadcast', { event: INBOX.EVENTS.MESSAGE }, ({ payload }) => {
         setMessages((prev) => [...prev, payload as Message])
       })
       .subscribe()

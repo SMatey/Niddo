@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import { COMMON_UI } from '@/shared/constants/ui.constants'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
-  title: 'Niddo — Encuentra tu roomie ideal',
-  description: 'Plataforma de búsqueda de roomies con matching por compatibilidad',
+  title: `${COMMON_UI.APP_NAME} — ${COMMON_UI.APP_SLOGAN}`,
+  description: COMMON_UI.APP_DESCRIPTION,
 }
 
 export default function RootLayout({
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
+    <html lang={COMMON_UI.CONFIG.LANG}>
       <body>{children}</body>
     </html>
   )

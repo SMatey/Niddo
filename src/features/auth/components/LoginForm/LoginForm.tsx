@@ -2,21 +2,14 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import Link from 'next/link'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
+import { loginSchema, type LoginValues } from '@/features/auth/schemas/login.schema'
 import styles from './LoginForm.module.css'
-
-const loginSchema = z.object({
-  email: z.string().email(AUTH.VALIDATION.EMAIL_INVALID),
-  password: z.string().min(6, AUTH.VALIDATION.PASSWORD_MIN_6),
-})
-
-type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginForm() {
   const { signIn, isLoading } = useAuth()
@@ -30,7 +23,7 @@ export function LoginForm() {
   const onSubmit = async (values: LoginValues) => {
     const { error } = await signIn(values.email, values.password)
     if (error) {
-      setError('root', { message: error })
+      setError(AUTH.ERROR_KEYS.ROOT, { message: error })
     }
   }
 
@@ -42,23 +35,23 @@ export function LoginForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
           <Input
-            label="Email"
+            label={AUTH.UI.LABEL_EMAIL}
             type="email"
             placeholder={AUTH.PLACEHOLDERS.EMAIL}
             error={errors.email?.message}
             {...register('email')}
           />
           <Input
-            label="Contraseña"
+            label={AUTH.UI.LABEL_PASSWORD}
             type="password"
             placeholder={AUTH.PLACEHOLDERS.PASSWORD}
             error={errors.password?.message}
             {...register('password')}
           />
 
-          {errors.root ? (
+          {errors.root && (
             <p className={styles.formError}>{errors.root.message}</p>
-          ) : null}
+          )}
 
           <Button type="submit" fullWidth isLoading={isLoading}>
             {AUTH.UI.LOGIN_SUBMIT}
@@ -67,12 +60,12 @@ export function LoginForm() {
 
         <div className={styles.footer}>
           <Link href={ROUTES.FORGOT_PASSWORD} className={styles.link}>
-            ¿Olvidaste tu contraseña?
+            {AUTH.UI.FORGOT_PASSWORD}
           </Link>
           <p>
-            ¿No tienes cuenta?{' '}
+            {AUTH.UI.NO_ACCOUNT}
             <Link href={ROUTES.REGISTER} className={styles.link}>
-              Regístrate
+              {AUTH.UI.LINK_REGISTER}
             </Link>
           </p>
         </div>

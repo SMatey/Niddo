@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { DOM } from '../constants/dom.constants'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -15,7 +16,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     (value: T | ((prev: T) => T)) => {
       setStoredValue((prev) => {
         const newValue = value instanceof Function ? value(prev) : value
-        if (typeof window !== 'undefined') {
+        if (typeof window !== DOM.WINDOW.UNDEFINED) {
           window.localStorage.setItem(key, JSON.stringify(newValue))
         }
         return newValue

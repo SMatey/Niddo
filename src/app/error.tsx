@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { COMMON_UI } from '@/shared/constants/ui.constants'
 
 export default function Error({
   error,
@@ -15,8 +16,8 @@ export default function Error({
 
   return (
     <main>
-      <h2>Algo salió mal</h2>
-      <button onClick={reset}>Reintentar</button>
+      <h2>{COMMON_UI.STATUS.ERROR}</h2>
+      <button onClick={reset}>{COMMON_UI.ACTIONS.RETRY}</button>
     </main>
   )
 }

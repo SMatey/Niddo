@@ -12,6 +12,7 @@ export const mockListings: Listing[] = [
     availableFrom: '2026-04-01',
     roomsTotal: 3,
     bathroomsTotal: 2,
+    category: 'apartment',
     isActive: true,
     photos: [],
     createdAt: '2026-03-01T00:00:00Z',
