@@ -3,6 +3,10 @@
 import { useEffect } from 'react'
 import styles from './Modal.module.css'
 
+const CLOSE_KEY = 'Escape'
+const CLOSE_ICON = '×'
+const CLOSE_ARIA_LABEL = 'Cerrar'
+
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -14,7 +18,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     if (!isOpen) return
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === CLOSE_KEY) onClose()
     }
     document.addEventListener('keydown', handleKey)
     document.body.style.overflow = 'hidden'
@@ -32,8 +36,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         {title ? (
           <div className={styles.header}>
             <h2 className={styles.title}>{title}</h2>
-            <button className={styles.closeButton} onClick={onClose} aria-label="Cerrar">
-              ×
+            <button className={styles.closeButton} onClick={onClose} aria-label={CLOSE_ARIA_LABEL}>
+              {CLOSE_ICON}
             </button>
           </div>
         ) : null}

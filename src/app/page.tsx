@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/constants/routes.constants'
 
 export default function HomePage() {
   return (
@@ -6,9 +7,9 @@ export default function HomePage() {
       <h1>Niddo</h1>
       <p>Encuentra tu roomie ideal.</p>
       <nav>
-        <Link href="/listings">Ver inmuebles</Link>
-        <Link href="/login">Iniciar sesión</Link>
-        <Link href="/register">Registrarse</Link>
+        <Link href={ROUTES.PUBLIC_LISTINGS}>Ver inmuebles</Link>
+        <Link href={ROUTES.LOGIN}>Iniciar sesión</Link>
+        <Link href={ROUTES.REGISTER}>Registrarse</Link>
       </nav>
     </main>
   )

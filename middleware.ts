@@ -1,8 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ROUTES } from '@/shared/constants/routes.constants'
 
-const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email']
-const PROTECTED_ROUTES = ['/dashboard', '/profile', '/listings', '/search', '/inbox', '/roomies', '/favorites', '/settings', '/admin']
+const AUTH_ROUTES = [
+  ROUTES.LOGIN,
+  ROUTES.REGISTER,
+  ROUTES.FORGOT_PASSWORD,
+  ROUTES.RESET_PASSWORD,
+  ROUTES.VERIFY_EMAIL,
+]
+
+const PROTECTED_ROUTES = [
+  ROUTES.DASHBOARD,
+  ROUTES.PROFILE,
+  ROUTES.PUBLIC_LISTINGS,
+  ROUTES.SEARCH,
+  ROUTES.INBOX,
+  ROUTES.ROOMIES,
+  ROUTES.FAVORITES,
+  ROUTES.SETTINGS,
+  ROUTES.ADMIN,
+]
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -35,13 +53,13 @@ export async function middleware(request: NextRequest) {
   // Auth routes: redirect to dashboard if already logged in
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route))
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL(ROUTES.DASHBOARD, request.url))
   }
 
   // Protected routes: redirect to login if not logged in
   const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route))
   if (isProtectedRoute && !user) {
-    const loginUrl = new URL('/login', request.url)
+    const loginUrl = new URL(ROUTES.LOGIN, request.url)
     loginUrl.searchParams.set('redirectTo', pathname)
     return NextResponse.redirect(loginUrl)
   }

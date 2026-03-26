@@ -7,11 +7,13 @@ import Link from 'next/link'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
+import { AUTH } from '@/features/auth/constants/auth.constants'
+import { ROUTES } from '@/shared/constants/routes.constants'
 import styles from './LoginForm.module.css'
 
 const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Mínimo 6 caracteres'),
+  email: z.string().email(AUTH.VALIDATION.EMAIL_INVALID),
+  password: z.string().min(6, AUTH.VALIDATION.PASSWORD_MIN_6),
 })
 
 type LoginValues = z.infer<typeof loginSchema>
@@ -35,21 +37,21 @@ export function LoginForm() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Iniciar sesión</h1>
-        <p className={styles.subtitle}>Bienvenido de vuelta</p>
+        <h1 className={styles.title}>{AUTH.UI.LOGIN_TITLE}</h1>
+        <p className={styles.subtitle}>{AUTH.UI.LOGIN_SUBTITLE}</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
           <Input
             label="Email"
             type="email"
-            placeholder="tu@email.com"
+            placeholder={AUTH.PLACEHOLDERS.EMAIL}
             error={errors.email?.message}
             {...register('email')}
           />
           <Input
             label="Contraseña"
             type="password"
-            placeholder="••••••••"
+            placeholder={AUTH.PLACEHOLDERS.PASSWORD}
             error={errors.password?.message}
             {...register('password')}
           />
@@ -59,17 +61,17 @@ export function LoginForm() {
           ) : null}
 
           <Button type="submit" fullWidth isLoading={isLoading}>
-            Iniciar sesión
+            {AUTH.UI.LOGIN_SUBMIT}
           </Button>
         </form>
 
         <div className={styles.footer}>
-          <Link href="/forgot-password" className={styles.link}>
+          <Link href={ROUTES.FORGOT_PASSWORD} className={styles.link}>
             ¿Olvidaste tu contraseña?
           </Link>
           <p>
             ¿No tienes cuenta?{' '}
-            <Link href="/register" className={styles.link}>
+            <Link href={ROUTES.REGISTER} className={styles.link}>
               Regístrate
             </Link>
           </p>

@@ -1,15 +1,16 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/constants/routes.constants'
 import styles from './Sidebar.module.css'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/search', label: 'Buscar' },
-  { href: '/my-listings', label: 'Mis inmuebles' },
-  { href: '/roomies', label: 'Buscadores' },
-  { href: '/inbox', label: 'Mensajes' },
-  { href: '/favorites', label: 'Favoritos' },
-  { href: '/profile', label: 'Mi perfil' },
-  { href: '/settings', label: 'Configuración' },
+  { href: ROUTES.DASHBOARD, label: 'Dashboard' },
+  { href: ROUTES.SEARCH, label: 'Buscar' },
+  { href: ROUTES.MY_LISTINGS, label: 'Mis inmuebles' },
+  { href: ROUTES.ROOMIES, label: 'Buscadores' },
+  { href: ROUTES.INBOX, label: 'Mensajes' },
+  { href: ROUTES.FAVORITES, label: 'Favoritos' },
+  { href: ROUTES.PROFILE, label: 'Mi perfil' },
+  { href: ROUTES.SETTINGS, label: 'Configuración' },
 ]
 
 export function Sidebar() {

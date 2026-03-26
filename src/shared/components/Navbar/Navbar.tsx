@@ -1,21 +1,22 @@
 import Link from 'next/link'
+import { ROUTES } from '@/shared/constants/routes.constants'
 import styles from './Navbar.module.css'
 
 export function Navbar() {
   return (
     <header className={styles.navbar}>
       <div className={styles.inner}>
-        <Link href="/" className={styles.logo}>
+        <Link href={ROUTES.HOME} className={styles.logo}>
           Niddo
         </Link>
         <nav className={styles.nav}>
-          <Link href="/listings" className={styles.navLink}>
+          <Link href={ROUTES.PUBLIC_LISTINGS} className={styles.navLink}>
             Inmuebles
           </Link>
-          <Link href="/login" className={styles.navLink}>
+          <Link href={ROUTES.LOGIN} className={styles.navLink}>
             Iniciar sesión
           </Link>
-          <Link href="/register" className={styles.navLinkCta}>
+          <Link href={ROUTES.REGISTER} className={styles.navLinkCta}>
             Registrarse
           </Link>
         </nav>
