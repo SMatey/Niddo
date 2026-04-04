@@ -3,15 +3,19 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { loginSchema, type LoginValues } from '@/features/auth/schemas/login.schema'
+import { OAuthButtons } from '@/features/auth/components/OAuthButtons/OAuthButtons'
 import styles from './LoginForm.module.css'
 
 export function LoginForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { signIn, isLoading } = useAuth()
   const {
     register,
@@ -24,7 +28,12 @@ export function LoginForm() {
     const { error } = await signIn(values.email, values.password)
     if (error) {
       setError(AUTH.ERROR_KEYS.ROOT, { message: error })
+      return
     }
+
+    const redirectTo = searchParams.get('redirectTo')
+    const safeRedirect = redirectTo?.startsWith('/') ? redirectTo : ROUTES.DASHBOARD
+    router.push(safeRedirect)
   }
 
   return (
@@ -57,6 +66,8 @@ export function LoginForm() {
             {AUTH.UI.LOGIN_SUBMIT}
           </Button>
         </form>
+
+        <OAuthButtons mode="sign-in" />
 
         <div className={styles.footer}>
           <Link href={ROUTES.FORGOT_PASSWORD} className={styles.link}>
