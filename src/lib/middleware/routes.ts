@@ -1,5 +1,15 @@
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email']
-const PROTECTED_ROUTES = ['/dashboard', '/profile', '/listings', '/search', '/inbox', '/roomies', '/favorites', '/settings', '/admin']
+const PROTECTED_ROUTES = [
+  '/dashboard',
+  '/profile',
+  '/my-listings',
+  '/search',
+  '/inbox',
+  '/roomies',
+  '/favorites',
+  '/settings',
+  '/admin',
+]
 
 export function isAuthRoute(pathname: string): boolean {
   return AUTH_ROUTES.some((route) => pathname.startsWith(route))

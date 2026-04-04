@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -10,8 +11,10 @@ import { ROUTES } from '@/shared/constants/routes.constants'
 import { registerSchema, type RegisterValues } from '@/features/auth/schemas/register.schema'
 import styles from './RegisterForm.module.css'
 import { AUTH } from '@/features/auth/constants/auth.constants'
+import { OAuthButtons } from '@/features/auth/components/OAuthButtons/OAuthButtons'
 
 export function RegisterForm() {
+  const router = useRouter()
   const { signUp, isLoading } = useAuth()
   const {
     register,
@@ -24,7 +27,11 @@ export function RegisterForm() {
     const { error } = await signUp(values.email, values.password, values.fullName)
     if (error) {
       setError(AUTH.ERROR_KEYS.ROOT, { message: error })
+      return
     }
+
+    const verifyEmailUrl = `${ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`
+    router.push(verifyEmailUrl)
   }
 
   return (
@@ -64,6 +71,8 @@ export function RegisterForm() {
             {AUTH.UI.REGISTER_SUBMIT}
           </Button>
         </form>
+
+        <OAuthButtons mode="sign-up" />
 
         <div className={styles.footer}>
           <p>
