@@ -33,3 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#Development
+.claude
+.claude-flow
+.vscode
+.swarm

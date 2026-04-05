@@ -6,25 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky",
+    "test": "jest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
     "lucide-react": "^0.468.0",
-    "next": "^14.2.35",
+    "next": "^16.2.2",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.54.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv": "^17.4.0",
     "eslint": "^8",
-    "eslint-config-next": "^16.2.1",
+    "eslint-config-next": "^16.2.2",
+    "husky": "^9.1.7",
+    "jest": "^30.3.0",
+    "jest-environment-node": "^30.3.0",
+    "ts-jest": "^29.4.9",
     "typescript": "^5"
   }
 }
