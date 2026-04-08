@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { AUTH } from '@/features/auth/constants/auth.constants'
+import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { OAuthButtons } from '@/features/auth/components/OAuthButtons/OAuthButtons'
@@ -14,7 +15,6 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordValues,
 } from '@/features/auth/schemas/forgot-password.schema'
-import styles from './ForgotPasswordForm.module.css'
 
 export function ForgotPasswordForm() {
   const { requestPasswordReset, isLoading } = useAuth()
@@ -65,12 +65,12 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>{AUTH.UI.FORGOT_PASSWORD_TITLE}</h1>
-        <p className={styles.subtitle}>{AUTH.UI.FORGOT_PASSWORD_SUBTITLE}</p>
+    <div className={AUTH_UI_STYLES.PAGE_WRAPPER}>
+      <div className={AUTH_UI_STYLES.CARD}>
+        <h1 className={AUTH_UI_STYLES.TITLE}>{AUTH.UI.FORGOT_PASSWORD_TITLE}</h1>
+        <p className={AUTH_UI_STYLES.SUBTITLE}>{AUTH.UI.FORGOT_PASSWORD_SUBTITLE}</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className={AUTH_UI_STYLES.FORM} noValidate>
           <Input
             label={AUTH.UI.LABEL_EMAIL}
             type="email"
@@ -80,10 +80,10 @@ export function ForgotPasswordForm() {
           />
 
           {errors.root ? (
-            <p className={styles.formInfo}>{errors.root.message}</p>
+            <p className={AUTH_UI_STYLES.FEEDBACK}>{errors.root.message}</p>
           ) : null}
 
-          {statusMessage ? <p className={styles.formInfo}>{statusMessage}</p> : null}
+          {statusMessage ? <p className={AUTH_UI_STYLES.FEEDBACK}>{statusMessage}</p> : null}
 
           <Button type="submit" fullWidth isLoading={isLoading} disabled={cooldownSeconds > 0}>
             {AUTH.UI.FORGOT_PASSWORD_SUBMIT}
@@ -92,10 +92,10 @@ export function ForgotPasswordForm() {
 
         <OAuthButtons mode="sign-in" />
 
-        <p className={styles.helper}>{AUTH.UI.GOOGLE_RECOVERY_HINT}</p>
+        <p className={AUTH_UI_STYLES.HINT}>{AUTH.UI.GOOGLE_RECOVERY_HINT}</p>
 
-        <div className={styles.footer}>
-          <Link href={ROUTES.LOGIN} className={styles.link}>
+        <div className={AUTH_UI_STYLES.FOOTER_CENTER}>
+          <Link href={ROUTES.LOGIN} className={AUTH_UI_STYLES.LINK}>
             {AUTH.UI.BACK_TO_LOGIN}
           </Link>
         </div>

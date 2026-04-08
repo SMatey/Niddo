@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { DOM } from '@/shared/constants/dom.constants'
 import { COMMON_UI } from '@/shared/constants/ui.constants'
-import styles from './Modal.module.css'
 
 const CLOSE_KEY = 'Escape'
 const CLOSE_ICON = '×'
@@ -33,17 +32,29 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null
 
   return (
-    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true">
-      <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-[480px] overflow-y-auto rounded-lg bg-surface shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         {title ? (
-          <div className={styles.header}>
-            <h2 className={styles.title}>{title}</h2>
-            <button className={styles.closeButton} onClick={onClose} aria-label={COMMON_UI.ACTIONS.CLOSE}>
+          <div className="flex items-center justify-between border-b border-border px-6 py-5">
+            <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+            <button
+              className="px-1 text-2xl leading-none text-text-muted transition-colors duration-150 hover:text-text-primary"
+              onClick={onClose}
+              aria-label={COMMON_UI.ACTIONS.CLOSE}
+            >
               {CLOSE_ICON}
             </button>
           </div>
         ) : null}
-        <div className={styles.body}>{children}</div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   )

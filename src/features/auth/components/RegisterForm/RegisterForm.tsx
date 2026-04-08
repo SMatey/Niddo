@@ -9,8 +9,8 @@ import { Input } from '@/shared/components/Input/Input'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { registerSchema, type RegisterValues } from '@/features/auth/schemas/register.schema'
-import styles from './RegisterForm.module.css'
 import { AUTH } from '@/features/auth/constants/auth.constants'
+import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 import { OAuthButtons } from '@/features/auth/components/OAuthButtons/OAuthButtons'
 
 export function RegisterForm() {
@@ -35,12 +35,12 @@ export function RegisterForm() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>{AUTH.UI.REGISTER_TITLE}</h1>
-        <p className={styles.subtitle}>{AUTH.UI.REGISTER_SUBTITLE}</p>
+    <div className={AUTH_UI_STYLES.PAGE_WRAPPER}>
+      <div className={AUTH_UI_STYLES.CARD}>
+        <h1 className={AUTH_UI_STYLES.TITLE}>{AUTH.UI.REGISTER_TITLE}</h1>
+        <p className={AUTH_UI_STYLES.SUBTITLE}>{AUTH.UI.REGISTER_SUBTITLE}</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className={AUTH_UI_STYLES.FORM} noValidate>
           <Input
             label={AUTH.UI.LABEL_FULL_NAME}
             type="text"
@@ -64,7 +64,7 @@ export function RegisterForm() {
           />
 
           {errors.root && (
-            <p className={styles.formError}>{errors.root.message}</p>
+            <p className={AUTH_UI_STYLES.FORM_ERROR}>{errors.root.message}</p>
           )}
 
           <Button type="submit" fullWidth isLoading={isLoading}>
@@ -74,10 +74,10 @@ export function RegisterForm() {
 
         <OAuthButtons mode="sign-up" />
 
-        <div className={styles.footer}>
+        <div className={AUTH_UI_STYLES.FOOTER}>
           <p>
             {AUTH.UI.ALREADY_HAVE_ACCOUNT}
-            <Link href={ROUTES.LOGIN} className={styles.link}>
+            <Link href={ROUTES.LOGIN} className={AUTH_UI_STYLES.LINK}>
               {AUTH.UI.LINK_LOGIN}
             </Link>
           </p>

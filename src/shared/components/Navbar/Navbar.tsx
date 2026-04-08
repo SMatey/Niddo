@@ -1,23 +1,31 @@
 import Link from 'next/link'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { COMMON_UI } from '@/shared/constants/ui.constants'
-import styles from './Navbar.module.css'
 
 export function Navbar() {
   return (
-    <header className={styles.navbar}>
-      <div className={styles.container}>
-        <Link href="/" className={styles.logo}>
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/70 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto flex h-[64px] w-full max-w-[1200px] items-center justify-between px-6">
+        <Link href={ROUTES.HOME} className="text-xl font-extrabold tracking-tight text-brand-600">
           {COMMON_UI.APP_NAME}
         </Link>
-        <nav className={styles.nav}>
-          <Link href="/listings" className={styles.navLink}>
+        <nav className="flex items-center gap-2 md:gap-4">
+          <Link
+            href={ROUTES.PUBLIC_LISTINGS}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-all duration-150 hover:bg-white hover:text-text-primary"
+          >
             {COMMON_UI.NAV.LISTINGS}
           </Link>
-          <Link href="/login" className={styles.navLink}>
+          <Link
+            href={ROUTES.LOGIN}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-all duration-150 hover:bg-white hover:text-text-primary"
+          >
             {COMMON_UI.NAV.LOGIN}
           </Link>
-          <Link href="/register" className={styles.navLinkCta}>
+          <Link
+            href={ROUTES.REGISTER}
+            className="rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-[1px] hover:from-brand-600 hover:to-brand-700 hover:shadow-md"
+          >
             {COMMON_UI.NAV.REGISTER}
           </Link>
         </nav>

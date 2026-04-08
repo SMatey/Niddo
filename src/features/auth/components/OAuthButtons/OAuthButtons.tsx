@@ -5,7 +5,7 @@ import { THEME } from '@/shared/constants/theme.constants'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import styles from './OAuthButtons.module.css'
+import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 
 interface OAuthButtonsProps {
   mode?: 'sign-in' | 'sign-up'
@@ -20,9 +20,11 @@ export function OAuthButtons({ mode = 'sign-in' }: OAuthButtonsProps) {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.divider}>
+    <div className="mt-4 flex flex-col gap-3">
+      <div className={AUTH_UI_STYLES.DIVIDER_ROW}>
+        <span className={AUTH_UI_STYLES.DIVIDER_LINE} aria-hidden="true" />
         <span>{AUTH.UI.OAUTH_DIVIDER}</span>
+        <span className={AUTH_UI_STYLES.DIVIDER_LINE} aria-hidden="true" />
       </div>
       <Button
         variant={THEME.VARIANTS.SECONDARY}

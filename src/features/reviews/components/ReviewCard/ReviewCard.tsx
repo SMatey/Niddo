@@ -1,11 +1,10 @@
 import type { Review } from '@/types'
-import styles from './ReviewCard.module.css'
 
 export function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className={styles.card}>
-      <p className={styles.comment}>{review.comment}</p>
-      <span className={styles.rating}>{'★'.repeat(review.rating)}</span>
+    <div className="rounded-lg border border-border bg-surface p-4">
+      <p className="text-sm text-text-secondary">{review.comment}</p>
+      <span className="text-amber-500">{'★'.repeat(review.rating)}</span>
     </div>
   )
 }

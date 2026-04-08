@@ -6,13 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/Button/Button'
 import { Input } from '@/shared/components/Input/Input'
 import { AUTH } from '@/features/auth/constants/auth.constants'
+import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
   resetPasswordSchema,
   type ResetPasswordValues,
 } from '@/features/auth/schemas/reset-password.schema'
-import styles from './ResetPasswordForm.module.css'
 
 export function ResetPasswordForm() {
   const { updatePassword, isLoading } = useAuth()
@@ -39,12 +39,12 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>{AUTH.UI.RESET_PASSWORD_TITLE}</h1>
-        <p className={styles.subtitle}>{AUTH.UI.RESET_PASSWORD_SUBTITLE}</p>
+    <div className={AUTH_UI_STYLES.PAGE_WRAPPER}>
+      <div className={AUTH_UI_STYLES.CARD}>
+        <h1 className={AUTH_UI_STYLES.TITLE}>{AUTH.UI.RESET_PASSWORD_TITLE}</h1>
+        <p className={AUTH_UI_STYLES.SUBTITLE}>{AUTH.UI.RESET_PASSWORD_SUBTITLE}</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form} noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className={AUTH_UI_STYLES.FORM} noValidate>
           <Input
             label={AUTH.UI.LABEL_NEW_PASSWORD}
             type="password"
@@ -61,7 +61,7 @@ export function ResetPasswordForm() {
           />
 
           {errors.root ? (
-            <p className={styles.formInfo}>{errors.root.message}</p>
+            <p className={AUTH_UI_STYLES.FEEDBACK}>{errors.root.message}</p>
           ) : null}
 
           <Button type="submit" fullWidth isLoading={isLoading}>
@@ -69,8 +69,8 @@ export function ResetPasswordForm() {
           </Button>
         </form>
 
-        <div className={styles.footer}>
-          <Link href={ROUTES.LOGIN} className={styles.link}>
+        <div className={AUTH_UI_STYLES.FOOTER_CENTER}>
+          <Link href={ROUTES.LOGIN} className={AUTH_UI_STYLES.LINK}>
             {AUTH.UI.BACK_TO_LOGIN}
           </Link>
         </div>
