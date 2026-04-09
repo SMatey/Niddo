@@ -1,7 +1,5 @@
+import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm/ResetPasswordForm'
+
 export default function ResetPasswordPage() {
-  return (
-    <main>
-      <h1>Nueva contraseña</h1>
-    </main>
-  )
+  return <ResetPasswordForm />
 }

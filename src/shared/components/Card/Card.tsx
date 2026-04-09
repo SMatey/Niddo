@@ -1,5 +1,4 @@
 import { DOM } from '@/shared/constants/dom.constants'
-import styles from './Card.module.css'
 
 interface CardProps {
   children: React.ReactNode
@@ -9,7 +8,14 @@ interface CardProps {
 
 export function Card({ children, className, as: Component = DOM.TAGS.DIV }: CardProps) {
   return (
-    <Component className={[styles.card, className ?? ''].filter(Boolean).join(' ')}>
+    <Component
+      className={[
+        'rounded-2xl border border-white/70 bg-white/90 p-6 shadow-md backdrop-blur-sm',
+        className ?? '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {children}
     </Component>
   )
