@@ -1,5 +1,4 @@
-import { RegisterForm } from '@/features/auth/components/RegisterForm/RegisterForm'
-
-export default function RegisterPage() {
-  return <RegisterForm />
+export const dynamic = 'force-dynamic'
+export default function Page() {
+  return <div>Register</div>
 }
