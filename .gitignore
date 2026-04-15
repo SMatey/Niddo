@@ -34,8 +34,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-#AI
-.claude/
-.claude-flow/
-.swarm/
-.swc
+#Development
+.claude
+.claude-flow
+.vscode
+.swarm
