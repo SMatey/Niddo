@@ -28,7 +28,7 @@ export default function MisPublicacionesPage() {
       </section>
 
       {/* Empty State (Estado Vacio) */}
-      <section className="flex min-h-100 flex-col items-center justify-center rounded-xl border border-dashed bg-card p-12 text-center shadow-sm">
+      <section className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed bg-card p-12 text-center shadow-sm">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted/50 mb-4">
           <Building2 className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
         </div>
