@@ -44,11 +44,12 @@ export async function middleware(request: NextRequest) {
 
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
 
-  if (isProtectedPath && !user) {
-    const redirectUrl = new URL('/login', request.url)
-    redirectUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(redirectUrl)
-  }
+  // Descomentar cuando haya autenticación real
+  // if (isProtectedPath && !user) {
+  //   const redirectUrl = new URL('/login', request.url)
+  //   redirectUrl.searchParams.set('redirect', pathname)
+  //   return NextResponse.redirect(redirectUrl)
+  // }
 
   // Rutas de auth → redirigir si ya está logueado
   if ((pathname === '/login' || pathname === '/register') && user) {
