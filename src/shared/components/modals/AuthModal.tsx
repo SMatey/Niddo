@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAuthModal } from '@/shared/hooks/useAuthModal';
 import { Home } from 'lucide-react';
+import { MODAL_LABELS } from '@/shared/constants/modal.constants';
+import { UI_LABELS } from '@/shared/constants/ui.constants';
 
 export const AuthModal = () => {
   const { isOpen, onClose } = useAuthModal();
@@ -24,7 +26,7 @@ export const AuthModal = () => {
           className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Cerrar modal"
         >
-          <span className="text-2xl font-medium leading-none">×</span>
+          <span className="text-2xl font-medium leading-none">{UI_LABELS.CLOSE}</span>
         </button>
 
         <div className="text-center mb-9">
@@ -33,10 +35,10 @@ export const AuthModal = () => {
           </div>
           
           <h2 className="text-[28px] font-bold text-gray-950 leading-tight">
-            Bienvenido a RoomMatch
+            {MODAL_LABELS.WELCOME_MESSAGE}
           </h2>
           <p className="mt-2.5 text-base text-gray-600">
-            Encuentra tu roomie o vivienda ideal
+            {MODAL_LABELS.SLOGAN}
           </p>
         </div>
 
@@ -49,7 +51,7 @@ export const AuthModal = () => {
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            Iniciar Sesión
+            {MODAL_LABELS.LOGIN_TAB}
           </button>
           <button
             onClick={() => setActiveTab('register')}
@@ -59,7 +61,7 @@ export const AuthModal = () => {
                 : 'text-gray-600 hover:text-gray-800'
             }`}
           >
-            Registro
+            {MODAL_LABELS.REGISTER_TAB}
           </button>
         </div>
 
