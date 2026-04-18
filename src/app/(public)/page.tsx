@@ -1,4 +1,7 @@
 "use client"
+
+import MisPublicacionesPage  from "../(dashboard)/mis-publicaciones/page";
+
 export default function Page() {
-  return <div>Home</div>
+  return <div><MisPublicacionesPage /></div>
 }

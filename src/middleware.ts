@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{name: string, value: string, options?: any}>) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
@@ -42,12 +42,24 @@ export async function middleware(request: NextRequest) {
     '/perfil',
   ]
 
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
+  // Rutas API protegidas para acciones reservadas
+  const protectedApiPaths = [
+    '/api/favorites',
+    '/api/messages',
+    '/api/contact',
+  ]
 
-  // Descomentar cuando haya autenticación real
-  // if (isProtectedPath && !user) {
-  //   const redirectUrl = new URL('/login', request.url)
-  //   redirectUrl.searchParams.set('redirect', pathname)
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
+  const isProtectedApiPath = protectedApiPaths.some(path => pathname.startsWith(path))
+
+  // Redirigir a login si no autenticado en rutas protegidas
+  if ((isProtectedPath || isProtectedApiPath) && !user) {
+    const redirectUrl = new URL('/login', request.url)
+    redirectUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  return supabaseResponse
   //   return NextResponse.redirect(redirectUrl)
   // }
 
