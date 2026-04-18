@@ -1,5 +1,6 @@
 'use client'
 
+import { Pagination } from '@/shared/components/ui/pagination'
 import { Tabs } from '@/shared/components/ui/tabs'
 import { ListView } from './list-view'
 import { MapView } from './map-view'
@@ -20,7 +21,14 @@ export function ResultsDisplay({
   onPropertyFavoriteToggle,
   onUserFavoriteToggle,
   isLoading,
+  totalProperties = 0,
+  totalUsers = 0,
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange,
 }: ResultsDisplayProps) {
+  const total = contentMode === 'properties' ? totalProperties : totalUsers
+
   return (
     <div className="h-full flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-3 shrink-0">
@@ -41,15 +49,24 @@ export function ResultsDisplay({
       </div>
 
       {viewMode === 'list' ? (
-        <ListView
-          properties={properties}
-          users={users}
-          contentMode={contentMode}
-          filters={filters}
-          onPropertyFavoriteToggle={onPropertyFavoriteToggle}
-          onUserFavoriteToggle={onUserFavoriteToggle}
-          isLoading={isLoading}
-        />
+        <>
+          <ListView
+            properties={properties}
+            users={users}
+            contentMode={contentMode}
+            filters={filters}
+            onPropertyFavoriteToggle={onPropertyFavoriteToggle}
+            onUserFavoriteToggle={onUserFavoriteToggle}
+            isLoading={isLoading}
+          />
+          {onPageChange && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          )}
+        </>
       ) : (
         <div className="h-[calc(100vh-16rem)] lg:h-[calc(100vh-12rem)]">
           <MapView

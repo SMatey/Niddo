@@ -1,3 +1,21 @@
+// Re-export all shared UI types from the central types location
+export type {
+    TagProps,
+    Tab,
+    TabsProps,
+    ToggleProps,
+    PriceRangeProps,
+    PropertyCardProps,
+    UserCardProps,
+    UserAvatarProps,
+    UserInfoProps,
+    FavoriteButtonProps,
+    ConfidenceBarProps,
+    BudgetBadgeProps,
+    DetailHeaderProps,
+} from '@/shared/components/ui/types'
+
+// Additional shared types
 export interface TagProps {
     children: React.ReactNode
     selected?: boolean
@@ -63,6 +81,9 @@ export interface PropertyCardProps {
     bedrooms?: number
     bathrooms?: number
     squareMeters?: number
+    amenities?: string[]
+    petFriendly?: boolean
+    smoker?: boolean
     lifestyles?: string[]
     isFavorite?: boolean
     onFavoriteToggle?: () => void
