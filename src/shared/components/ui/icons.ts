@@ -1,5 +1,0 @@
-export { Heart } from 'lucide-react'
-export { Check } from 'lucide-react'
-export { MapPin } from 'lucide-react'
-export { Home } from 'lucide-react'
-export { Users } from 'lucide-react'
