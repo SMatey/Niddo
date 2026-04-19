@@ -95,10 +95,9 @@ export function AuthenticatedNavbar() {
               <div className="relative" ref={profileRef}>
                 <UserAvatar
                   avatar={CURRENT_USER_MOCK.avatar}
-                  onClick={(e) => {
-                    ;(e as any).stopPropagation()
-                    setIsProfileOpen(!isProfileOpen)
-                  }}
+onClick={() => {
+  setIsProfileOpen(!isProfileOpen)
+}}
                   size="md"
                 />
                 <ProfileDropdown
