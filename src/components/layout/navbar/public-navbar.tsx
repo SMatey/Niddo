@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { useAuthModal } from '@/shared/hooks/useAuthModal'
+import { MODAL_LABELS } from '@/shared/constants/modal.constants'
 
 const NAVIGATION_LINKS = [
   { href: '/', label: 'Inicio' },
@@ -14,6 +16,7 @@ const NAVIGATION_LINKS = [
 export function PublicNavbar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const { onOpenWithTab } = useAuthModal()
 
   const isActive = (href: string) => pathname === href
 
@@ -45,21 +48,23 @@ export function PublicNavbar() {
                 </Link>
               ))}
             </div>
-
             {/* CTA Buttons */}
             <div className="flex items-center gap-4">
-              <Link
-                href="/login"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
-              >
-                Iniciar sesión
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
-              >
-                Registrarse
-              </Link>
+                <button
+                  type="button"
+                  onClick={() => onOpenWithTab('login')}
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                >
+                  {MODAL_LABELS.LOGIN_TAB}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenWithTab('register')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
+                >
+                  {MODAL_LABELS.REGISTER_TAB}
+                </button>
             </div>
           </div>
         </div>
@@ -101,21 +106,29 @@ export function PublicNavbar() {
                 {link.label}
               </Link>
             ))}
+
             <div className="pt-3 border-t border-gray-200 space-y-2">
-              <Link
-                href="/login"
-                className="block text-center text-gray-700 hover:text-gray-900 font-medium transition-colors py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                Iniciar sesión
-              </Link>
-              <Link
-                href="/signup"
-                className="block text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                Registrarse
-              </Link>
+                <button
+                  type="button"
+                  className="block text-center text-gray-700 hover:text-gray-900 font-medium transition-colors py-2"
+                  onClick={() => {
+                    setIsOpen(false)
+                    onOpenWithTab('login')
+                  }}
+                >
+                  {MODAL_LABELS.LOGIN_TAB}
+                </button>
+
+                <button
+                  type="button"
+                  className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium"
+                  onClick={() => {
+                    setIsOpen(false)
+                    onOpenWithTab('register')
+                  }}
+                >
+                  {MODAL_LABELS.REGISTER_TAB}
+                </button>
             </div>
           </div>
         )}
