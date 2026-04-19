@@ -50,15 +50,26 @@ export async function middleware(request: NextRequest) {
     '/api/contact',
   ]
 
+  // Rutas API protegidas para acciones reservadas
+  const protectedApiPaths = [
+    '/api/favorites',
+    '/api/messages',
+    '/api/contact',
+  ]
+
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
   const isProtectedApiPath = protectedApiPaths.some(path => pathname.startsWith(path))
 
   // Redirigir a login si no autenticado en rutas protegidas
   if ((isProtectedPath || isProtectedApiPath) && !user) {
-    const redirectUrl = new URL(ROUTES.LOGIN, request.url)
+    const redirectUrl = new URL('/login', request.url)
     redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
   }
+
+  return supabaseResponse
+  //   return NextResponse.redirect(redirectUrl)
+  // }
 
   // Rutas de auth → redirigir si ya está logueado
   if (

@@ -5,36 +5,24 @@ import { useAuthModal } from '@/shared/hooks/useAuthModal';
 import { Home } from 'lucide-react';
 import { MODAL_LABELS } from '@/shared/constants/modal.constants';
 import { UI_LABELS } from '@/shared/constants/ui.constants';
-import { LoginForm } from '@/features/auth/components/login-form';
-import { RegisterForm } from '@/features/auth/components/register-form';
-import { AUTH } from '@/features/auth/constants/auth.constants';
 
 export const AuthModal = () => {
-  const { isOpen, onClose, activeTab, setActiveTab } = useAuthModal();
-  const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
+  const { isOpen, onClose } = useAuthModal();
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
   if (!isOpen) return null;
-
-  const handleClose = () => {
-    setVerificationEmail(null);
-    onClose();
-  };
-
-  const handleRegisterSuccess = (email: string) => {
-    setVerificationEmail(email);
-  };
 
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn"
-      onClick={handleClose}
+      onClick={onClose}
     >
       <div 
         className="bg-white rounded-4xl shadow-2xl w-full max-w-110 p-10 relative animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
         <button 
-          onClick={handleClose}
+          onClick={onClose}
           className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Cerrar modal"
         >
@@ -79,34 +67,18 @@ export const AuthModal = () => {
 
         
         <div className="animate-fadeIn">
-          {verificationEmail ? (
-            <div className="space-y-4 rounded-2xl border border-brand-100 bg-brand-50 p-5 text-center">
-              <h3 className="text-lg font-semibold text-text-primary">{AUTH.UI.VERIFY_EMAIL_TITLE}</h3>
-              <p className="text-sm text-text-secondary">{AUTH.UI.VERIFY_EMAIL_SUBTITLE}</p>
-              <p className="text-xs text-text-muted">{verificationEmail}</p>
-              <button
-                type="button"
-                className="text-sm font-semibold text-brand-600 hover:text-brand-700"
-                onClick={() => {
-                  setVerificationEmail(null);
-                  setActiveTab('login');
-                }}
-              >
-                {AUTH.UI.BACK_TO_LOGIN}
-              </button>
+          {activeTab === 'login' ? (
+            // TODO: Replace with LoginForm component when ready
+            <div className="text-center py-8">
+              <p className="text-gray-600">Login Form Component</p>
+              <p className="text-sm text-gray-400 mt-2">Implementar LoginForm aquí</p>
             </div>
           ) : (
-            activeTab === 'login' ? (
-              <LoginForm
-                onSuccess={handleClose}
-                onSwitchToRegister={() => setActiveTab('register')}
-              />
-            ) : (
-              <RegisterForm
-                onSuccess={handleRegisterSuccess}
-                onSwitchToLogin={() => setActiveTab('login')}
-              />
-            )
+            // TODO: Replace with RegisterForm component when ready
+            <div className="text-center py-8">
+              <p className="text-gray-600">Register Form Component</p>
+              <p className="text-sm text-gray-400 mt-2">Implementar RegisterForm aquí</p>
+            </div>
           )}
         </div>
       </div>
