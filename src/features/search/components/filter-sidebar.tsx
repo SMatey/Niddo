@@ -67,6 +67,18 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
                 </div>
             )}
 
+            {contentMode === 'users' && (
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
+                    <PriceRange
+                        minValue={filters.minBudget}
+                        maxValue={filters.maxBudget}
+                        onMinChange={(v) => updateFilter('minBudget', v)}
+                        onMaxChange={(v) => updateFilter('maxBudget', v)}
+                    />
+                </div>
+            )}
+
             {contentMode === 'properties' && (
                 <div className="space-y-3">
                     <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.lifestyle}</label>

@@ -5,6 +5,8 @@ export const DEFAULT_FILTERS: FilterState = {
     location: '',
     minPrice: '',
     maxPrice: '',
+    minBudget: '',
+    maxBudget: '',
     petFriendly: false,
     smoker: false,
     lifestyles: [],

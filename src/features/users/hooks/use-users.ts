@@ -53,6 +53,8 @@ export function useUsers(
             if (filters?.lifestyles?.length) {
                 params.set('lifestyles', filters.lifestyles.join(','))
             }
+            if (filters?.minBudget) params.set('minBudget', filters.minBudget)
+            if (filters?.maxBudget) params.set('maxBudget', filters.maxBudget)
 
             const response = await fetch(`${functionUrl}?${params}`, {
                 headers: {

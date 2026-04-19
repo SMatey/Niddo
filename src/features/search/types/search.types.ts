@@ -15,6 +15,8 @@ export interface FilterState {
     location: string
     minPrice: string
     maxPrice: string
+    minBudget: string
+    maxBudget: string
     petFriendly: boolean
     smoker: boolean
     lifestyles: string[]
@@ -53,6 +55,8 @@ export interface UserItem {
     isFavorite?: boolean
     minBudget?: string
     maxBudget?: string
+    budgetMin?: number
+    budgetMax?: number
     confidenceScore?: number
     lat?: number
     lng?: number

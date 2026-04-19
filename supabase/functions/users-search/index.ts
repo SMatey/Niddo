@@ -20,6 +20,8 @@ function formatUser(row: Record<string, unknown>, tagLabels: string[]) {
     isFavorite: false,
     minBudget: row.budget_min ? `$${row.budget_min}` : undefined,
     maxBudget: row.budget_max ? `$${row.budget_max}` : undefined,
+    budgetMin: row.budget_min ? Number(row.budget_min) : undefined,
+    budgetMax: row.budget_max ? Number(row.budget_max) : undefined,
     confidenceScore: row.trust_score,
     lat: row.latitude ?? undefined,
     lng: row.longitude ?? undefined,
@@ -41,6 +43,8 @@ Deno.serve(async (req) => {
     const url = new URL(req.url)
     const location = url.searchParams.get('location') ?? ''
     const lifestyles = url.searchParams.get('lifestyles')?.split(',').filter(Boolean) ?? []
+    const minBudget = url.searchParams.get('minBudget') ?? ''
+    const maxBudget = url.searchParams.get('maxBudget') ?? ''
     const page = Math.max(1, Number(url.searchParams.get('page') ?? 1))
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
@@ -94,6 +98,13 @@ Deno.serve(async (req) => {
         profilesQuery = profilesQuery.ilike('location', `%${location}%`)
       }
 
+      if (minBudget) {
+        profilesQuery = profilesQuery.gte('budget_min', Number(minBudget))
+      }
+      if (maxBudget) {
+        profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
+      }
+
       const { data: profilesData, error: profilesError, count } = await profilesQuery
         .range(offset, offset + pageSize - 1)
 
@@ -138,6 +149,13 @@ Deno.serve(async (req) => {
 
     if (location) {
       profilesQuery = profilesQuery.ilike('location', `%${location}%`)
+    }
+
+    if (minBudget) {
+      profilesQuery = profilesQuery.gte('budget_min', Number(minBudget))
+    }
+    if (maxBudget) {
+      profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
     }
 
     const { data: profilesData, error: profilesError, count } = await profilesQuery
