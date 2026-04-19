@@ -1,6 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { ROUTES } from '@/shared/constants/routes.constants'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -36,18 +35,11 @@ export async function middleware(request: NextRequest) {
 
   // Rutas protegidas dentro del grupo (dashboard)
   const protectedPaths = [
-    ROUTES.FAVORITES,
-    ROUTES.MY_PUBLICATIONS,
-    ROUTES.MESSAGES,
-    ROUTES.SETTINGS,
-    ROUTES.PROFILE,
-  ]
-
-  // Rutas API protegidas para acciones reservadas
-  const protectedApiPaths = [
-    '/api/favorites',
-    '/api/messages',
-    '/api/contact',
+    '/favoritos',
+    '/mis-publicaciones',
+    '/mensajes',
+    '/configuracion',
+    '/perfil',
   ]
 
   // Rutas API protegidas para acciones reservadas
@@ -72,11 +64,8 @@ export async function middleware(request: NextRequest) {
   // }
 
   // Rutas de auth → redirigir si ya está logueado
-  if (
-    (pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER) &&
-    user
-  ) {
-    const redirectTo = request.nextUrl.searchParams.get('redirect') || ROUTES.FAVORITES
+  if ((pathname === '/login' || pathname === '/register') && user) {
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/favoritos'
     return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 

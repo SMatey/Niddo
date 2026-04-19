@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/shared/components/Button/Button'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
-import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export function VerifyEmailMessage() {
   const { resendEmailVerification, isLoading } = useAuth()
@@ -59,11 +59,12 @@ export function VerifyEmailMessage() {
 
         <Button
           type="button"
-          className="w-full"
+          fullWidth
           onClick={handleResendEmail}
-          disabled={isLoading || cooldownSeconds > 0}
+          isLoading={isLoading}
+          disabled={cooldownSeconds > 0}
         >
-          {isLoading ? AUTH.UI.LOADING_LABEL : AUTH.UI.VERIFY_EMAIL_RESEND}
+          {AUTH.UI.VERIFY_EMAIL_RESEND}
         </Button>
 
         {message ? <p className="mb-4 mt-3 text-sm text-text-secondary">{message}</p> : null}

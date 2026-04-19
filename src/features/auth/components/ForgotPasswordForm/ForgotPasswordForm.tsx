@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
+import { Button } from '@/shared/components/Button/Button'
+import { Input } from '@/shared/components/Input/Input'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { AUTH_UI_STYLES } from '@/features/auth/constants/auth-ui.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
-import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { OAuthButtons } from '@/features/auth/components/OAuthButtons/OAuthButtons'
 import {
   forgotPasswordSchema,
   type ForgotPasswordValues,
@@ -70,22 +71,13 @@ export function ForgotPasswordForm() {
         <p className={AUTH_UI_STYLES.SUBTITLE}>{AUTH.UI.FORGOT_PASSWORD_SUBTITLE}</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className={AUTH_UI_STYLES.FORM} noValidate>
-          <div className="space-y-2">
-            <label
-              htmlFor="forgot-password-email"
-              className="block text-sm font-medium text-text-primary"
-            >
-              {AUTH.UI.LABEL_EMAIL}
-            </label>
-            <Input
-              id="forgot-password-email"
-              type="email"
-              placeholder={AUTH.PLACEHOLDERS.EMAIL}
-              error={Boolean(errors.email)}
-              {...register('email')}
-            />
-            {errors.email ? <p className="text-sm text-state-error">{errors.email.message}</p> : null}
-          </div>
+          <Input
+            label={AUTH.UI.LABEL_EMAIL}
+            type="email"
+            placeholder={AUTH.PLACEHOLDERS.EMAIL}
+            error={errors.email?.message}
+            {...register('email')}
+          />
 
           {errors.root ? (
             <p className={AUTH_UI_STYLES.FEEDBACK}>{errors.root.message}</p>
@@ -93,10 +85,12 @@ export function ForgotPasswordForm() {
 
           {statusMessage ? <p className={AUTH_UI_STYLES.FEEDBACK}>{statusMessage}</p> : null}
 
-          <Button type="submit" className="w-full" disabled={isLoading || cooldownSeconds > 0}>
-            {isLoading ? AUTH.UI.LOADING_LABEL : AUTH.UI.FORGOT_PASSWORD_SUBMIT}
+          <Button type="submit" fullWidth isLoading={isLoading} disabled={cooldownSeconds > 0}>
+            {AUTH.UI.FORGOT_PASSWORD_SUBMIT}
           </Button>
         </form>
+
+        <OAuthButtons mode="sign-in" />
 
         <p className={AUTH_UI_STYLES.HINT}>{AUTH.UI.GOOGLE_RECOVERY_HINT}</p>
 
