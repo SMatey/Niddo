@@ -1,17 +1,19 @@
 import { useState, useCallback } from 'react'
 import type { FilterState } from '../types/search.types'
 
-const defaultFilters: FilterState = {
+export const DEFAULT_FILTERS: FilterState = {
     location: '',
     minPrice: '',
     maxPrice: '',
+    minBudget: '',
+    maxBudget: '',
     petFriendly: false,
     smoker: false,
     lifestyles: [],
 }
 
 export function useSearchFilters() {
-    const [filters, setFilters] = useState<FilterState>(defaultFilters)
+    const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
 
     const updateFilter = useCallback(<K extends keyof FilterState>(
         key: K,
@@ -21,7 +23,7 @@ export function useSearchFilters() {
     }, [])
 
     const resetFilters = useCallback(() => {
-        setFilters(defaultFilters)
+        setFilters(DEFAULT_FILTERS)
     }, [])
 
     return {

@@ -1,3 +1,10 @@
+// TODO: [US-52] Implement progressive marker loading based on map viewport bounds
+// - Current pagination doesn't work well with map view (all results loaded at once)
+// - Need to fetch markers progressively as user pans/zooms the map
+// - Consider using Google Maps `onBoundsChanged` or `onIdle` to trigger fetches
+// - Implementation should update URL params and debounce rapid map movements
+// - Track state with useReducer for complex pagination logic in map mode
+
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
