@@ -1,6 +1,8 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { reviewsService } from '@/features/reviews/lib/review-service'
+import { ReviewSection } from '@/features/reviews/components/review-section'
 import { useUser } from '@/features/users/hooks/use-user'
 import { UserProfileHeader } from '@/features/users/components/user-profile-header'
 import { UserStatsCard } from '@/features/users/components/user-stats-card'
@@ -9,13 +11,26 @@ import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-
 import { UserLocationCard } from '@/features/users/components/user-location-card'
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
-import { ReviewsSection } from '@/features/reviews/components/reviews-section'
+import type { CreateReviewValues } from '@/features/reviews/schemas/create-review.schema'
 
 export default function UserDetailPage() {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
-  const { data: user, isLoading } = useUser(id)
+  const { data: user, isLoading, refresh } = useUser(id)
+
+  const handleCreateReview = async (values: CreateReviewValues) => {
+    reviewsService.createReview({
+      targetType: 'user',
+      targetId: id,
+      confirmationId: values.confirmationId,
+      rating: values.rating,
+      comment: values.comment,
+    })
+
+    // Comentario: refrescamos el detalle para que el resumen y la lista reflejen la nueva reseña al instante.
+    refresh()
+  }
 
   if (isLoading) {
     return (
@@ -59,11 +74,12 @@ export default function UserDetailPage() {
           <UserLocationCard user={user} />
         </div>
 
-        <ReviewsSection
+        <ReviewSection
           targetType="user"
-          targetId={user.id}
-          linkedProfileId={user.id}
-          targetDisplayName={user.name}
+          reviews={user.reviews}
+          summary={user.reviewSummary}
+          composer={user.reviewComposer}
+          onCreateReview={handleCreateReview}
         />
       </div>
     </main>

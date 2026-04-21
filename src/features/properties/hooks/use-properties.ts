@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { PropertyItem, FilterState } from '@/features/search/types/search.types'
+import { propertiesService } from '@/features/properties/lib/supabase-properties'
 import { parsePrice } from '@/shared/utils/parse-price'
 
 export interface UsePropertiesOptions {
@@ -42,8 +43,7 @@ export function useProperties(
         setIsLoading(true)
         setError(null)
 
-        // Mock data - replace with Supabase call
-        const mockData: PropertyItem[] = [
+        const legacyMockData: PropertyItem[] = [
             {
                 id: '1',
                 title: 'Apartamento céntrico',
@@ -72,7 +72,7 @@ export function useProperties(
             },
             {
                 id: '3',
-                title: 'Habitación en出租',
+                title: 'Habitación en alquiler',
                 location: 'Heredia, Costa Rica',
                 price: '$350/mes',
                 bedrooms: 1,
@@ -98,42 +98,44 @@ export function useProperties(
             },
         ]
 
-        // Apply local filtering (move to Supabase query when backend is ready)
+        const serviceProperties = propertiesService.getProperties()
+        // Comentario: usamos el catálogo del servicio para alinear listados y detalles, con respaldo local para evitar estados vacíos.
+        const mockData: PropertyItem[] = serviceProperties.length > 0 ? serviceProperties : legacyMockData
+
         let filtered = mockData
         if (filters) {
             if (filters.location) {
-                filtered = filtered.filter(p =>
-                    p.location.toLowerCase().includes(filters.location.toLowerCase())
+                filtered = filtered.filter((property) =>
+                    property.location.toLowerCase().includes(filters.location.toLowerCase())
                 )
             }
             if (filters.minPrice) {
                 const minNum = parsePrice(filters.minPrice)
-                filtered = filtered.filter(p => {
-                    const priceNum = parsePrice(p.price)
+                filtered = filtered.filter((property) => {
+                    const priceNum = parsePrice(property.price)
                     return !isNaN(priceNum) && priceNum >= minNum
                 })
             }
             if (filters.maxPrice) {
                 const maxNum = parsePrice(filters.maxPrice)
-                filtered = filtered.filter(p => {
-                    const priceNum = parsePrice(p.price)
+                filtered = filtered.filter((property) => {
+                    const priceNum = parsePrice(property.price)
                     return !isNaN(priceNum) && priceNum <= maxNum
                 })
             }
             if (filters.petFriendly) {
-                filtered = filtered.filter(p => p.petFriendly)
+                filtered = filtered.filter((property) => property.petFriendly)
             }
             if (filters.smoker) {
-                filtered = filtered.filter(p => p.smoker)
+                filtered = filtered.filter((property) => property.smoker)
             }
             if (filters.lifestyles.length > 0) {
-                filtered = filtered.filter(p =>
-                    filters.lifestyles.every(l => p.lifestyles?.includes(l))
+                filtered = filtered.filter((property) =>
+                    filters.lifestyles.every((lifestyle) => property.lifestyles?.includes(lifestyle))
                 )
             }
         }
 
-        // Simulate network delay
         const timer = setTimeout(() => {
             setData(filtered)
             setTotal(filtered.length)

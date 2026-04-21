@@ -2,6 +2,9 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { MapView } from '@/features/search/components/map-view'
+import { ReviewSection } from '@/features/reviews/components/review-section'
+import { reviewsService } from '@/features/reviews/lib/review-service'
+import type { CreateReviewValues } from '@/features/reviews/schemas/create-review.schema'
 import { useProperty } from '@/features/properties/hooks/use-property'
 import { PROPERTY_DETAIL_LABELS } from '@/features/properties/constants/property-detail.constants'
 import { PropertyInfoCard } from '@/features/properties/components/property-info-card'
@@ -12,13 +15,25 @@ import { PropertyRulesCard } from '@/features/properties/components/property-rul
 import { PropertyGallery } from '@/features/properties/components/property-gallery'
 import { PropertyTitle } from '@/features/properties/components/property-title'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
-import { ReviewsSection } from '@/features/reviews/components/reviews-section'
 
 export default function PropertyDetailPage() {
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
-  const { data: property, isLoading } = useProperty(id)
+  const { data: property, isLoading, refresh } = useProperty(id)
+
+  const handleCreateReview = async (values: CreateReviewValues) => {
+    reviewsService.createReview({
+      targetType: 'property',
+      targetId: id,
+      confirmationId: values.confirmationId,
+      rating: values.rating,
+      comment: values.comment,
+    })
+
+    // Comentario: refrescamos el detalle para que la reseña recién creada también actualice el perfil asociado.
+    refresh()
+  }
 
   if (isLoading) {
     return (
@@ -88,11 +103,12 @@ export default function PropertyDetailPage() {
           <PropertyRulesCard rules={property.rules} />
         </div>
 
-        <ReviewsSection
+        <ReviewSection
           targetType="property"
-          targetId={property.id}
-          linkedProfileId={property.hostId}
-          targetDisplayName={property.title}
+          reviews={property.reviews}
+          summary={property.reviewSummary}
+          composer={property.reviewComposer}
+          onCreateReview={handleCreateReview}
         />
       </div>
     </main>

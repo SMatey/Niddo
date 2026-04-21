@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { PropertyDetail } from '@/features/search/types/search.types'
+import { propertiesService } from '@/features/properties/lib/supabase-properties'
 
 export interface UsePropertyResult {
     data: PropertyDetail | null
     isLoading: boolean
     error: Error | null
+    refresh: () => void
 }
 
-export function useProperty(id: string) {
+export function useProperty(id: string, viewerId?: string | null): UsePropertyResult {
     const [data, setData] = useState<PropertyDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<Error | null>(null)
+    const [refreshToken, setRefreshToken] = useState(0)
 
     useEffect(() => {
         if (!id) {
@@ -30,7 +33,7 @@ export function useProperty(id: string) {
         //   .eq('id', id)
         //   .single()
 
-        const mockData: PropertyDetail = {
+        const legacyMockData: PropertyDetail = {
             id,
             title: 'Apartamento céntrico',
             location: 'San José, Costa Rica',
@@ -55,15 +58,35 @@ export function useProperty(id: string) {
                 'No hacer ruido después de las 10pm',
                 'Respetar las áreas comunes',
             ],
+            reviews: [],
+            reviewSummary: {
+                averageRating: 0,
+                totalReviews: 0,
+                confirmedReviews: 0,
+            },
+            reviewComposer: null,
         }
 
         const timer = setTimeout(() => {
-            setData(mockData)
-            setIsLoading(false)
+            try {
+                // Comentario: priorizamos el detalle enriquecido del servicio y usamos un mock local si aún no hay datos resueltos.
+                setData(propertiesService.getPropertyById(id, viewerId) ?? legacyMockData)
+                setIsLoading(false)
+            } catch (serviceError) {
+                // Comentario: el mock local evita romper la pantalla mientras el origen real de datos sigue en transición.
+                setData(legacyMockData)
+                setError(serviceError instanceof Error ? serviceError : new Error('No se pudo cargar la propiedad.'))
+                setIsLoading(false)
+            }
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [id])
+    }, [id, refreshToken, viewerId])
 
-    return { data, isLoading, error }
+    return {
+        data,
+        isLoading,
+        error,
+        refresh: () => setRefreshToken((currentToken) => currentToken + 1),
+    }
 }

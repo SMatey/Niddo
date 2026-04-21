@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { UserItem, FilterState } from '@/features/search/types/search.types'
+import { usersService } from '@/features/users/lib/supabase-users'
 
 export interface UseUsersOptions {
     page?: number
@@ -41,8 +42,7 @@ export function useUsers(
         setIsLoading(true)
         setError(null)
 
-        // Mock data - replace with Supabase call
-        const mockData: UserItem[] = [
+        const legacyMockData: UserItem[] = [
             {
                 id: '1',
                 name: 'María García',
@@ -103,22 +103,24 @@ export function useUsers(
             },
         ]
 
-        // Apply local filtering (move to Supabase query when backend is ready)
+        const serviceUsers = usersService.getUsers()
+        // Comentario: usamos el catálogo del servicio para alinear listados y detalles, con respaldo local para evitar estados vacíos.
+        const mockData: UserItem[] = serviceUsers.length > 0 ? serviceUsers : legacyMockData
+
         let filtered = mockData
         if (filters) {
             if (filters.location) {
-                filtered = filtered.filter(u =>
-                    u.location?.toLowerCase().includes(filters.location.toLowerCase())
+                filtered = filtered.filter((user) =>
+                    user.location?.toLowerCase().includes(filters.location.toLowerCase())
                 )
             }
             if (filters.lifestyles.length > 0) {
-                filtered = filtered.filter(u =>
-                    filters.lifestyles.every(l => u.lifestyles?.includes(l))
+                filtered = filtered.filter((user) =>
+                    filters.lifestyles.every((lifestyle) => user.lifestyles?.includes(lifestyle))
                 )
             }
         }
 
-        // Simulate network delay
         const timer = setTimeout(() => {
             setData(filtered)
             setTotal(filtered.length)
