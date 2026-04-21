@@ -39,9 +39,4 @@ next-env.d.ts
 .claude-flow
 .vscode
 .swarm
-
-# Supabase
-supabase/.temp
-supabase/migrations/.temp
-src/lib/supabase/migrations
 .swc

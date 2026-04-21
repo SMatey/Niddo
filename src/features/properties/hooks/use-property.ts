@@ -19,33 +19,50 @@ export function useProperty(id: string) {
             return
         }
 
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const functionUrl = `${supabaseUrl}/functions/v1/property-detail`
+        setIsLoading(true)
+        setError(null)
 
-        async function fetchProperty() {
-            setIsLoading(true)
-            setError(null)
+        // TODO(backend): Replace with Supabase query
+        // Example:
+        // const { data, error } = await supabase
+        //   .from('properties')
+        //   .select('*')
+        //   .eq('id', id)
+        //   .single()
 
-            const response = await fetch(`${functionUrl}?id=${id}`, {
-                headers: {
-                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-                },
-            })
-
-            if (!response.ok) {
-                setError(new Error(`HTTP ${response.status}`))
-                setData(null)
-                setIsLoading(false)
-                return
-            }
-
-            const result = await response.json()
-            setData(result)
-            setIsLoading(false)
+        const mockData: PropertyDetail = {
+            id,
+            title: 'Apartamento céntrico',
+            location: 'San José, Costa Rica',
+            price: '$850/mes',
+            bedrooms: 2,
+            bathrooms: 1,
+            squareMeters: 65,
+            lat: 9.9281,
+            lng: -84.0907,
+            lifestyles: ['Piscina', 'Gimnasio', 'Estacionamiento', 'Seguridad 24h'],
+            isFavorite: false,
+            images: [],
+            description: 'Hermoso apartamento en el corazón de San José, cerca de tiendas y transporte público.',
+            hostId: 'host-1',
+            hostName: 'María García',
+            hostVerified: true,
+            hostConfidence: 92,
+            memberSince: '2022',
+            rules: [
+                'No fumar dentro del apartamento',
+                'No mascotas sin previa aprobación',
+                'No hacer ruido después de las 10pm',
+                'Respetar las áreas comunes',
+            ],
         }
 
-        fetchProperty()
+        const timer = setTimeout(() => {
+            setData(mockData)
+            setIsLoading(false)
+        }, 300)
+
+        return () => clearTimeout(timer)
     }, [id])
 
     return { data, isLoading, error }

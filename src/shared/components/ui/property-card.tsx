@@ -3,10 +3,8 @@
 import Link from 'next/link'
 import { Tag } from './tag'
 import { FavoriteButton } from './favorite-button'
-import { PropertyBadge } from './property-badge'
 import { CARD_LABELS } from '@/features/search/constants/search.constants'
 import type { PropertyCardProps } from './types'
-import type { BadgeItem } from './types'
 
 export function PropertyCard({
   id,
@@ -17,37 +15,11 @@ export function PropertyCard({
   bedrooms,
   bathrooms,
   squareMeters,
-  amenities = [],
-  petFriendly,
-  smoker,
+  lifestyles = [],
   isFavorite = false,
   onFavoriteToggle,
   className,
 }: PropertyCardProps) {
-  const badges: BadgeItem[] = []
-
-  if (petFriendly) {
-    badges.push({
-      type: 'pet-friendly',
-      label: CARD_LABELS.petAllowed,
-      variant: 'success',
-    })
-  }
-
-  if (smoker) {
-    badges.push({
-      type: 'smoking-allowed',
-      label: CARD_LABELS.smoker,
-      variant: 'warning',
-    })
-  } else {
-    badges.push({
-      type: 'no-smoking',
-      label: CARD_LABELS.noSmokers,
-      variant: 'info',
-    })
-  }
-
   return (
     <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
       <div className="relative aspect-video bg-surface-muted">
@@ -72,9 +44,6 @@ export function PropertyCard({
             />
           </div>
         )}
-        <div className="absolute bottom-3 left-3 z-10">
-          <PropertyBadge badges={badges} />
-        </div>
       </div>
       <Link href={`/propiedad/${id}`} className="block p-4 space-y-3">
         <div>
@@ -87,10 +56,10 @@ export function PropertyCard({
           {bathrooms != null && <span>{bathrooms} {CARD_LABELS.bathroom}</span>}
           {squareMeters != null && <span>{squareMeters} {CARD_LABELS.squareMeter}</span>}
         </div>
-        {amenities.length > 0 && (
+        {lifestyles.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {amenities.map((a) => (
-              <Tag key={a} variant="outline">{a}</Tag>
+            {lifestyles.map((l) => (
+              <Tag key={l} variant="outline">{l}</Tag>
             ))}
           </div>
         )}

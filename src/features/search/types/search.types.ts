@@ -1,22 +1,10 @@
 export type ContentMode = 'properties' | 'users'
 export type ViewMode = 'list' | 'map'
 
-// Re-export UI types from shared location for backward compatibility
-export type {
-    BadgeItem,
-    PropertyBadgeProps,
-    BadgeVariant,
-    PageButton,
-    PageButtonType,
-    PaginationProps,
-} from '@/shared/components/ui/types'
-
 export interface FilterState {
     location: string
     minPrice: string
     maxPrice: string
-    minBudget: string
-    maxBudget: string
     petFriendly: boolean
     smoker: boolean
     lifestyles: string[]
@@ -40,7 +28,7 @@ export interface PropertyItem {
     lng?: number
     petFriendly?: boolean
     smoker?: boolean
-    amenities?: string[]
+    lifestyles?: string[]
     isFavorite?: boolean
 }
 
@@ -55,8 +43,6 @@ export interface UserItem {
     isFavorite?: boolean
     minBudget?: string
     maxBudget?: string
-    budgetMin?: number
-    budgetMax?: number
     confidenceScore?: number
     lat?: number
     lng?: number
@@ -92,11 +78,6 @@ export interface ResultsDisplayProps {
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
-    totalProperties?: number
-    totalUsers?: number
-    currentPage?: number
-    totalPages?: number
-    onPageChange?: (page: number) => void
 }
 
 export interface PropertyDetail extends PropertyItem {
@@ -124,35 +105,6 @@ export interface MobileFiltersDrawerProps {
     isOpen: boolean
     onClose: () => void
     children: React.ReactNode
-}
-
-export type BadgeVariant = 'success' | 'info' | 'warning'
-
-export interface BadgeItem {
-    type: string
-    label: string
-    variant: BadgeVariant
-}
-
-export interface PropertyBadgeProps {
-    badges?: BadgeItem[]
-    className?: string
-}
-
-export type PageButtonType = 'page' | 'prev' | 'next' | 'ellipsis'
-
-export interface PageButton {
-    type: PageButtonType
-    page?: number
-    label: string
-    disabled?: boolean
-}
-
-export interface PaginationProps {
-    currentPage: number
-    totalPages: number
-    onPageChange: (page: number) => void
-    className?: string
 }
 
 export interface Point {

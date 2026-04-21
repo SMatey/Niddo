@@ -9,6 +9,7 @@ import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-
 import { UserLocationCard } from '@/features/users/components/user-location-card'
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { ReviewsSection } from '@/features/reviews/components/reviews-section'
 
 export default function UserDetailPage() {
   const params = useParams()
@@ -57,6 +58,13 @@ export default function UserDetailPage() {
           <UserLifestylesCard user={user} />
           <UserLocationCard user={user} />
         </div>
+
+        <ReviewsSection
+          targetType="user"
+          targetId={user.id}
+          linkedProfileId={user.id}
+          targetDisplayName={user.name}
+        />
       </div>
     </main>
   )

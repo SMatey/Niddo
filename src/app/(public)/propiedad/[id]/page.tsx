@@ -12,6 +12,7 @@ import { PropertyRulesCard } from '@/features/properties/components/property-rul
 import { PropertyGallery } from '@/features/properties/components/property-gallery'
 import { PropertyTitle } from '@/features/properties/components/property-title'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { ReviewsSection } from '@/features/reviews/components/reviews-section'
 
 export default function PropertyDetailPage() {
   const params = useParams()
@@ -83,9 +84,16 @@ export default function PropertyDetailPage() {
               />
             </div>
           </div>
-          <PropertyAmenitiesCard amenities={property.amenities ?? []} />
+          <PropertyAmenitiesCard lifestyles={property.lifestyles ?? []} />
           <PropertyRulesCard rules={property.rules} />
         </div>
+
+        <ReviewsSection
+          targetType="property"
+          targetId={property.id}
+          linkedProfileId={property.hostId}
+          targetDisplayName={property.title}
+        />
       </div>
     </main>
   )

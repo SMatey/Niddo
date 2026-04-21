@@ -19,33 +19,42 @@ export function useUser(id: string) {
             return
         }
 
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const functionUrl = `${supabaseUrl}/functions/v1/user-detail`
+        setIsLoading(true)
+        setError(null)
 
-        async function fetchUser() {
-            setIsLoading(true)
-            setError(null)
+        // TODO(backend): Replace with Supabase query
+        // Example:
+        // const { data, error } = await supabase
+        //   .from('users')
+        //   .select('*')
+        //   .eq('id', id)
+        //   .single()
 
-            const response = await fetch(`${functionUrl}?id=${id}`, {
-                headers: {
-                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-                },
-            })
-
-            if (!response.ok) {
-                setError(new Error(`HTTP ${response.status}`))
-                setData(null)
-                setIsLoading(false)
-                return
-            }
-
-            const result = await response.json()
-            setData(result)
-            setIsLoading(false)
+        const mockData: UserDetail = {
+            id,
+            name: 'María García',
+            age: 24,
+            bio: 'Estudiante de medicina buscando compañero de cuarto tranquilo y responsable. No fumo, tengo una gatita llamada Luna.',
+            location: 'San José, Costa Rica',
+            imageUrl: undefined,
+            verified: true,
+            isFavorite: false,
+            minBudget: '$400',
+            maxBudget: '$600',
+            confidenceScore: 85,
+            lat: 9.9281,
+            lng: -84.0907,
+            lifestyles: ['Limpieza', 'Calefacción', 'Internet fiber'],
+            memberSince: '2023',
+            description: 'Busco un lugar tranquilo para estudiar y descansar.',
         }
 
-        fetchUser()
+        const timer = setTimeout(() => {
+            setData(mockData)
+            setIsLoading(false)
+        }, 300)
+
+        return () => clearTimeout(timer)
     }, [id])
 
     return { data, isLoading, error }
