@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { LogOut } from 'lucide-react'
 import { UserAvatar } from './user-avatar'
-import type { ProfileDropdownProps } from '../types'
+import type { ProfileDropdownProps } from '../navbar.types'
 
 export function ProfileDropdown({
   user,

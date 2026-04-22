@@ -3,14 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Search, MessageCircle, Building2, Heart, Settings, X, Menu } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
 import { NotificationIcon } from './components/notification-icon'
 import { MessageIcon } from './components/message-icon'
 import { UserAvatar } from './components/user-avatar'
 import { ProfileDropdown } from './components/profile-dropdown'
 import { MobileDrawer } from './components/mobile-drawer'
-import { AUTHENTICATED_NAVBAR_CONFIG } from './constants/authenticated-navbar.constants'
-import type { AuthenticatedNavbarProps } from './types'
+import { AUTHENTICATED_NAVBAR_CONFIG, NAVBAR_CONFIG } from './constants/authenticated-navbar.constants'
+import { useNavbarState } from './hooks'
+import type { AuthenticatedNavbarProps } from './navbar.types'
 
 const iconMap = {
   home: Home,
@@ -28,27 +28,11 @@ export function AuthenticatedNavbar({
   messagesCount = 0,
   onLogout,
 }: AuthenticatedNavbarProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const profileRef = useRef<HTMLDivElement>(null)
+  const { isMenuOpen, setIsMenuOpen, isProfileOpen, setIsProfileOpen, profileRef } = useNavbarState()
   const pathname = usePathname()
   const { NAVIGATION_LINKS, MENU_LINKS } = AUTHENTICATED_NAVBAR_CONFIG
 
   const isActive = (href: string) => pathname === href
-
-  // Cerrar dropdown al hacer click fuera
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false)
-      }
-    }
-
-    if (isProfileOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isProfileOpen])
 
   // Mapear los links del menú con iconos
   const menuLinksWithIcons = MENU_LINKS.map((link) => ({
@@ -87,7 +71,7 @@ export function AuthenticatedNavbar({
               <div className="bg-blue-600 rounded-full p-2">
                 <Home className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Niddo</span>
+              <span className="text-xl font-bold text-gray-900">{NAVBAR_CONFIG.APP_NAME}</span>
             </Link>
 
             {/* Links Centrales */}
@@ -139,7 +123,7 @@ export function AuthenticatedNavbar({
             <div className="bg-blue-600 rounded-full p-2">
               <Home className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-gray-900">Niddo</span>
+            <span className="font-bold text-gray-900">{NAVBAR_CONFIG.APP_NAME}</span>
           </Link>
 
           {/* Acciones */}
@@ -149,22 +133,22 @@ export function AuthenticatedNavbar({
 
             {/* Menu Button */}
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-gray-900"
               type="button"
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Drawer */}
         <MobileDrawer
-          isOpen={isOpen}
+          isOpen={isMenuOpen}
           menuLinks={menuLinksWithIcons as any}
           user={user}
           activeHref={pathname}
-          onLinkClick={() => setIsOpen(false)}
+          onLinkClick={() => setIsMenuOpen(false)}
         />
       </nav>
     </>
