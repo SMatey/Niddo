@@ -49,18 +49,3 @@ export const AUTHENTICATED_NAVBAR_CONFIG = {
     },
   ],
 }
-
-export const CURRENT_USER_MOCK = {
-  id: 'user-123',
-  name: 'Carlos García',
-  email: 'carlos@example.com',
-  avatar: 'C',
-}
-
-export const NOTIFICATIONS_MOCK = {
-  unread_count: 3,
-}
-
-export const MESSAGES_MOCK = {
-  unread_count: 2,
-}

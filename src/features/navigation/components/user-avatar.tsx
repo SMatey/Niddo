@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { UserAvatarProps } from '@/shared/types/types'
+import type { UserAvatarProps } from '../navbar.types'
 
 export function UserAvatar({ avatar, onClick, size = 'md' }: UserAvatarProps) {
   const sizeClasses = {
