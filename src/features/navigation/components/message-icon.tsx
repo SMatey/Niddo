@@ -2,11 +2,7 @@
 
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
-
-interface MessageIconProps {
-  unreadCount: number
-  href?: string
-}
+import type { MessageIconProps } from '../types'
 
 export function MessageIcon({ unreadCount, href = '/mensajes' }: MessageIconProps) {
   return (

@@ -9,8 +9,7 @@ import { MODAL_LABELS } from '@/shared/constants/modal.constants'
 
 const NAVIGATION_LINKS = [
   { href: '/', label: 'Inicio' },
-  { href: '/about', label: 'Acerca de' },
-  { href: '/contact', label: 'Contacto' },
+  { href: '/explorar', label: 'Explorar' },
 ]
 
 export function PublicNavbar() {

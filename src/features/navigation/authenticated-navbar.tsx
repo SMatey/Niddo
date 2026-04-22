@@ -9,7 +9,8 @@ import { MessageIcon } from './components/message-icon'
 import { UserAvatar } from './components/user-avatar'
 import { ProfileDropdown } from './components/profile-dropdown'
 import { MobileDrawer } from './components/mobile-drawer'
-import { AUTHENTICATED_NAVBAR_CONFIG, CURRENT_USER_MOCK, NOTIFICATIONS_MOCK, MESSAGES_MOCK } from './constants/authenticated-navbar.constants'
+import { AUTHENTICATED_NAVBAR_CONFIG } from './constants/authenticated-navbar.constants'
+import type { AuthenticatedNavbarProps } from './types'
 
 const iconMap = {
   home: Home,
@@ -21,7 +22,12 @@ const iconMap = {
   settings: Settings,
 }
 
-export function AuthenticatedNavbar() {
+export function AuthenticatedNavbar({
+  user,
+  notificationsCount = 0,
+  messagesCount = 0,
+  onLogout,
+}: AuthenticatedNavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
@@ -52,6 +58,19 @@ export function AuthenticatedNavbar() {
         {(() => {
           const Icon = iconMap[link.icon as keyof typeof iconMap]
           return <Icon className="w-5 h-5" />
+        })()}
+      </div>
+    ),
+  }))
+
+  // Mapear los items del dropdown del perfil con iconos
+  const profileMenuItems = MENU_LINKS.slice(3).map((link) => ({
+    ...link,
+    icon: (
+      <div key={`profile-icon-${link.href}`}>
+        {(() => {
+          const Icon = iconMap[link.icon as keyof typeof iconMap]
+          return <Icon className="w-4 h-4" />
         })()}
       </div>
     ),
@@ -88,22 +107,23 @@ export function AuthenticatedNavbar() {
 
             {/* Acciones Derecha */}
             <div className="flex items-center gap-6">
-              <NotificationIcon unreadCount={NOTIFICATIONS_MOCK.unread_count} />
-              <MessageIcon unreadCount={MESSAGES_MOCK.unread_count} />
+              <NotificationIcon unreadCount={notificationsCount} />
+              <MessageIcon unreadCount={messagesCount} />
 
               {/* Perfil Dropdown */}
               <div className="relative" ref={profileRef}>
                 <UserAvatar
-                  avatar={CURRENT_USER_MOCK.avatar}
-onClick={() => {
-  setIsProfileOpen(!isProfileOpen)
-}}
+                  avatar={user.avatar}
+                  onClick={() => {
+                    setIsProfileOpen(!isProfileOpen)
+                  }}
                   size="md"
                 />
                 <ProfileDropdown
-                  user={CURRENT_USER_MOCK}
+                  user={user}
                   isOpen={isProfileOpen}
                   onClose={() => setIsProfileOpen(false)}
+                  menuItems={profileMenuItems as any}
                 />
               </div>
             </div>
@@ -124,8 +144,8 @@ onClick={() => {
 
           {/* Acciones */}
           <div className="flex items-center gap-3">
-            <NotificationIcon unreadCount={NOTIFICATIONS_MOCK.unread_count} />
-            <MessageIcon unreadCount={MESSAGES_MOCK.unread_count} />
+            <NotificationIcon unreadCount={notificationsCount} />
+            <MessageIcon unreadCount={messagesCount} />
 
             {/* Menu Button */}
             <button
@@ -142,7 +162,7 @@ onClick={() => {
         <MobileDrawer
           isOpen={isOpen}
           menuLinks={menuLinksWithIcons as any}
-          user={CURRENT_USER_MOCK}
+          user={user}
           activeHref={pathname}
           onLinkClick={() => setIsOpen(false)}
         />

@@ -19,3 +19,8 @@ export const NAVBAR_CONFIG = {
     REGISTER_LABEL: 'Registro',
   },
 }
+
+export const FOOTER_CONFIG = {
+  APP_NAME: 'Niddo',
+  COPYRIGHT_TEXT: 'Todos los derechos reservados.',
+}
