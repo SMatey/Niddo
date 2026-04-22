@@ -18,7 +18,7 @@ import type { Property, PropertyStatus } from '../types';
 
 const currencyFormatter = new Intl.NumberFormat('es-MX', {
   style: 'currency',
-  currency: 'MXN', // Ajusta a CRC si usas colones como en la imagen
+  currency: 'CRC', 
   maximumFractionDigits: 0,
 });
 
