@@ -16,6 +16,12 @@ export interface ProfileMenuItem {
   icon: React.ReactNode
 }
 
+export interface UserAvatarProps {
+  avatar: string
+  onClick?: () => void
+  size?: 'sm' | 'md' | 'lg'
+}
+
 export interface MobileDrawerProps {
   isOpen: boolean
   menuLinks: MenuLink[]
