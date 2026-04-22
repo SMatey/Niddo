@@ -23,7 +23,7 @@ export interface PropertyHostCardProps {
 }
 
 export interface PropertyAmenitiesCardProps {
-    lifestyles: string[]
+    amenities: string[]
 }
 
 export interface PropertyRulesCardProps {

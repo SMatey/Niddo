@@ -4,35 +4,35 @@ import { Input } from '@/shared/components/ui/input'
 import { Toggle } from '@/shared/components/ui/toggle'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, FILTER_LABELS } from '../constants/search.constants'
-import type { FilterState, FilterSidebarProps } from '../types/search.types'
+import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS } from '../constants/search.constants'
+import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
+import { DEFAULT_FILTERS } from '../hooks/use-search-filters'
 
 export type { FilterState, FilterSidebarProps }
 
-export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
+interface FilterSidebarWithModeProps extends FilterSidebarProps {
+    contentMode: ContentMode
+}
+
+export function FilterSidebar({ filters, onFilterChange, contentMode = 'properties' }: FilterSidebarWithModeProps) {
     const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
         onFilterChange?.({ ...filters, [key]: value })
     }
 
-    const toggleLifestyle = (lifestyle: string) => {
+    const toggleTag = (tag: string) => {
         const current = filters.lifestyles
-        const updated = current.includes(lifestyle)
-            ? current.filter((l) => l !== lifestyle)
-            : [...current, lifestyle]
+        const updated = current.includes(tag)
+            ? current.filter((l) => l !== tag)
+            : [...current, tag]
         updateFilter('lifestyles', updated)
     }
 
     const clearFilters = () => {
-        const defaultFilters: FilterState = {
-            location: '',
-            minPrice: '',
-            maxPrice: '',
-            petFriendly: false,
-            smoker: false,
-            lifestyles: [],
-        }
-        onFilterChange?.(defaultFilters)
+        onFilterChange?.(DEFAULT_FILTERS)
     }
+
+    const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
+    const tagLabel = contentMode === 'properties' ? 'Amenidades' : 'Estilo de vida'
 
     return (
         <aside className="w-full space-y-6 p-4 bg-surface rounded-lg border border-border">
@@ -55,44 +55,60 @@ export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
                 />
             </div>
 
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
-                <PriceRange
-                    minValue={filters.minPrice}
-                    maxValue={filters.maxPrice}
-                    onMinChange={(v) => updateFilter('minPrice', v)}
-                    onMaxChange={(v) => updateFilter('maxPrice', v)}
-                />
-            </div>
+            {contentMode === 'properties' && (
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
+                    <PriceRange
+                        minValue={filters.minPrice}
+                        maxValue={filters.maxPrice}
+                        onMinChange={(v) => updateFilter('minPrice', v)}
+                        onMaxChange={(v) => updateFilter('maxPrice', v)}
+                    />
+                </div>
+            )}
 
-            <div className="space-y-3">
-                <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.lifestyle}</label>
-                <Toggle
-                    checked={filters.petFriendly}
-                    onChange={(v) => updateFilter('petFriendly', v)}
-                    label={FILTER_LABELS.petFriendly}
-                />
-                <Toggle
-                    checked={filters.smoker}
-                    onChange={(v) => updateFilter('smoker', v)}
-                    label={FILTER_LABELS.smoker}
-                />
-            </div>
+            {contentMode === 'users' && (
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
+                    <PriceRange
+                        minValue={filters.minBudget}
+                        maxValue={filters.maxBudget}
+                        onMinChange={(v) => updateFilter('minBudget', v)}
+                        onMaxChange={(v) => updateFilter('maxBudget', v)}
+                    />
+                </div>
+            )}
+
+            {contentMode === 'properties' && (
+                <div className="space-y-3">
+                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.lifestyle}</label>
+                    <Toggle
+                        checked={filters.petFriendly}
+                        onChange={(v) => updateFilter('petFriendly', v)}
+                        label={FILTER_LABELS.petFriendly}
+                    />
+                    <Toggle
+                        checked={filters.smoker}
+                        onChange={(v) => updateFilter('smoker', v)}
+                        label={FILTER_LABELS.smoker}
+                    />
+                </div>
+            )}
 
             <div className="space-y-2">
-                <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.other}</label>
+                <label className="text-sm font-medium text-text-secondary">{tagLabel}</label>
                 <div className="flex flex-wrap gap-2">
-                    {LIFESTYLES.map((lifestyle) => (
+                    {availableTags.map((tag) => (
                         <Tag
-                            key={lifestyle}
-                            selected={filters.lifestyles.includes(lifestyle)}
+                            key={tag}
+                            selected={filters.lifestyles.includes(tag)}
                             onClick={(e) => {
                                 e.stopPropagation()
-                                toggleLifestyle(lifestyle)
+                                toggleTag(tag)
                             }}
                             variant="outline"
                         >
-                            {lifestyle}
+                            {tag}
                         </Tag>
                     ))}
                 </div>

@@ -1,5 +1,5 @@
 export const PROPERTY_DETAIL_LABELS = {
-  notFound: 'Propiedad no encontrada',
+    notFound: 'Propiedad no encontrada',
     noImages: 'Sin imágenes',
     bedroom: 'hab',
     bathroom: 'baños',
@@ -17,4 +17,4 @@ export const PROPERTY_DETAIL_LABELS = {
     petAllowed: 'Mascotas permitidas',
     noPets: 'No mascotas',
     noSmokers: 'No fumadores',
-} as const;
+} as const

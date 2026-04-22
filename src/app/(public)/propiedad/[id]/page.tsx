@@ -83,7 +83,7 @@ export default function PropertyDetailPage() {
               />
             </div>
           </div>
-          <PropertyAmenitiesCard lifestyles={property.lifestyles ?? []} />
+          <PropertyAmenitiesCard amenities={property.amenities ?? []} />
           <PropertyRulesCard rules={property.rules} />
         </div>
       </div>

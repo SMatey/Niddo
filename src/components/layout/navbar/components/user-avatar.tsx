@@ -1,10 +1,7 @@
 'use client'
 
-interface UserAvatarProps {
-  avatar: string
-  onClick?: () => void
-  size?: 'sm' | 'md' | 'lg'
-}
+import { cn } from '@/lib/utils'
+import type { UserAvatarProps } from '@/shared/types/types'
 
 export function UserAvatar({ avatar, onClick, size = 'md' }: UserAvatarProps) {
   const sizeClasses = {
@@ -16,9 +13,10 @@ export function UserAvatar({ avatar, onClick, size = 'md' }: UserAvatarProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors cursor-pointer ${
+      className={cn(
+        'flex items-center justify-center rounded-full bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors cursor-pointer',
         sizeClasses[size]
-      }`}
+      )}
       type="button"
     >
       {avatar}
