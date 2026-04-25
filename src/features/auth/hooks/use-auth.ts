@@ -14,15 +14,9 @@ import {
 	signOut,
 	signUpWithPassword,
 	updatePassword,
-	type AuthResult,
-	type RegisterInput,
 } from '@/features/auth/lib/supabase-auth'
-
-// Otra interface que debería de estar un archivo types. 
-interface SignInInput {
-	email: string
-	password: string
-}
+import type { SignInInput } from '@/features/auth/hooks/types/use-auth.types'
+import type { AuthResult, RegisterInput } from '@/features/auth/lib/types/supabase-auth.types'
 
 export function useAuth() {
 	const [isLoading, setIsLoading] = useState(false)
