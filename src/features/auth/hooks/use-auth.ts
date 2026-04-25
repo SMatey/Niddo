@@ -18,6 +18,7 @@ import {
 	type RegisterInput,
 } from '@/features/auth/lib/supabase-auth'
 
+// Otra interface que debería de estar un archivo types. 
 interface SignInInput {
 	email: string
 	password: string

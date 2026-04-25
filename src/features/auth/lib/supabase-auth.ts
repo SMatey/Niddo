@@ -3,7 +3,8 @@ import { createClient } from '@/lib/supabase/client'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
 
-export interface AuthResult {
+// Estas interfaces deberían ir en un archivo types. 
+export interface AuthResult { 
 	error: string | null
 }
 
