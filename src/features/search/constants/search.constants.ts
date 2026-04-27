@@ -10,10 +10,6 @@ export const CARD_LABELS = {
     upTo: 'Hasta',
     noMapPoints: 'No hay puntos geográficos para mostrar en el mapa',
     noResults: 'No hay resultados para mostrar',
-    petAllowed: 'Mascotas permitidas',
-    noPets: 'No mascotas',
-    noSmokers: 'No fumadores',
-    smoker: 'Fumadores',
 } as const
 
 export const FILTER_LABELS = {
@@ -21,10 +17,9 @@ export const FILTER_LABELS = {
     location: 'Ubicación',
     budget: 'Presupuesto',
     lifestyle: 'Estilo de vida',
+    amenities: 'Amenidades',
     other: 'Otros',
     locationPlaceholder: 'Ciudad, barrio o dirección...',
-    petFriendly: 'Solo mascotas permitidas',
-    smoker: 'Solo no fumar',
     clearFilters: 'Limpiar filtros',
     filtersButton: 'Filtros',
     closeFilters: 'Cerrar',
@@ -53,6 +48,8 @@ export const LIFESTYLES = [
     'Social',
     'Estudiante',
     'Vegano',
+    'Pet friendly',
+    'No fumador',
 ] as const
 
 export const AMENITY_TAGS = [
@@ -88,15 +85,19 @@ export const MAP_LABELS = {
     loadError: 'Error al cargar el mapa',
 } as const
 
+export const MAP_COORDINATES = {
+    SAN_JOSE: {
+        lat: 9.9281,
+        lng: -84.0907,
+    },
+} as const
+
 export const MAP_CONFIG = {
     containerStyle: {
         width: '100%',
         height: '100%',
     },
-    defaultCenter: {
-        lat: 9.9281,
-        lng: -84.0907,
-    },
+    defaultCenter: MAP_COORDINATES.SAN_JOSE,
     defaultZoom: 12,
     options: {
         disableDefaultUI: false,
@@ -143,10 +144,35 @@ export const PAGINATION_CLASSES = {
 
 export const PAGINATION_CONFIG = {
     maxVisiblePages: 5,
+    defaultPageSize: 9,
+    firstPage: 1,
+    bufferThreshold: 2,
 } as const
 
 export const PAGINATION_LABELS = {
     previous: 'Anterior',
     next: 'Siguiente',
     ellipsis: '...',
+} as const
+
+export const ROUTING_PATHS = {
+    PROPERTY_DETAIL: '/propiedad',
+    USER_DETAIL: '/usuario',
+} as const
+
+export const SEARCH_DEFAULT_FILTERS = {
+    location: '',
+    minPrice: '',
+    maxPrice: '',
+    minBudget: '',
+    maxBudget: '',
+    lifestyles: [],
+} as const
+
+export const LAYOUT_CONFIG = {
+    MAP_HEIGHT_MOBILE: 'calc(100vh - 16rem)',
+    MAP_HEIGHT_DESKTOP: 'calc(100vh - 12rem)',
+    SKELETON_COUNT: 6,
+    DRAWER_MAX_WIDTH: 'max-w-sm',
+    INFO_WINDOW_MIN_WIDTH: 'min-w-48',
 } as const

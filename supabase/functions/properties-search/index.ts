@@ -21,8 +21,6 @@ function formatProperty(row: Record<string, unknown>, amenityLabels: string[]) {
     squareMeters: row.area,
     lat: row.latitude ?? undefined,
     lng: row.longitude ?? undefined,
-    petFriendly: amenityLabels.includes('Pet friendly'),
-    smoker: amenityLabels.includes('No fumar'),
     amenities: amenityLabels,
     isFavorite: false,
   }
@@ -43,8 +41,6 @@ Deno.serve(async (req) => {
     const location = url.searchParams.get('location') ?? ''
     const minPrice = url.searchParams.get('minPrice') ? Number(url.searchParams.get('minPrice')) : null
     const maxPrice = url.searchParams.get('maxPrice') ? Number(url.searchParams.get('maxPrice')) : null
-    const petFriendly = url.searchParams.get('petFriendly') === 'true'
-    const smoker = url.searchParams.get('smoker') === 'true'
     const amenities = url.searchParams.get('amenities')?.split(',').filter(Boolean) ?? []
     const page = Math.max(1, Number(url.searchParams.get('page') ?? 1))
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
@@ -81,29 +77,6 @@ Deno.serve(async (req) => {
     }
     if (maxPrice !== null && !isNaN(maxPrice)) {
       propertiesQuery = propertiesQuery.lte('price', maxPrice)
-    }
-
-    // Filter by pet-friendly and/or no-smoking via property_amenities (OR logic)
-    if (petFriendly || smoker) {
-      // Fetch both amenity types in one query
-      const amenityIdsToFetch: string[] = []
-      if (petFriendly) amenityIdsToFetch.push('pet-friendly')
-      if (smoker) amenityIdsToFetch.push('no-smoking')
-
-      const { data: amenityMatches } = await supabase
-        .from('property_amenities')
-        .select('property_id, amenity_id')
-        .in('amenity_id', amenityIdsToFetch)
-
-      const matchedPropertyIds = [...new Set((amenityMatches ?? []).map(m => m.property_id))]
-      if (matchedPropertyIds.length > 0) {
-        propertiesQuery = propertiesQuery.in('id', matchedPropertyIds)
-      } else {
-        return new Response(
-          JSON.stringify({ items: [], total: 0 }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
     }
 
     // Filter by amenities via property_amenities

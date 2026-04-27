@@ -4,9 +4,8 @@ import { Input } from '@/shared/components/ui/input'
 import { Toggle } from '@/shared/components/ui/toggle'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS } from '../constants/search.constants'
+import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, SEARCH_DEFAULT_FILTERS } from '../constants/search.constants'
 import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
-import { DEFAULT_FILTERS } from '../hooks/use-search-filters'
 
 export type { FilterState, FilterSidebarProps }
 
@@ -28,11 +27,11 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
     }
 
     const clearFilters = () => {
-        onFilterChange?.(DEFAULT_FILTERS)
+        onFilterChange?.(SEARCH_DEFAULT_FILTERS as FilterState)
     }
 
     const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
-    const tagLabel = contentMode === 'properties' ? 'Amenidades' : 'Estilo de vida'
+    const tagLabel = contentMode === 'properties' ? FILTER_LABELS.amenities : FILTER_LABELS.lifestyle
 
     return (
         <aside className="w-full space-y-6 p-4 bg-surface rounded-lg border border-border">
@@ -75,22 +74,6 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
                         maxValue={filters.maxBudget}
                         onMinChange={(v) => updateFilter('minBudget', v)}
                         onMaxChange={(v) => updateFilter('maxBudget', v)}
-                    />
-                </div>
-            )}
-
-            {contentMode === 'properties' && (
-                <div className="space-y-3">
-                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.lifestyle}</label>
-                    <Toggle
-                        checked={filters.petFriendly}
-                        onChange={(v) => updateFilter('petFriendly', v)}
-                        label={FILTER_LABELS.petFriendly}
-                    />
-                    <Toggle
-                        checked={filters.smoker}
-                        onChange={(v) => updateFilter('smoker', v)}
-                        label={FILTER_LABELS.smoker}
                     />
                 </div>
             )}

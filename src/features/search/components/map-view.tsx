@@ -10,7 +10,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point } from '../types/search.types'
-import { filterItems } from '../utils/filter-items'
 import { MapInfoWindow } from './map-info-window'
 import { MAP_LABELS, MAP_CONFIG } from '../constants/search.constants'
 
@@ -26,7 +25,7 @@ function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode):
         }))
 }
 
-export function MapView({ properties = [], users = [], contentMode, filters, isLoading }: MapViewProps) {
+export function MapView({ properties = [], users = [], contentMode, isLoading }: MapViewProps) {
     const [isClient, setIsClient] = useState(false)
     const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
 
@@ -40,7 +39,7 @@ export function MapView({ properties = [], users = [], contentMode, filters, isL
     })
 
     const allItems: (PropertyItem | UserItem)[] = contentMode === 'properties' ? properties : users
-    const filteredItems = filterItems(allItems, contentMode, filters)
+    const filteredItems = allItems
     const points = toPoints(filteredItems, contentMode)
 
     const onMarkerClick = useCallback((point: Point) => {

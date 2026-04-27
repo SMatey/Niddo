@@ -26,9 +26,9 @@ export function buildPaginationButtons(
     }
 
     // First page button if not in visible range
-    if (start > 1) {
-        buttons.push({ type: 'page', page: 1, label: '1' })
-        if (start > 2) {
+    if (start > PAGINATION_CONFIG.firstPage) {
+        buttons.push({ type: 'page', page: PAGINATION_CONFIG.firstPage, label: String(PAGINATION_CONFIG.firstPage) })
+        if (start > PAGINATION_CONFIG.bufferThreshold) {
             buttons.push({ type: 'ellipsis', label: PAGINATION_LABELS.ellipsis })
         }
     }

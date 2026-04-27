@@ -53,7 +53,6 @@ export default function ExplorarPage() {
                 viewMode={viewMode}
                 onContentChange={setContentMode}
                 onViewChange={setViewMode}
-                filters={filters}
                 onPropertyFavoriteToggle={() => {}}
                 onUserFavoriteToggle={() => {}}
                 properties={properties}

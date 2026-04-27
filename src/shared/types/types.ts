@@ -82,8 +82,6 @@ export interface PropertyCardProps {
     bathrooms?: number
     squareMeters?: number
     amenities?: string[]
-    petFriendly?: boolean
-    smoker?: boolean
     lifestyles?: string[]
     isFavorite?: boolean
     onFavoriteToggle?: () => void

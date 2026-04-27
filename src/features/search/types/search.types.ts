@@ -17,8 +17,6 @@ export interface FilterState {
     maxPrice: string
     minBudget: string
     maxBudget: string
-    petFriendly: boolean
-    smoker: boolean
     lifestyles: string[]
 }
 
@@ -38,8 +36,6 @@ export interface PropertyItem {
     squareMeters?: number
     lat?: number
     lng?: number
-    petFriendly?: boolean
-    smoker?: boolean
     amenities?: string[]
     isFavorite?: boolean
 }
@@ -67,7 +63,6 @@ export interface ListViewProps {
     properties?: PropertyItem[]
     users?: UserItem[]
     contentMode: ContentMode
-    filters?: FilterState | null
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
@@ -77,7 +72,6 @@ export interface MapViewProps {
     properties?: PropertyItem[]
     users?: UserItem[]
     contentMode: ContentMode
-    filters?: FilterState | null
     isLoading?: boolean
 }
 
@@ -88,7 +82,6 @@ export interface ResultsDisplayProps {
     onViewChange: (mode: ViewMode) => void
     properties?: PropertyItem[]
     users?: UserItem[]
-    filters?: FilterState | null
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean

@@ -78,8 +78,6 @@ Deno.serve(async (req) => {
       squareMeters: propertyData.area,
       lat: propertyData.latitude ?? undefined,
       lng: propertyData.longitude ?? undefined,
-      petFriendly: amenityIds.includes('pet-friendly'),
-      smoker: amenityIds.includes('no-smoking'),
       amenities: amenityLabels,
       isFavorite: false,
       description: propertyData.description ?? undefined,

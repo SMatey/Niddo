@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { PropertyItem, FilterState } from '@/features/search/types/search.types'
+import { SUPABASE_HEADERS, SUPABASE_ENDPOINTS, SEARCH_PARAMS, API_ERROR_MESSAGES } from '@/lib/supabase/constants'
+import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
 
 export interface UsePropertiesOptions {
     initialPageSize?: number
@@ -22,7 +24,7 @@ export function useProperties(
     options: UsePropertiesOptions = {}
 ) {
     const [page, setPage] = useState(1)
-    const pageSize = options.initialPageSize ?? 9
+    const pageSize = options.initialPageSize ?? PAGINATION_CONFIG.defaultPageSize
 
     const [data, setData] = useState<PropertyItem[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -39,34 +41,32 @@ export function useProperties(
 
     useEffect(() => {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const functionUrl = `${supabaseUrl}/functions/v1/properties-search`
+        const functionUrl = `${supabaseUrl}${SUPABASE_ENDPOINTS.FUNCTIONS.PROPERTIES_SEARCH}`
 
         async function fetchProperties() {
             setIsLoading(true)
             setError(null)
 
             const params = new URLSearchParams({
-                page: String(page),
-                pageSize: String(pageSize),
+                [SEARCH_PARAMS.PAGE]: String(page),
+                [SEARCH_PARAMS.PAGE_SIZE]: String(pageSize),
             })
-            if (filters?.location) params.set('location', filters.location)
-            if (filters?.minPrice) params.set('minPrice', filters.minPrice)
-            if (filters?.maxPrice) params.set('maxPrice', filters.maxPrice)
-            if (filters?.petFriendly) params.set('petFriendly', 'true')
-            if (filters?.smoker) params.set('smoker', 'true')
+            if (filters?.location) params.set(SEARCH_PARAMS.LOCATION, filters.location)
+            if (filters?.minPrice) params.set(SEARCH_PARAMS.MIN_PRICE, filters.minPrice)
+            if (filters?.maxPrice) params.set(SEARCH_PARAMS.MAX_PRICE, filters.maxPrice)
             if (filters?.lifestyles?.length) {
-                params.set('amenities', filters.lifestyles.join(','))
+                params.set(SEARCH_PARAMS.AMENITIES, filters.lifestyles.join(','))
             }
 
             const response = await fetch(`${functionUrl}?${params}`, {
                 headers: {
-                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+                    [SUPABASE_HEADERS.API_KEY]: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                    [SUPABASE_HEADERS.AUTHORIZATION]: `${SUPABASE_HEADERS.BEARER} ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
                 },
             })
 
             if (!response.ok) {
-                setError(new Error(`HTTP ${response.status}`))
+                setError(new Error(`${API_ERROR_MESSAGES.HTTP_PREFIX} ${response.status}`))
                 setData([])
                 setTotal(0)
                 setIsLoading(false)

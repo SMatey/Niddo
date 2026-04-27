@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { PropertyItem, UserItem } from '../types/search.types'
+import { ROUTING_PATHS, LAYOUT_CONFIG } from '../constants/search.constants'
 
 export interface MapInfoWindowProps {
     point: {
@@ -28,7 +29,9 @@ export function MapInfoWindow({ point }: MapInfoWindowProps) {
             : null
 
     const initials = name.charAt(0).toUpperCase()
-    const detailUrl = isProperty ? `/propiedad/${point.id}` : `/usuario/${point.id}`
+    const detailUrl = isProperty 
+        ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}` 
+        : `${ROUTING_PATHS.USER_DETAIL}/${point.id}`
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault()
@@ -41,7 +44,7 @@ export function MapInfoWindow({ point }: MapInfoWindowProps) {
                 href={detailUrl}
                 onClick={handleClick}
             >
-                <div className="min-w-48 flex items-center gap-3">
+                <div className={`${LAYOUT_CONFIG.INFO_WINDOW_MIN_WIDTH} flex items-center gap-3`}>
                     <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden flex items-center justify-center font-semibold text-lg text-slate-500 flex-shrink-0 cursor-pointer">
                         {imageUrl ? (
                             <img
