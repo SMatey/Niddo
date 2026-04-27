@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { Input } from '@/shared/components/ui/input'
 import { Toggle } from '@/shared/components/ui/toggle'
 import { Tag } from '@/shared/components/ui/tag'
@@ -14,21 +15,21 @@ interface FilterSidebarWithModeProps extends FilterSidebarProps {
 }
 
 export function FilterSidebar({ filters, onFilterChange, contentMode = 'properties' }: FilterSidebarWithModeProps) {
-    const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
         onFilterChange?.({ ...filters, [key]: value })
-    }
+    }, [filters, onFilterChange])
 
-    const toggleTag = (tag: string) => {
+    const toggleTag = useCallback((tag: string) => {
         const current = filters.lifestyles
         const updated = current.includes(tag)
             ? current.filter((l) => l !== tag)
             : [...current, tag]
         updateFilter('lifestyles', updated)
-    }
+    }, [filters.lifestyles, updateFilter])
 
-    const clearFilters = () => {
-        onFilterChange?.(SEARCH_DEFAULT_FILTERS as FilterState)
-    }
+    const clearFilters = useCallback(() => {
+        onFilterChange?.(SEARCH_DEFAULT_FILTERS)
+    }, [onFilterChange])
 
     const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
     const tagLabel = contentMode === 'properties' ? FILTER_LABELS.amenities : FILTER_LABELS.lifestyle

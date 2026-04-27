@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point } from '../types/search.types'
 import { MapInfoWindow } from './map-info-window'
-import { MAP_LABELS, MAP_CONFIG } from '../constants/search.constants'
+import { MAP_LABELS, MAP_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
 
 function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode): Point[] {
     return items
@@ -21,7 +21,7 @@ function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode):
             lat: item.lat!,
             lng: item.lng!,
             item,
-            type: contentMode === 'properties' ? 'property' : 'user',
+            type: contentMode === CONTENT_MODE_LABELS.properties ? 'properties' : 'users',
         }))
 }
 
@@ -94,7 +94,7 @@ export function MapView({ properties = [], users = [], contentMode, isLoading }:
                     <Marker
                         key={point.id}
                         position={{ lat: point.lat, lng: point.lng }}
-                        title={point.type === 'property' ? (point.item as PropertyItem).title : (point.item as UserItem).name}
+                        title={point.type === CONTENT_MODE_LABELS.properties ? (point.item as PropertyItem).title : (point.item as UserItem).name}
                         onClick={() => onMarkerClick(point)}
                     />
                 ))}

@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       .from('properties')
       .select(`
         id, owner_id, title, description, images, price, location, address,
-        latitude, longitude, bedrooms, bathrooms, area, amenities, rules,
+        latitude, longitude, bedrooms, bathrooms, area, rules,
         status, available_from,
         profiles!owner_id ( name, avatar, is_verified, trust_score )
       `, { count: 'exact' })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { FilterSidebar } from '@/features/search/components/filter-sidebar'
 import { ResultsDisplay } from '@/features/search/components/results-display'
 import { ExplorarHeader } from '@/features/search/components/explorar-header'
@@ -9,23 +9,29 @@ import { useSearchFilters } from '@/features/search/hooks/use-search-filters'
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
 import type { FilterState, ContentMode, ViewMode } from '@/features/search/types/search.types'
+import { CONTENT_MODE_LABELS, VIEW_MODE_LABELS } from '@/features/search/constants/search.constants'
 
 export default function ExplorarPage() {
   const { filters, setFilters } = useSearchFilters()
-  const [contentMode, setContentMode] = useState<ContentMode>('properties')
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [contentMode, setContentMode] = useState<ContentMode>(CONTENT_MODE_LABELS.properties)
+  const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODE_LABELS.list)
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
 
-  const handleFilterChange = (newFilters: FilterState) => {
+  const handleFilterChange = useCallback((newFilters: FilterState) => {
     setFilters(newFilters)
-  }
+  }, [setFilters])
 
   const propertiesResult = useProperties(filters)
   const usersResult = useUsers(filters)
 
-  const isLoading = contentMode === 'properties' ? propertiesResult.isLoading : usersResult.isLoading
+  const isLoading = contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.isLoading : usersResult.isLoading
   const properties = propertiesResult.data
   const users = usersResult.data
+
+  const onContentChange = setContentMode
+  const onViewChange = setViewMode
+  const onPropertyFavoriteToggle = useCallback(() => { }, [])
+  const onUserFavoriteToggle = useCallback(() => { }, [])
 
   return (
     <main className="min-h-screen bg-surface-subtle">
@@ -51,18 +57,16 @@ export default function ExplorarPage() {
               <ResultsDisplay
                 contentMode={contentMode}
                 viewMode={viewMode}
-                onContentChange={setContentMode}
-                onViewChange={setViewMode}
-                onPropertyFavoriteToggle={() => {}}
-                onUserFavoriteToggle={() => {}}
+                onContentChange={onContentChange}
+                onViewChange={onViewChange}
+                onPropertyFavoriteToggle={onPropertyFavoriteToggle}
+                onUserFavoriteToggle={onUserFavoriteToggle}
                 properties={properties}
                 users={users}
                 isLoading={isLoading}
-                totalProperties={propertiesResult.total}
-                totalUsers={usersResult.total}
-                currentPage={contentMode === 'properties' ? propertiesResult.page : usersResult.page}
-                totalPages={contentMode === 'properties' ? propertiesResult.totalPages : usersResult.totalPages}
-                onPageChange={contentMode === 'properties' ? propertiesResult.setPage : usersResult.setPage}
+                currentPage={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.page : usersResult.page}
+                totalPages={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.totalPages : usersResult.totalPages}
+                onPageChange={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.setPage : usersResult.setPage}
               />
             </div>
           </div>

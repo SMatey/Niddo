@@ -85,8 +85,6 @@ export interface ResultsDisplayProps {
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
-    totalProperties?: number
-    totalUsers?: number
     currentPage?: number
     totalPages?: number
     onPageChange?: (page: number) => void
@@ -119,39 +117,15 @@ export interface MobileFiltersDrawerProps {
     children: React.ReactNode
 }
 
-export type BadgeVariant = 'success' | 'info' | 'warning'
-
-export interface BadgeItem {
-    type: string
-    label: string
-    variant: BadgeVariant
-}
-
-export interface PropertyBadgeProps {
-    badges?: BadgeItem[]
-    className?: string
-}
-
-export type PageButtonType = 'page' | 'prev' | 'next' | 'ellipsis'
-
-export interface PageButton {
-    type: PageButtonType
-    page?: number
-    label: string
-    disabled?: boolean
-}
-
-export interface PaginationProps {
-    currentPage: number
-    totalPages: number
-    onPageChange: (page: number) => void
-    className?: string
-}
 
 export interface Point {
     id: string
     lat: number
     lng: number
     item: PropertyItem | UserItem
-    type: 'property' | 'user'
+    type: 'properties' | 'users'
+}
+
+export interface MapInfoWindowProps {
+    point: Point
 }

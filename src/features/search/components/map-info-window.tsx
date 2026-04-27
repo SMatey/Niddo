@@ -1,42 +1,32 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import type { PropertyItem, UserItem } from '../types/search.types'
-import { ROUTING_PATHS, LAYOUT_CONFIG } from '../constants/search.constants'
-
-export interface MapInfoWindowProps {
-    point: {
-        id: string
-        lat: number
-        lng: number
-        item: PropertyItem | UserItem
-        type: 'property' | 'user'
-    }
-}
+import { useCallback } from 'react'
+import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
+import { ROUTING_PATHS, LAYOUT_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
 
 export function MapInfoWindow({ point }: MapInfoWindowProps) {
     const router = useRouter()
-    const isProperty = point.type === 'property'
-    const prop = point.item as PropertyItem
-    const user = point.item as UserItem
+    const isProperty = point.type === CONTENT_MODE_LABELS.properties
 
-    const imageUrl = isProperty ? prop.imageUrl : user.imageUrl
-    const name = isProperty ? prop.title : user.name
+    const item = point.item as PropertyItem | UserItem
+    const imageUrl = item.imageUrl
+    const name = isProperty ? (item as PropertyItem).title : (item as UserItem).name
     const priceLabel = isProperty
-        ? prop.price
-        : user.minBudget || user.maxBudget
-            ? `${user.minBudget ?? ''}${user.minBudget && user.maxBudget ? ' - ' : ''}${user.maxBudget ?? ''}`
+        ? (item as PropertyItem).price
+        : (item as UserItem).minBudget || (item as UserItem).maxBudget
+            ? `${(item as UserItem).minBudget ?? ''}${(item as UserItem).minBudget && (item as UserItem).maxBudget ? ' - ' : ''}${(item as UserItem).maxBudget ?? ''}`
             : null
 
     const initials = name.charAt(0).toUpperCase()
-    const detailUrl = isProperty 
-        ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}` 
+    const detailUrl = isProperty
+        ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}`
         : `${ROUTING_PATHS.USER_DETAIL}/${point.id}`
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         router.push(detailUrl)
-    }
+    }, [router, detailUrl])
 
     return (
         <div className="p-1">
