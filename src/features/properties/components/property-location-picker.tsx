@@ -91,13 +91,13 @@ export function PropertyLocationPicker({ lat, lng, onLocationChange }: PropertyL
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-border bg-surface-muted">
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface-muted h-96">
           {!apiKey ? (
-            <div className="flex h-72 items-center justify-center p-6 text-center text-sm text-text-muted">
+            <div className="flex h-96 items-center justify-center p-6 text-center text-sm text-text-muted">
               {MAP_LABELS.apiKeyMissing}
             </div>
           ) : !isClient || !isLoaded ? (
-            <div className="flex h-72 items-center justify-center p-6 text-sm text-text-muted">
+            <div className="flex h-96 items-center justify-center p-6 text-sm text-text-muted">
               {loadError ? MAP_LABELS.loadError : MAP_LABELS.loading}
             </div>
           ) : (

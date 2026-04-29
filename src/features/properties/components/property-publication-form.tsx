@@ -6,11 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { cn } from '@/lib/utils'
-import { PROPERTY_PUBLICATION_CONFIG, PROPERTY_PUBLICATION_LABELS, PROPERTY_PUBLICATION_SUGGESTIONS } from '@/features/properties/constants/publication.constants'
+import { PROPERTY_PUBLICATION_CONFIG, PROPERTY_PUBLICATION_LABELS } from '@/features/properties/constants/publication.constants'
 import { publicationSchema, type PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import { usePropertyPublication } from '@/features/properties/hooks/use-property-publication'
 import { PropertyImageUploader } from '@/features/properties/components/property-image-uploader'
 import { PropertyLocationPicker } from '@/features/properties/components/property-location-picker'
+import { PropertyAmenitiesSelector } from '@/features/properties/components/property-amenities-selector'
+import { createProperty, type CreatePropertyPayload } from '@/features/properties/actions/create-property'
+import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
 
 export function PropertyPublicationForm() {
   const {
@@ -24,12 +27,9 @@ export function PropertyPublicationForm() {
     updateLocation,
     amenities,
     rules,
-    amenityInput,
     ruleInput,
-    setAmenityInput,
     setRuleInput,
-    addAmenity,
-    removeAmenity,
+    toggleAmenity,
     addRule,
     removeRule,
   } = usePropertyPublication()
@@ -41,7 +41,7 @@ export function PropertyPublicationForm() {
     setValue,
     watch,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<PublicationFormValues>({
     resolver: zodResolver(publicationSchema),
     defaultValues: {
@@ -66,9 +66,16 @@ export function PropertyPublicationForm() {
 
   const availableFrom = watch('availableFrom')
   const availableTo = watch('availableTo')
+  const priceValue = watch('price')
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const isExpired = Boolean(availableTo && availableTo < today)
+
+  // Format price input
+  const formatPrice = (value: string) => {
+    const numbers = value.replace(/\D/g, '')
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
 
   useEffect(() => {
     if (location) {
@@ -85,17 +92,15 @@ export function PropertyPublicationForm() {
     setValue('rules', rules)
   }, [rules, setValue])
 
-  const handleAddAmenity = () => {
-    addAmenity(amenityInput)
-  }
-
   const handleAddRule = () => {
     addRule(ruleInput)
   }
 
-  const handleSubmitForm = (values: PublicationFormValues) => {
+  const handleSubmitForm = async (values: PublicationFormValues) => {
+    setFormError(null)
+
     if (selectedImages.length === 0) {
-      setFormError('Sube al menos una foto del inmueble antes de publicar.')
+      setFormError(PROPERTY_ACTIONS_MESSAGES.errors.noImages)
       return
     }
 
@@ -112,19 +117,36 @@ export function PropertyPublicationForm() {
       return
     }
 
-    const payload = {
-      ...values,
-      latitude: location.lat,
-      longitude: location.lng,
-      images: selectedImages.map((image) => image.file),
-      navigationUrl: `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`,
+    if (amenities.length === 0) {
+      setFormError(PROPERTY_ACTIONS_MESSAGES.errors.noAmenities)
+      return
     }
 
-    console.log('Publicación completa:', payload)
-    setSubmitSuccess(true)
-    setFormError(null)
-    reset()
-    clearImages()
+    try {
+      const payload: CreatePropertyPayload = {
+        ...values,
+        latitude: location.lat,
+        longitude: location.lng,
+        images: selectedImages.map((image) => image.file),
+        navigationUrl: `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`,
+      }
+
+      const result = await createProperty(payload)
+
+      if (result.success) {
+        setSubmitSuccess(true)
+        setFormError(null)
+        reset()
+        clearImages()
+        // Show success message for a few seconds
+        setTimeout(() => setSubmitSuccess(false), 5000)
+      } else {
+        setFormError(result.error || PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError)
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      setFormError(PROPERTY_ACTIONS_MESSAGES.errors.unexpectedProcessing)
+    }
   }
 
   return (
@@ -137,7 +159,7 @@ export function PropertyPublicationForm() {
       </section>
 
       <form onSubmit={handleSubmit(handleSubmitForm)} noValidate className="space-y-8">
-        <section className="grid gap-6 rounded-3xl border border-border bg-surface p-6 shadow-sm lg:grid-cols-[1.4fr_0.9fr]">
+        <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
           <div className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -159,12 +181,20 @@ export function PropertyPublicationForm() {
                 <label htmlFor="price" className="text-sm font-medium text-text-primary">
                   {PROPERTY_PUBLICATION_LABELS.labels.price}
                 </label>
-                <Input
-                  id="price"
-                  placeholder={PROPERTY_PUBLICATION_LABELS.placeholders.price}
-                  error={Boolean(errors.price)}
-                  {...register('price')}
-                />
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-primary font-medium">₡</span>
+                  <Input
+                    id="price"
+                    placeholder={PROPERTY_PUBLICATION_LABELS.placeholders.price}
+                    error={Boolean(errors.price)}
+                    className="pl-8"
+                    {...register('price', {
+                      onChange: (e) => {
+                        e.target.value = formatPrice(e.target.value)
+                      },
+                    })}
+                  />
+                </div>
                 {errors.price ? (
                   <p className="text-sm text-state-error">{errors.price.message}</p>
                 ) : null}
@@ -247,50 +277,54 @@ export function PropertyPublicationForm() {
               </div>
             </div>
           </div>
+        </section>
 
+        <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+          <PropertyLocationPicker
+            lat={location?.lat ?? null}
+            lng={location?.lng ?? null}
+            onLocationChange={updateLocation}
+          />
+        </section>
+
+        <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
           <div className="space-y-4">
-            <PropertyLocationPicker
-              lat={location?.lat ?? null}
-              lng={location?.lng ?? null}
-              onLocationChange={updateLocation}
-            />
-
-            <div className="rounded-3xl border border-border bg-background p-4">
-              <p className="text-sm font-medium text-text-primary">{PROPERTY_PUBLICATION_LABELS.sectionTitles.availability}</p>
-              <p className="mt-2 text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.dateHint}</p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="availableFrom" className="text-sm font-medium text-text-primary">
-                    {PROPERTY_PUBLICATION_LABELS.labels.availableFrom}
-                  </label>
-                  <Input
-                    id="availableFrom"
-                    type="date"
-                    min={today}
-                    error={Boolean(errors.availableFrom)}
-                    {...register('availableFrom')}
-                  />
-                  {errors.availableFrom ? (
-                    <p className="text-sm text-state-error">{errors.availableFrom.message}</p>
-                  ) : null}
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="availableTo" className="text-sm font-medium text-text-primary">
-                    {PROPERTY_PUBLICATION_LABELS.labels.availableTo}
-                  </label>
-                  <Input
-                    id="availableTo"
-                    type="date"
-                    min={availableFrom || today}
-                    error={Boolean(errors.availableTo) || isExpired}
-                    {...register('availableTo')}
-                  />
-                  {errors.availableTo ? (
-                    <p className="text-sm text-state-error">{errors.availableTo.message}</p>
-                  ) : isExpired ? (
-                    <p className="text-sm text-state-error">{PROPERTY_PUBLICATION_LABELS.helpers.expiredAvailability}</p>
-                  ) : null}
-                </div>
+            <div>
+              <h2 className="text-lg font-semibold text-text-primary">{PROPERTY_PUBLICATION_LABELS.sectionTitles.availability}</h2>
+              <p className="text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.dateHint}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label htmlFor="availableFrom" className="text-sm font-medium text-text-primary">
+                  {PROPERTY_PUBLICATION_LABELS.labels.availableFrom}
+                </label>
+                <Input
+                  id="availableFrom"
+                  type="date"
+                  min={today}
+                  error={Boolean(errors.availableFrom)}
+                  {...register('availableFrom')}
+                />
+                {errors.availableFrom ? (
+                  <p className="text-sm text-state-error">{errors.availableFrom.message}</p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="availableTo" className="text-sm font-medium text-text-primary">
+                  {PROPERTY_PUBLICATION_LABELS.labels.availableTo}
+                </label>
+                <Input
+                  id="availableTo"
+                  type="date"
+                  min={availableFrom || today}
+                  error={Boolean(errors.availableTo) || isExpired}
+                  {...register('availableTo')}
+                />
+                {errors.availableTo ? (
+                  <p className="text-sm text-state-error">{errors.availableTo.message}</p>
+                ) : isExpired ? (
+                  <p className="text-sm text-state-error">{PROPERTY_PUBLICATION_LABELS.helpers.expiredAvailability}</p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -305,89 +339,16 @@ export function PropertyPublicationForm() {
             error={imageError}
           />
 
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-6">
             <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
               <div className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold text-text-primary">
                     {PROPERTY_PUBLICATION_LABELS.sectionTitles.amenities}
                   </h2>
-                  <p className="text-sm text-text-secondary">Describe lo que ofrece el inmueble.</p>
+                  <p className="text-sm text-text-secondary">Selecciona las amenidades que ofrece el inmueble</p>
                 </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label htmlFor="amenity" className="text-sm font-medium text-text-primary">
-                      {PROPERTY_PUBLICATION_LABELS.labels.amenityInput}
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="amenity"
-                        value={amenityInput}
-                        placeholder={PROPERTY_PUBLICATION_LABELS.placeholders.amenityInput}
-                        onChange={(event) => setAmenityInput(event.target.value)}
-                      />
-                      <Button type="button" onClick={handleAddAmenity}>
-                        {PROPERTY_PUBLICATION_LABELS.buttons.addAmenity}
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="rule" className="text-sm font-medium text-text-primary">
-                      {PROPERTY_PUBLICATION_LABELS.labels.ruleInput}
-                    </label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="rule"
-                        value={ruleInput}
-                        placeholder={PROPERTY_PUBLICATION_LABELS.placeholders.ruleInput}
-                        onChange={(event) => setRuleInput(event.target.value)}
-                      />
-                      <Button type="button" onClick={handleAddRule}>
-                        {PROPERTY_PUBLICATION_LABELS.buttons.addRule}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    {PROPERTY_PUBLICATION_SUGGESTIONS.amenities.map((amenity) => (
-                      <button
-                        key={amenity}
-                        type="button"
-                        className="rounded-full border border-border bg-background px-3 py-2 text-sm text-text-secondary transition hover:border-border-focus hover:text-text-primary"
-                        onClick={() => addAmenity(amenity)}
-                      >
-                        {amenity}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="grid gap-2">
-                    {amenities.length > 0 ? (
-                      <div className="grid gap-2">
-                        {amenities.map((amenity, index) => (
-                          <div
-                            key={`${amenity}-${index}`}
-                            className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-background px-4 py-3 text-sm"
-                          >
-                            <span>{amenity}</span>
-                            <button
-                              type="button"
-                              className="text-text-secondary transition hover:text-text-primary"
-                              onClick={() => removeAmenity(index)}
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-text-secondary">Añade amenidades para mejorar la visibilidad de tu publicación.</p>
-                    )}
-                  </div>
-                </div>
+                <PropertyAmenitiesSelector selectedAmenities={amenities} onToggleAmenity={toggleAmenity} />
               </div>
             </div>
 
@@ -400,6 +361,18 @@ export function PropertyPublicationForm() {
                   <p className="text-sm text-text-secondary">Define las normas de convivencia del inmueble.</p>
                 </div>
 
+                <div className="flex gap-2">
+                  <Input
+                    id="rule"
+                    value={ruleInput}
+                    placeholder={PROPERTY_PUBLICATION_LABELS.placeholders.ruleInput}
+                    onChange={(event) => setRuleInput(event.target.value)}
+                  />
+                  <Button type="button" onClick={handleAddRule}>
+                    {PROPERTY_PUBLICATION_LABELS.buttons.addRule}
+                  </Button>
+                </div>
+
                 <div className="grid gap-3">
                   {rules.length > 0 ? (
                     rules.map((rule, index) => (
@@ -410,10 +383,10 @@ export function PropertyPublicationForm() {
                         <span>{rule}</span>
                         <button
                           type="button"
-                          className="text-text-secondary transition hover:text-text-primary"
+                          className="text-text-secondary transition hover:text-state-error"
                           onClick={() => removeRule(index)}
                         >
-                          Eliminar
+                          ✕
                         </button>
                       </div>
                     ))
@@ -436,7 +409,7 @@ export function PropertyPublicationForm() {
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
                 <p className="text-sm text-text-primary font-medium">Precio aproximado</p>
-                <p>{watch('price') || '$850/mes'}</p>
+                <p>₡ {priceValue || '450,000'}/mes</p>
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
                 <p className="text-sm text-text-primary font-medium">Ubicación</p>
@@ -485,13 +458,13 @@ export function PropertyPublicationForm() {
           </div>
         </section>
 
-        {formError ? <p className="text-sm text-state-error">{formError}</p> : null}
+        {formError ? <div className="rounded-lg border border-state-error/30 bg-state-error/10 p-4 text-sm text-state-error">{formError}</div> : null}
         {submitSuccess ? (
-          <p className="text-sm text-success">Publicación preparada correctamente. Revisa el panel cuando termines.</p>
+          <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-700">✓ ¡Propiedad publicada correctamente! Ahora aparecerá en el catálogo.</div>
         ) : null}
 
-        <Button type="submit" className="w-full py-3 text-base">
-          {PROPERTY_PUBLICATION_LABELS.buttons.submit}
+        <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-base">
+          {isSubmitting ? 'Publicando...' : PROPERTY_PUBLICATION_LABELS.buttons.submit}
         </Button>
       </form>
     </div>

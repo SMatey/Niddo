@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { PROPERTY_PUBLICATION_LABELS } from '@/features/properties/constants/publication.constants'
+import { PUBLICATION_VALIDATION_MESSAGES } from '@/features/properties/constants/publication-validation.constants'
 
 const parseNullableNumber = z.preprocess((value) => {
   if (typeof value === 'string') {
@@ -59,7 +60,7 @@ export const publicationSchema = z
   })
   .refine((values) => values.availableTo >= values.availableFrom, {
     path: ['availableTo'],
-    message: 'La fecha de salida debe ser igual o posterior a la fecha de llegada.',
+    message: PUBLICATION_VALIDATION_MESSAGES.dateRange,
   })
   .refine((values) => values.latitude !== null && values.longitude !== null, {
     path: ['location'],

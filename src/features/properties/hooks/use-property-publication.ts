@@ -88,6 +88,20 @@ export function usePropertyPublication() {
     setAmenityInput('')
   }, [amenities])
 
+  const toggleAmenity = useCallback((value: string) => {
+    const trimmed = value.trim()
+    if (!trimmed) return
+
+    setAmenities((current) => {
+      if (current.includes(trimmed)) {
+        return current.filter((a) => a !== trimmed)
+      } else if (current.length < PROPERTY_PUBLICATION_CONFIG.maxAmenities) {
+        return [...current, trimmed]
+      }
+      return current
+    })
+  }, [])
+
   const removeAmenity = useCallback((index: number) => {
     setAmenities((current) => current.filter((_, itemIndex) => itemIndex !== index))
   }, [])
@@ -121,6 +135,7 @@ export function usePropertyPublication() {
     setAmenityInput,
     setRuleInput,
     addAmenity,
+    toggleAmenity,
     removeAmenity,
     addRule,
     removeRule,

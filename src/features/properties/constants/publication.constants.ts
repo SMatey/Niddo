@@ -33,7 +33,7 @@ export const PROPERTY_PUBLICATION_LABELS = {
   },
   placeholders: {
     title: 'Apartamento mediano 2 habitaciones',
-    price: '$850/mes',
+    price: '450,000/mes',
     location: 'San José, Costa Rica',
     description:
       'Incluye limpieza semanal, internet estable y acceso a áreas comunes.',
@@ -73,15 +73,70 @@ export const PROPERTY_PUBLICATION_CONFIG = {
   maxRules: 12,
 } as const
 
+export const AMENITIES_CATALOG = {
+  facilities: {
+    label: 'Instalaciones',
+    items: [
+      { id: 'wifi', label: 'WiFi' },
+      { id: 'ac', label: 'Aire acondicionado' },
+      { id: 'heating', label: 'Calefacción' },
+      { id: 'washer', label: 'Lavadora' },
+      { id: 'dryer', label: 'Secadora' },
+      { id: 'dishwasher', label: 'Lavavajillas' },
+      { id: 'oven', label: 'Horno' },
+      { id: 'fridge', label: 'Refrigerador' },
+    ],
+  },
+  outdoor: {
+    label: 'Espacios exteriores',
+    items: [
+      { id: 'balcony', label: 'Balcón' },
+      { id: 'terrace', label: 'Terraza' },
+      { id: 'garden', label: 'Jardín' },
+      { id: 'patio', label: 'Patio' },
+      { id: 'pool', label: 'Piscina' },
+    ],
+  },
+  amenities: {
+    label: 'Amenidades',
+    items: [
+      { id: 'gym', label: 'Gimnasio' },
+      { id: 'parking', label: 'Estacionamiento' },
+      { id: 'security-24h', label: 'Seguridad 24h' },
+      { id: 'concierge', label: 'Concierge' },
+      { id: 'roofgarden', label: 'Roof Garden' },
+      { id: 'lounge', label: 'Sala de estar común' },
+      { id: 'playground', label: 'Área de juegos' },
+      { id: 'business-center', label: 'Business Center' },
+    ],
+  },
+  pet_policy: {
+    label: 'Mascotas',
+    items: [
+      { id: 'pet-friendly', label: 'Mascotas permitidas' },
+      { id: 'no-pets', label: 'Sin mascotas' },
+    ],
+  },
+} as const
+
 export const PROPERTY_PUBLICATION_SUGGESTIONS = {
   amenities: [
-    'Piscina',
-    'Gimnasio',
-    'Internet',
+    'WiFi',
     'Aire acondicionado',
     'Estacionamiento',
-    'Terraza',
     'Seguridad 24h',
+    'Piscina',
+    'Gimnasio',
+    'Terraza',
     'Lavadora',
   ] as const,
 } as const
+
+// Helper para obtener todas las amenidades planas
+export const getAllAmenities = () => {
+  const all: Array<{ id: string; label: string }> = []
+  Object.values(AMENITIES_CATALOG).forEach((category) => {
+    all.push(...category.items)
+  })
+  return all
+}

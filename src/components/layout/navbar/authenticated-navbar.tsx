@@ -10,6 +10,7 @@ import { UserAvatar } from './components/user-avatar'
 import { ProfileDropdown } from './components/profile-dropdown'
 import { MobileDrawer } from './components/mobile-drawer'
 import { AUTHENTICATED_NAVBAR_CONFIG, CURRENT_USER_MOCK, NOTIFICATIONS_MOCK, MESSAGES_MOCK } from './constants/authenticated-navbar.constants'
+import { NAVIGATION } from '@/shared/constants/navigation.constants'
 
 const iconMap = {
   home: Home,
@@ -68,7 +69,7 @@ export function AuthenticatedNavbar() {
               <div className="bg-blue-600 rounded-full p-2">
                 <Home className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Niddo</span>
+              <span className="text-xl font-bold text-gray-900">{NAVIGATION.brand.name}</span>
             </Link>
 
             {/* Links Centrales */}
@@ -119,7 +120,7 @@ onClick={() => {
             <div className="bg-blue-600 rounded-full p-2">
               <Home className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-gray-900">Niddo</span>
+            <span className="font-bold text-gray-900">{NAVIGATION.brand.name}</span>
           </Link>
 
           {/* Acciones */}
