@@ -46,6 +46,19 @@ Deno.serve(async (req) => {
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
 
+    // Bounds parameters for map view progressive loading
+    const neLat = url.searchParams.get('neLat') ? Number(url.searchParams.get('neLat')) : null
+    const neLng = url.searchParams.get('neLng') ? Number(url.searchParams.get('neLng')) : null
+    const swLat = url.searchParams.get('swLat') ? Number(url.searchParams.get('swLat')) : null
+    const swLng = url.searchParams.get('swLng') ? Number(url.searchParams.get('swLng')) : null
+
+    // Validar que los bounds definen un área no degenerada
+    // El área se define por la diferencia entre NE y SW, no por cuál es mayor
+    const boundsArea = Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
+    const hasValidBounds = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng) &&
+        boundsArea > 0
+
     // Fetch amenities catalog for label mapping
     const { data: amenityData } = await supabase
       .from('amenities')
@@ -63,7 +76,7 @@ Deno.serve(async (req) => {
       .from('properties')
       .select(`
         id, owner_id, title, description, images, price, location, address,
-        latitude, longitude, bedrooms, bathrooms, area, amenities, rules,
+        latitude, longitude, bedrooms, bathrooms, area, rules,
         status, available_from,
         profiles!owner_id ( name, avatar, is_verified, trust_score )
       `, { count: 'exact' })
@@ -77,6 +90,16 @@ Deno.serve(async (req) => {
     }
     if (maxPrice !== null && !isNaN(maxPrice)) {
       propertiesQuery = propertiesQuery.lte('price', maxPrice)
+    }
+
+    // Filter by map bounds (neLat, neLng, swLat, swLng) when all coordinates present
+    if (neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)) {
+      propertiesQuery = propertiesQuery
+        .gte('latitude', swLat)
+        .lte('latitude', neLat)
+        .gte('longitude', swLng)
+        .lte('longitude', neLng)
     }
 
     // Filter by amenities via property_amenities
@@ -109,8 +132,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    const { data: propertiesData, error: propertiesError, count } = await propertiesQuery
-      .range(offset, offset + pageSize - 1)
+    // If bounds are present and valid, limit results to avoid massive payloads; otherwise paginate
+    const MAX_BOUND_RESULTS = 200
+    const { data: propertiesData, error: propertiesError, count } = hasValidBounds
+      ? await propertiesQuery.range(0, MAX_BOUND_RESULTS - 1)
+      : await propertiesQuery.range(offset, offset + pageSize - 1)
 
     if (propertiesError) {
       throw propertiesError

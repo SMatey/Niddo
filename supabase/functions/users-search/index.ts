@@ -49,6 +49,19 @@ Deno.serve(async (req) => {
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
 
+    // Bounds parameters for map view progressive loading
+    const neLat = url.searchParams.get('neLat') ? Number(url.searchParams.get('neLat')) : null
+    const neLng = url.searchParams.get('neLng') ? Number(url.searchParams.get('neLng')) : null
+    const swLat = url.searchParams.get('swLat') ? Number(url.searchParams.get('swLat')) : null
+    const swLng = url.searchParams.get('swLng') ? Number(url.searchParams.get('swLng')) : null
+
+    // Validar que los bounds definen un área no degenerada
+    // El área se define por la diferencia entre NE y SW, no por cuál es mayor
+    const boundsArea = Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
+    const hasValidBounds = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng) &&
+        boundsArea > 0
+
     // Fetch tag labels map
     const { data: tagData } = await supabase
       .from('lifestyle_tags')
@@ -105,6 +118,16 @@ Deno.serve(async (req) => {
         profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
       }
 
+      // Filter by map bounds when all coordinates are present
+      if (neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+          !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)) {
+        profilesQuery = profilesQuery
+          .gte('latitude', swLat)
+          .lte('latitude', neLat)
+          .gte('longitude', swLng)
+          .lte('longitude', neLng)
+      }
+
       const { data: profilesData, error: profilesError, count } = await profilesQuery
         .range(offset, offset + pageSize - 1)
 
@@ -156,6 +179,16 @@ Deno.serve(async (req) => {
     }
     if (maxBudget) {
       profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
+    }
+
+    // Filter by map bounds when all coordinates are present
+    if (neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)) {
+      profilesQuery = profilesQuery
+        .gte('latitude', swLat)
+        .lte('latitude', neLat)
+        .gte('longitude', swLng)
+        .lte('longitude', neLng)
     }
 
     const { data: profilesData, error: profilesError, count } = await profilesQuery

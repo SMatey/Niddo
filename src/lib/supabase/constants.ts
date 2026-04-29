@@ -24,6 +24,10 @@ export const SEARCH_PARAMS = {
     LIFESTYLES: 'lifestyles',
     MIN_BUDGET: 'minBudget',
     MAX_BUDGET: 'maxBudget',
+    NE_LAT: 'neLat',
+    NE_LNG: 'neLng',
+    SW_LAT: 'swLat',
+    SW_LNG: 'swLng',
 } as const
 
 export const API_ERROR_MESSAGES = {
