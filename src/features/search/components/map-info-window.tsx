@@ -1,42 +1,42 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import type { PropertyItem, UserItem } from '../types/search.types'
-import { ROUTING_PATHS, LAYOUT_CONFIG } from '../constants/search.constants'
+import { useCallback, useMemo } from 'react'
+import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
+import { ROUTING_PATHS, LAYOUT_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
 
-export interface MapInfoWindowProps {
-    point: {
-        id: string
-        lat: number
-        lng: number
-        item: PropertyItem | UserItem
-        type: 'property' | 'user'
+function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): string | null {
+    if (isProperty) {
+        return (item as PropertyItem).price
     }
+    const user = item as UserItem
+    if (user.minBudget || user.maxBudget) {
+        const min = user.minBudget ?? ''
+        const max = user.maxBudget ?? ''
+        const separator = user.minBudget && user.maxBudget ? ' - ' : ''
+        return `${min}${separator}${max}`
+    }
+    return null
 }
 
 export function MapInfoWindow({ point }: MapInfoWindowProps) {
     const router = useRouter()
-    const isProperty = point.type === 'property'
-    const prop = point.item as PropertyItem
-    const user = point.item as UserItem
+    const isProperty = point.type === CONTENT_MODE_LABELS.properties
 
-    const imageUrl = isProperty ? prop.imageUrl : user.imageUrl
-    const name = isProperty ? prop.title : user.name
-    const priceLabel = isProperty
-        ? prop.price
-        : user.minBudget || user.maxBudget
-            ? `${user.minBudget ?? ''}${user.minBudget && user.maxBudget ? ' - ' : ''}${user.maxBudget ?? ''}`
-            : null
+    const item = point.item as PropertyItem | UserItem
+    const imageUrl = item.imageUrl
+    const name = isProperty ? (item as PropertyItem).title : (item as UserItem).name
+    const priceLabel = useMemo(() => formatPriceLabel(item, isProperty), [item, isProperty])
 
     const initials = name.charAt(0).toUpperCase()
-    const detailUrl = isProperty 
-        ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}` 
+    const detailUrl = isProperty
+        ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}`
         : `${ROUTING_PATHS.USER_DETAIL}/${point.id}`
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         router.push(detailUrl)
-    }
+    }, [router, detailUrl])
 
     return (
         <div className="p-1">

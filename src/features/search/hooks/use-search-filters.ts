@@ -3,7 +3,7 @@ import type { FilterState } from '../types/search.types'
 import { SEARCH_DEFAULT_FILTERS } from '../constants/search.constants'
 
 export function useSearchFilters() {
-    const [filters, setFilters] = useState<FilterState>(SEARCH_DEFAULT_FILTERS as FilterState)
+    const [filters, setFilters] = useState<FilterState>(SEARCH_DEFAULT_FILTERS)
 
     const updateFilter = useCallback(<K extends keyof FilterState>(
         key: K,
@@ -13,7 +13,7 @@ export function useSearchFilters() {
     }, [])
 
     const resetFilters = useCallback(() => {
-        setFilters(SEARCH_DEFAULT_FILTERS as FilterState)
+        setFilters(SEARCH_DEFAULT_FILTERS)
     }, [])
 
     return {

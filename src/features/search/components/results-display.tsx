@@ -1,10 +1,11 @@
 'use client'
 
+import { useCallback } from 'react'
 import { Pagination } from '@/shared/components/ui/pagination'
 import { Tabs } from '@/shared/components/ui/tabs'
 import { ListView } from './list-view'
 import { MapView } from './map-view'
-import { RESULTS_TABS, LAYOUT_CONFIG } from '../constants/search.constants'
+import { RESULTS_TABS, LAYOUT_CONFIG, VIEW_MODE_LABELS } from '../constants/search.constants'
 import type { ContentMode, ViewMode, PropertyItem, UserItem, ResultsDisplayProps } from '../types/search.types'
 
 export type { ContentMode, ViewMode }
@@ -19,11 +20,10 @@ export function ResultsDisplay({
   onPropertyFavoriteToggle,
   onUserFavoriteToggle,
   isLoading,
-  totalProperties = 0,
-  totalUsers = 0,
   currentPage = 1,
   totalPages = 1,
   onPageChange,
+  filters,
 }: ResultsDisplayProps) {
   return (
     <div className="h-full flex flex-col gap-4">
@@ -31,20 +31,20 @@ export function ResultsDisplay({
         <Tabs
           tabs={RESULTS_TABS.content}
           value={contentMode}
-          onChange={(v) => onContentChange(v as ContentMode)}
+          onChange={(value) => onContentChange(value as ContentMode)}
           className="w-full sm:w-auto sm:flex-1 sm:max-w-64"
         />
         <div className="flex gap-3 sm:ml-auto">
           <Tabs
             tabs={RESULTS_TABS.view}
             value={viewMode}
-            onChange={(v) => onViewChange(v as ViewMode)}
+            onChange={(value) => onViewChange(value as ViewMode)}
             className="w-full sm:w-auto sm:max-w-48"
           />
         </div>
       </div>
 
-      {viewMode === 'list' ? (
+      {viewMode === VIEW_MODE_LABELS.list ? (
         <>
           <ListView
             properties={properties}
@@ -75,10 +75,9 @@ export function ResultsDisplay({
             }
           `}</style>
           <MapView
-            properties={properties}
-            users={users}
             contentMode={contentMode}
             isLoading={isLoading}
+            filters={filters}
           />
         </div>
       )}

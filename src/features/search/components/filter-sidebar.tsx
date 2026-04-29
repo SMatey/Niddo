@@ -4,8 +4,9 @@ import { Input } from '@/shared/components/ui/input'
 import { Toggle } from '@/shared/components/ui/toggle'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, SEARCH_DEFAULT_FILTERS } from '../constants/search.constants'
+import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES } from '../constants/search.constants'
 import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
+import { SEARCH_DEFAULT_FILTERS } from '../constants/search.constants'
 
 export type { FilterState, FilterSidebarProps }
 
@@ -13,7 +14,7 @@ interface FilterSidebarWithModeProps extends FilterSidebarProps {
     contentMode: ContentMode
 }
 
-export function FilterSidebar({ filters, onFilterChange, contentMode = 'properties' }: FilterSidebarWithModeProps) {
+export function FilterSidebar({ filters, onFilterChange, contentMode = CONTENT_MODES.PROPERTIES }: FilterSidebarWithModeProps) {
     const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
         onFilterChange?.({ ...filters, [key]: value })
     }
@@ -27,11 +28,11 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
     }
 
     const clearFilters = () => {
-        onFilterChange?.(SEARCH_DEFAULT_FILTERS as FilterState)
+        onFilterChange?.(SEARCH_DEFAULT_FILTERS)
     }
 
-    const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
-    const tagLabel = contentMode === 'properties' ? FILTER_LABELS.amenities : FILTER_LABELS.lifestyle
+    const availableTags = contentMode === CONTENT_MODES.PROPERTIES ? AMENITY_TAGS : LIFESTYLES
+    const tagLabel = contentMode === CONTENT_MODES.PROPERTIES ? FILTER_LABELS.amenities : FILTER_LABELS.lifestyle
 
     return (
         <aside className="w-full space-y-6 p-4 bg-surface rounded-lg border border-border">
@@ -54,7 +55,7 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
                 />
             </div>
 
-            {contentMode === 'properties' && (
+            {contentMode === CONTENT_MODES.PROPERTIES && (
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
                     <PriceRange
@@ -66,7 +67,7 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
                 </div>
             )}
 
-            {contentMode === 'users' && (
+            {contentMode === CONTENT_MODES.USERS && (
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
                     <PriceRange

@@ -1,3 +1,5 @@
+import type { FilterState } from '../types/search.types'
+
 export const CARD_LABELS = {
     noImage: 'Sin imagen',
     bedroom: 'hab',
@@ -160,14 +162,14 @@ export const ROUTING_PATHS = {
     USER_DETAIL: '/usuario',
 } as const
 
-export const SEARCH_DEFAULT_FILTERS = {
+export const SEARCH_DEFAULT_FILTERS: FilterState = {
     location: '',
     minPrice: '',
     maxPrice: '',
     minBudget: '',
     maxBudget: '',
     lifestyles: [],
-} as const
+}
 
 export const LAYOUT_CONFIG = {
     MAP_HEIGHT_MOBILE: 'calc(100vh - 16rem)',
@@ -175,4 +177,35 @@ export const LAYOUT_CONFIG = {
     SKELETON_COUNT: 6,
     DRAWER_MAX_WIDTH: 'max-w-sm',
     INFO_WINDOW_MIN_WIDTH: 'min-w-48',
+} as const
+
+export const MAP_VIEW_CONFIG = {
+    BOUNDS_DEBOUNCE_MS: 400,
+    MAX_MARKERS: 100,
+} as const
+
+export const CONTENT_MODE_LABELS = {
+    properties: 'properties',
+    users: 'users',
+} as const
+
+export const VIEW_MODE_LABELS = {
+    list: 'list',
+    map: 'map',
+} as const
+
+// Aliases for logic (UPPERCASE)
+export const CONTENT_MODES = {
+    PROPERTIES: 'properties',
+    USERS: 'users',
+} as const
+
+export const VIEW_MODES = {
+    LIST: 'list',
+    MAP: 'map',
+} as const
+
+export const MARKER_TYPES = {
+    PROPERTY: 'property',
+    USER: 'user',
 } as const
