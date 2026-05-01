@@ -1,4 +1,12 @@
-"use client"
+'use client'
+
+import { SettingsLayout } from '@/features/settings'
+
 export default function Page() {
-  return <div>Configuración</div>
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <SettingsLayout />
+    </div>
+  )
 }
+
