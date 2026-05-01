@@ -44,7 +44,9 @@ export function ListView({ properties = [], users = [], contentMode, filters, on
               bedrooms={item.bedrooms}
               bathrooms={item.bathrooms}
               squareMeters={item.squareMeters}
-              lifestyles={item.lifestyles}
+              amenities={item.amenities}
+              petFriendly={item.petFriendly}
+              smoker={item.smoker}
               isFavorite={item.isFavorite}
               onFavoriteToggle={onPropertyFavoriteToggle ? () => onPropertyFavoriteToggle(item.id) : undefined}
             />

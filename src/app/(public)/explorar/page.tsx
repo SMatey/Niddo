@@ -20,10 +20,12 @@ export default function ExplorarPage() {
     setFilters(newFilters)
   }
 
-  const { data: properties, isLoading: isLoadingProperties } = useProperties(filters)
-  const { data: users, isLoading: isLoadingUsers } = useUsers(filters)
+  const propertiesResult = useProperties(filters)
+  const usersResult = useUsers(filters)
 
-  const isLoading = contentMode === 'properties' ? isLoadingProperties : isLoadingUsers
+  const isLoading = contentMode === 'properties' ? propertiesResult.isLoading : usersResult.isLoading
+  const properties = propertiesResult.data
+  const users = usersResult.data
 
   return (
     <main className="min-h-screen bg-surface-subtle">
@@ -34,14 +36,14 @@ export default function ExplorarPage() {
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:block w-full lg:w-80 shrink-0">
-            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
+            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
           </div>
 
           <MobileFiltersDrawer
             isOpen={isMobileFiltersOpen}
             onClose={() => setIsMobileFiltersOpen(false)}
           >
-            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
+            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
           </MobileFiltersDrawer>
 
           <div className="flex-1 min-h-0">
@@ -57,6 +59,11 @@ export default function ExplorarPage() {
                 properties={properties}
                 users={users}
                 isLoading={isLoading}
+                totalProperties={propertiesResult.total}
+                totalUsers={usersResult.total}
+                currentPage={contentMode === 'properties' ? propertiesResult.page : usersResult.page}
+                totalPages={contentMode === 'properties' ? propertiesResult.totalPages : usersResult.totalPages}
+                onPageChange={contentMode === 'properties' ? propertiesResult.setPage : usersResult.setPage}
               />
             </div>
           </div>

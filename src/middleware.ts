@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ROUTES } from '@/shared/constants/routes.constants'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -12,7 +13,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: Array<{name: string, value: string, options?: any}>) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
@@ -35,25 +36,36 @@ export async function middleware(request: NextRequest) {
 
   // Rutas protegidas dentro del grupo (dashboard)
   const protectedPaths = [
-    '/favoritos',
-    '/mis-publicaciones',
-    '/mensajes',
-    '/configuracion',
-    '/perfil',
+    ROUTES.FAVORITES,
+    ROUTES.MY_PUBLICATIONS,
+    ROUTES.MESSAGES,
+    ROUTES.SETTINGS,
+    ROUTES.PROFILE,
+  ]
+
+  // Rutas API protegidas para acciones reservadas
+  const protectedApiPaths = [
+    '/api/favorites',
+    '/api/messages',
+    '/api/contact',
   ]
 
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
+  const isProtectedApiPath = protectedApiPaths.some(path => pathname.startsWith(path))
 
-  // Descomentar cuando haya autenticación real
-  // if (isProtectedPath && !user) {
-  //   const redirectUrl = new URL('/login', request.url)
-  //   redirectUrl.searchParams.set('redirect', pathname)
-  //   return NextResponse.redirect(redirectUrl)
-  // }
+  // Redirigir a login si no autenticado en rutas protegidas
+  if ((isProtectedPath || isProtectedApiPath) && !user) {
+    const redirectUrl = new URL(ROUTES.LOGIN, request.url)
+    redirectUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
 
   // Rutas de auth → redirigir si ya está logueado
-  if ((pathname === '/login' || pathname === '/register') && user) {
-    const redirectTo = request.nextUrl.searchParams.get('redirect') || '/favoritos'
+  if (
+    (pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER) &&
+    user
+  ) {
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || ROUTES.FAVORITES
     return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 
