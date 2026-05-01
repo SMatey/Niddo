@@ -14,7 +14,6 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point, MapBounds } from '../types/search.types'
 import { MapInfoWindow } from './map-info-window'
-<<<<<<< HEAD
 import { MAP_LABELS, MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
 import { toPoints } from '../utils/map.utils'
 
@@ -25,23 +24,6 @@ export function MapView({
     isLoading,
     onBoundsChange,
 }: MapViewProps) {
-=======
-import { MAP_LABELS, MAP_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
-
-function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode): Point[] {
-    return items
-        .filter((item) => item.lat != null && item.lng != null)
-        .map((item) => ({
-            id: item.id,
-            lat: item.lat!,
-            lng: item.lng!,
-            item,
-            type: contentMode === CONTENT_MODE_LABELS.properties ? 'properties' : 'users',
-        }))
-}
-
-export function MapView({ properties = [], users = [], contentMode, isLoading }: MapViewProps) {
->>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
     const [isClient, setIsClient] = useState(false)
     const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
     const mapRef = useRef<google.maps.Map | null>(null)
@@ -148,11 +130,7 @@ export function MapView({ properties = [], users = [], contentMode, isLoading }:
                     <Marker
                         key={point.id}
                         position={{ lat: point.lat, lng: point.lng }}
-<<<<<<< HEAD
                         title={point.type === CONTENT_MODES.PROPERTIES ? (point.item as PropertyItem).title : (point.item as UserItem).name}
-=======
-                        title={point.type === CONTENT_MODE_LABELS.properties ? (point.item as PropertyItem).title : (point.item as UserItem).name}
->>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
                         onClick={() => onMarkerClick(point)}
                     />
                 ))}

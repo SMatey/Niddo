@@ -124,21 +124,12 @@ export interface MobileFiltersDrawerProps {
     children: React.ReactNode
 }
 
-
 export interface Point {
     id: string
     lat: number
     lng: number
     item: PropertyItem | UserItem
-<<<<<<< HEAD
     type: ContentMode
-=======
-    type: 'properties' | 'users'
-}
-
-export interface MapInfoWindowProps {
-    point: Point
->>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 }
 
 export interface MapInfoWindowProps {
