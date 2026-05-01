@@ -1,4 +1,6 @@
+import { PropertyRepository } from '@/features/properties/types/property-repository.types'
 import { CONTENT_MODES, VIEW_MODES } from '../constants/search.constants'
+import { UserRepository } from '@/features/users/types/user-repository.types'
 
 export type ContentMode = typeof CONTENT_MODES[keyof typeof CONTENT_MODES]
 export type ViewMode = typeof VIEW_MODES[keyof typeof VIEW_MODES]
@@ -25,6 +27,7 @@ export interface FilterState {
 export interface FilterSidebarProps {
     filters: FilterState
     onFilterChange?: (filters: FilterState) => void
+    contentMode?: ContentMode
 }
 
 export interface PropertyItem {
@@ -75,7 +78,7 @@ export interface MapViewProps {
     users?: UserItem[]
     contentMode: ContentMode
     isLoading?: boolean
-    filters?: FilterState | null
+    onBoundsChange?: (bounds: MapBounds) => void
 }
 
 export interface ResultsDisplayProps {
@@ -91,7 +94,7 @@ export interface ResultsDisplayProps {
     currentPage?: number
     totalPages?: number
     onPageChange?: (page: number) => void
-    filters?: FilterState | null
+    onBoundsChange?: (bounds: MapBounds) => void
 }
 
 export interface PropertyDetail extends PropertyItem {
@@ -132,6 +135,7 @@ export interface Point {
 
 export interface MapInfoWindowProps {
     point: Point
+    onClose?: () => void
 }
 
 export interface MapBounds {
@@ -140,3 +144,59 @@ export interface MapBounds {
     swLat: number
     swLng: number
 }
+
+// DIP - Search Service Types (Phase 3)
+export interface SearchResult<T> {
+    data: T[]
+    total: number
+    page: number
+    pageSize: number
+    totalPages: number
+    hasMore: boolean
+    isLoading: boolean
+    error: Error | null
+    setPage: (page: number) => void
+}
+
+export interface SearchService {
+    searchProperties(
+        filters: FilterState | null,
+        bounds: MapBounds | null
+    ): SearchResult<PropertyItem>
+
+    searchUsers(
+        filters: FilterState | null,
+        bounds: MapBounds | null
+    ): SearchResult<UserItem>
+}
+
+export interface SearchServiceFactory {
+    createSearchService(
+        propertyRepository: PropertyRepository,
+        userRepository: UserRepository
+    ): SearchService
+}
+
+// DIP - Map Provider Types (Phase 2)
+export interface MapProvider {
+    isLoaded(): boolean
+    isLoading(): boolean
+    hasError(): boolean
+    getError(): string | null
+    renderMarker(point: Point): React.ReactNode
+    renderInfoWindow(point: Point, onClose: () => void): React.ReactNode
+}
+
+export interface MapProviderProps {
+    children?: React.ReactNode
+    apiKey?: string
+}
+
+export interface MapProviderContextValue {
+    provider: MapProvider | null
+    setProvider: (provider: MapProvider | null) => void
+}
+
+// Re-export repository types for convenience
+export type { PropertyRepository, PropertySearchParams, PropertySearchResult } from '@/features/properties/types/property-repository.types'
+export type { UserRepository, UserSearchParams, UserSearchResult } from '@/features/users/types/user-repository.types'

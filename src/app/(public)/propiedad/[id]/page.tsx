@@ -12,6 +12,7 @@ import { PropertyRulesCard } from '@/features/properties/components/property-rul
 import { PropertyGallery } from '@/features/properties/components/property-gallery'
 import { PropertyTitle } from '@/features/properties/components/property-title'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 
 export default function PropertyDetailPage() {
   const params = useParams()
@@ -79,7 +80,7 @@ export default function PropertyDetailPage() {
               <MapView
                 properties={[property]}
                 users={[]}
-                contentMode="properties"
+                contentMode={CONTENT_MODES.PROPERTIES}
               />
             </div>
           </div>

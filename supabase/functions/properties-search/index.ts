@@ -47,17 +47,34 @@ Deno.serve(async (req) => {
     const offset = (page - 1) * pageSize
 
     // Bounds parameters for map view progressive loading
-    const neLat = url.searchParams.get('neLat') ? Number(url.searchParams.get('neLat')) : null
-    const neLng = url.searchParams.get('neLng') ? Number(url.searchParams.get('neLng')) : null
-    const swLat = url.searchParams.get('swLat') ? Number(url.searchParams.get('swLat')) : null
-    const swLng = url.searchParams.get('swLng') ? Number(url.searchParams.get('swLng')) : null
+    const neLatParam = url.searchParams.get('neLat')
+    const neLngParam = url.searchParams.get('neLng')
+    const swLatParam = url.searchParams.get('swLat')
+    const swLngParam = url.searchParams.get('swLng')
 
-    // Validar que los bounds definen un área no degenerada
-    // El área se define por la diferencia entre NE y SW, no por cuál es mayor
-    const boundsArea = Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
-    const hasValidBounds = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
-        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng) &&
-        boundsArea > 0
+    // Parse and validate all bounds parameters
+    const neLat = neLatParam !== null ? Number(neLatParam) : null
+    const neLng = neLngParam !== null ? Number(neLngParam) : null
+    const swLat = swLatParam !== null ? Number(swLatParam) : null
+    const swLng = swLngParam !== null ? Number(swLngParam) : null
+
+    // Validate that all bounds are valid numbers
+    const allBoundsValid = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)
+
+    // Validate that bounds form a valid area (not degenerate)
+    const boundsArea = allBoundsValid
+      ? Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
+      : 0
+    const hasValidBounds = allBoundsValid && boundsArea > 0
+
+    // Normalize bounds: ensure sw < ne for latitude and longitude
+    const normalizedBounds = hasValidBounds ? {
+        minLat: Math.min(swLat as number, neLat as number),
+        maxLat: Math.max(swLat as number, neLat as number),
+        minLng: Math.min(swLng as number, neLng as number),
+        maxLng: Math.max(swLng as number, neLng as number),
+    } : null
 
     // Fetch amenities catalog for label mapping
     const { data: amenityData } = await supabase
@@ -92,14 +109,13 @@ Deno.serve(async (req) => {
       propertiesQuery = propertiesQuery.lte('price', maxPrice)
     }
 
-    // Filter by map bounds (neLat, neLng, swLat, swLng) when all coordinates present
-    if (neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
-        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)) {
+    // Filter by map bounds using normalized bounds to ensure correct filtering
+    if (normalizedBounds !== null) {
       propertiesQuery = propertiesQuery
-        .gte('latitude', swLat)
-        .lte('latitude', neLat)
-        .gte('longitude', swLng)
-        .lte('longitude', neLng)
+        .gte('latitude', normalizedBounds.minLat)
+        .lte('latitude', normalizedBounds.maxLat)
+        .gte('longitude', normalizedBounds.minLng)
+        .lte('longitude', normalizedBounds.maxLng)
     }
 
     // Filter by amenities via property_amenities
@@ -176,8 +192,10 @@ Deno.serve(async (req) => {
       }
     })
 
+    const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+
     return new Response(
-      JSON.stringify({ items, total: count ?? items.length }),
+      JSON.stringify({ items, total: count ?? items.length, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

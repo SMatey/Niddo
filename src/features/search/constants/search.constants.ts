@@ -171,6 +171,15 @@ export const SEARCH_DEFAULT_FILTERS: FilterState = {
     lifestyles: [],
 }
 
+export const FILTER_KEYS = {
+    LOCATION: 'location',
+    MIN_PRICE: 'minPrice',
+    MAX_PRICE: 'maxPrice',
+    MIN_BUDGET: 'minBudget',
+    MAX_BUDGET: 'maxBudget',
+    LIFESTYLES: 'lifestyles',
+} as const
+
 export const LAYOUT_CONFIG = {
     MAP_HEIGHT_MOBILE: 'calc(100vh - 16rem)',
     MAP_HEIGHT_DESKTOP: 'calc(100vh - 12rem)',
@@ -184,17 +193,6 @@ export const MAP_VIEW_CONFIG = {
     MAX_MARKERS: 100,
 } as const
 
-export const CONTENT_MODE_LABELS = {
-    properties: 'properties',
-    users: 'users',
-} as const
-
-export const VIEW_MODE_LABELS = {
-    list: 'list',
-    map: 'map',
-} as const
-
-// Aliases for logic (UPPERCASE)
 export const CONTENT_MODES = {
     PROPERTIES: 'properties',
     USERS: 'users',
@@ -203,9 +201,4 @@ export const CONTENT_MODES = {
 export const VIEW_MODES = {
     LIST: 'list',
     MAP: 'map',
-} as const
-
-export const MARKER_TYPES = {
-    PROPERTY: 'property',
-    USER: 'user',
 } as const
