@@ -130,7 +130,15 @@ export interface Point {
     lat: number
     lng: number
     item: PropertyItem | UserItem
+<<<<<<< HEAD
     type: ContentMode
+=======
+    type: 'properties' | 'users'
+}
+
+export interface MapInfoWindowProps {
+    point: Point
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 }
 
 export interface MapInfoWindowProps {

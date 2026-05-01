@@ -5,7 +5,11 @@ import { Pagination } from '@/shared/components/ui/pagination'
 import { Tabs } from '@/shared/components/ui/tabs'
 import { ListView } from './list-view'
 import { MapView } from './map-view'
+<<<<<<< HEAD
 import { RESULTS_TABS, LAYOUT_CONFIG, VIEW_MODES } from '../constants/search.constants'
+=======
+import { RESULTS_TABS, LAYOUT_CONFIG, VIEW_MODE_LABELS } from '../constants/search.constants'
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 import type { ContentMode, ViewMode, PropertyItem, UserItem, ResultsDisplayProps } from '../types/search.types'
 
 export type { ContentMode, ViewMode }
@@ -44,7 +48,11 @@ export function ResultsDisplay({
         </div>
       </div>
 
+<<<<<<< HEAD
       {viewMode === VIEW_MODES.LIST ? (
+=======
+      {viewMode === VIEW_MODE_LABELS.list ? (
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
         <>
           <ListView
             properties={properties}

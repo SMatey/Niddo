@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { Input } from '@/shared/components/ui/input'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
@@ -13,6 +14,7 @@ interface FilterSidebarWithModeProps extends FilterSidebarProps {
     contentMode: ContentMode
 }
 
+<<<<<<< HEAD
 const CONTENT_MODE_CONFIG = {
     [CONTENT_MODES.PROPERTIES]: {
         tags: AMENITY_TAGS,
@@ -33,6 +35,27 @@ const CONTENT_MODE_CONFIG = {
 export function FilterSidebar({ filters, onFilterChange, contentMode = CONTENT_MODES.PROPERTIES }: FilterSidebarWithModeProps) {
     const config = CONTENT_MODE_CONFIG[contentMode]
     const { updateFilter, toggleTag, clearFilters } = useFilterState(filters, { onFilterChange })
+=======
+export function FilterSidebar({ filters, onFilterChange, contentMode = 'properties' }: FilterSidebarWithModeProps) {
+    const updateFilter = useCallback(<K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+        onFilterChange?.({ ...filters, [key]: value })
+    }, [filters, onFilterChange])
+
+    const toggleTag = useCallback((tag: string) => {
+        const current = filters.lifestyles
+        const updated = current.includes(tag)
+            ? current.filter((l) => l !== tag)
+            : [...current, tag]
+        updateFilter('lifestyles', updated)
+    }, [filters.lifestyles, updateFilter])
+
+    const clearFilters = useCallback(() => {
+        onFilterChange?.(SEARCH_DEFAULT_FILTERS)
+    }, [onFilterChange])
+
+    const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
+    const tagLabel = contentMode === 'properties' ? FILTER_LABELS.amenities : FILTER_LABELS.lifestyle
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
     return (
         <aside className="w-full space-y-6 p-4 bg-surface rounded-lg border border-border">

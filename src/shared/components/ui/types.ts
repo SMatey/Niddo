@@ -44,7 +44,7 @@ export interface Tab {
 }
 
 export interface TabsProps {
-    tabs: Tab[]
+    tabs: readonly Tab[]
     value: string
     onChange: (value: string) => void
     className?: string

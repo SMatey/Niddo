@@ -162,15 +162,7 @@ export const ROUTING_PATHS = {
     USER_DETAIL: '/usuario',
 } as const
 
-export const SEARCH_DEFAULT_FILTERS: FilterState = {
-    location: '',
-    minPrice: '',
-    maxPrice: '',
-    minBudget: '',
-    maxBudget: '',
-    lifestyles: [],
-}
-
+<<<<<<< HEAD
 export const FILTER_KEYS = {
     LOCATION: 'location',
     MIN_PRICE: 'minPrice',
@@ -179,6 +171,16 @@ export const FILTER_KEYS = {
     MAX_BUDGET: 'maxBudget',
     LIFESTYLES: 'lifestyles',
 } as const
+=======
+export const SEARCH_DEFAULT_FILTERS: FilterState = {
+    location: '',
+    minPrice: '',
+    maxPrice: '',
+    minBudget: '',
+    maxBudget: '',
+    lifestyles: [],
+}
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
 export const LAYOUT_CONFIG = {
     MAP_HEIGHT_MOBILE: 'calc(100vh - 16rem)',
@@ -188,6 +190,7 @@ export const LAYOUT_CONFIG = {
     INFO_WINDOW_MIN_WIDTH: 'min-w-48',
 } as const
 
+<<<<<<< HEAD
 export const MAP_VIEW_CONFIG = {
     BOUNDS_DEBOUNCE_MS: 400,
     MAX_MARKERS: 100,
@@ -201,4 +204,14 @@ export const CONTENT_MODES = {
 export const VIEW_MODES = {
     LIST: 'list',
     MAP: 'map',
+=======
+export const CONTENT_MODE_LABELS = {
+    properties: 'properties',
+    users: 'users',
+} as const
+
+export const VIEW_MODE_LABELS = {
+    list: 'list',
+    map: 'map',
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 } as const

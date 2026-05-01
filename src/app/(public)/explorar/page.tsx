@@ -1,29 +1,19 @@
-/**
- * @file app/(public)/explorar/page.tsx
- * DIP Phase 3 Complete - SearchService Facade
- *
- * This page now uses SearchServiceProvider to inject repositories.
- * The concrete hooks (useProperties, useUsers) receive repository instances via options,
- * following the Dependency Inversion Principle.
- *
- * Architecture:
- * - SearchServiceProvider supplies PropertyRepository and UserRepository
- * - useProperties/useUsers accept optional repository via options parameter
- * - This decouples the UI from concrete Supabase implementation
- *
- * Future (Phase 4): Introduce hooks-based SearchService that wraps repository calls
- */
 
 'use client'
 
+<<<<<<< HEAD
 import { ExplorarProvider, useExplorarContext } from '@/features/search/context/explorar.context'
 import { SearchServiceProvider } from '@/features/search/context/search-service.context'
+=======
+import { useState, useCallback } from 'react'
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 import { FilterSidebar } from '@/features/search/components/filter-sidebar'
 import { ResultsDisplay } from '@/features/search/components/results-display'
 import { ExplorarHeader } from '@/features/search/components/explorar-header'
 import { MobileFiltersDrawer } from '@/features/search/components/mobile-filters-drawer'
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
+<<<<<<< HEAD
 import { VIEW_MODES, CONTENT_MODES } from '@/features/search/constants/search.constants'
 import { useSearchServiceRepositories } from '@/features/search/context/search-service.context'
 
@@ -41,15 +31,10 @@ function ExplorarPageContent() {
         mapBounds,
     } = useExplorarContext()
 
-    // Get repositories from context for potential future use
-    // Currently hooks fallback to default repos if not provided
     const { propertyRepository, userRepository } = useSearchServiceRepositories()
 
-    // Only pass bounds if we are in map mode to avoid interfering with list pagination
     const currentBounds = viewMode === VIEW_MODES.MAP ? mapBounds : null
 
-    // Only fetch data for the content mode being displayed
-    // Pass repositories from context when available
     const propertiesResult = useProperties(
         contentMode === CONTENT_MODES.PROPERTIES ? filters : null,
         currentBounds,
@@ -135,4 +120,72 @@ export default function ExplorarPage() {
             </ExplorarProvider>
         </SearchServiceProvider>
     )
+=======
+import type { FilterState, ContentMode, ViewMode } from '@/features/search/types/search.types'
+import { CONTENT_MODE_LABELS, VIEW_MODE_LABELS } from '@/features/search/constants/search.constants'
+
+export default function ExplorarPage() {
+  const { filters, setFilters } = useSearchFilters()
+  const [contentMode, setContentMode] = useState<ContentMode>(CONTENT_MODE_LABELS.properties)
+  const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODE_LABELS.list)
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
+
+  const handleFilterChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters)
+  }, [setFilters])
+
+  const propertiesResult = useProperties(filters)
+  const usersResult = useUsers(filters)
+
+  const isLoading = contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.isLoading : usersResult.isLoading
+  const properties = propertiesResult.data
+  const users = usersResult.data
+
+  const onContentChange = setContentMode
+  const onViewChange = setViewMode
+  const onPropertyFavoriteToggle = useCallback(() => { }, [])
+  const onUserFavoriteToggle = useCallback(() => { }, [])
+
+  return (
+    <main className="min-h-screen bg-surface-subtle">
+      <div className="container mx-auto px-4 py-6">
+        <ExplorarHeader
+          onOpenFilters={() => setIsMobileFiltersOpen(true)}
+        />
+
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="hidden lg:block w-full lg:w-80 shrink-0">
+            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
+          </div>
+
+          <MobileFiltersDrawer
+            isOpen={isMobileFiltersOpen}
+            onClose={() => setIsMobileFiltersOpen(false)}
+          >
+            <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
+          </MobileFiltersDrawer>
+
+          <div className="flex-1 min-h-0">
+            <div className="sticky top-0 z-10 bg-surface-subtle pb-3 -mx-4 px-4">
+              <ResultsDisplay
+                contentMode={contentMode}
+                viewMode={viewMode}
+                onContentChange={onContentChange}
+                onViewChange={onViewChange}
+                onPropertyFavoriteToggle={onPropertyFavoriteToggle}
+                onUserFavoriteToggle={onUserFavoriteToggle}
+                properties={properties}
+                users={users}
+                isLoading={isLoading}
+                currentPage={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.page : usersResult.page}
+                totalPages={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.totalPages : usersResult.totalPages}
+                onPageChange={contentMode === CONTENT_MODE_LABELS.properties ? propertiesResult.setPage : usersResult.setPage}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 }

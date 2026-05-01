@@ -13,8 +13,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point, MapBounds } from '../types/search.types'
-import type { MapProvider } from '../interfaces/map-provider.interface'
 import { MapInfoWindow } from './map-info-window'
+<<<<<<< HEAD
 import { MAP_LABELS, MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
 import { toPoints } from '../utils/map.utils'
 
@@ -24,8 +24,24 @@ export function MapView({
     contentMode,
     isLoading,
     onBoundsChange,
-    mapProvider,
-}: MapViewProps & { mapProvider?: MapProvider }) {
+}: MapViewProps) {
+=======
+import { MAP_LABELS, MAP_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
+
+function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode): Point[] {
+    return items
+        .filter((item) => item.lat != null && item.lng != null)
+        .map((item) => ({
+            id: item.id,
+            lat: item.lat!,
+            lng: item.lng!,
+            item,
+            type: contentMode === CONTENT_MODE_LABELS.properties ? 'properties' : 'users',
+        }))
+}
+
+export function MapView({ properties = [], users = [], contentMode, isLoading }: MapViewProps) {
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
     const [isClient, setIsClient] = useState(false)
     const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
     const mapRef = useRef<google.maps.Map | null>(null)
@@ -34,7 +50,6 @@ export function MapView({
         setIsClient(true)
     }, [])
 
-    // Clear selected point when content mode changes to prevent stale data display
     useEffect(() => {
         setSelectedPoint(null)
     }, [contentMode])
@@ -113,27 +128,6 @@ export function MapView({
         )
     }
 
-    // When a MapProvider is injected, delegate marker rendering to it
-    if (mapProvider) {
-        return (
-            <div className="w-full h-full rounded-lg border border-border overflow-hidden">
-                <GoogleMap
-                    mapContainerStyle={MAP_CONFIG.containerStyle}
-                    center={MAP_CONFIG.defaultCenter}
-                    zoom={MAP_CONFIG.defaultZoom}
-                    options={MAP_CONFIG.options}
-                    onLoad={onLoad}
-                    onUnmount={onUnmount}
-                    onIdle={handleIdle}
-                >
-                    {points.map((point) => mapProvider.renderMarker(point))}
-                    {selectedPoint && mapProvider.renderInfoWindow(selectedPoint, onInfoWindowClose)}
-                </GoogleMap>
-            </div>
-        )
-    }
-
-    // Backward compatibility: use Google Maps directly when no provider is passed
     return (
         <div className="w-full h-full rounded-lg border border-border overflow-hidden">
             <style>{`
@@ -154,7 +148,11 @@ export function MapView({
                     <Marker
                         key={point.id}
                         position={{ lat: point.lat, lng: point.lng }}
+<<<<<<< HEAD
                         title={point.type === CONTENT_MODES.PROPERTIES ? (point.item as PropertyItem).title : (point.item as UserItem).name}
+=======
+                        title={point.type === CONTENT_MODE_LABELS.properties ? (point.item as PropertyItem).title : (point.item as UserItem).name}
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
                         onClick={() => onMarkerClick(point)}
                     />
                 ))}
@@ -169,4 +167,4 @@ export function MapView({
             </GoogleMap>
         </div>
     )
-}
+}

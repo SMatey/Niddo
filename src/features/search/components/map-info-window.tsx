@@ -1,7 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+<<<<<<< HEAD
 import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
 import { ROUTING_PATHS, CONTENT_MODES } from '../constants/search.constants'
 
@@ -18,35 +19,58 @@ function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): s
     }
     return null
 }
+=======
+import { useCallback } from 'react'
+import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
+import { ROUTING_PATHS, LAYOUT_CONFIG, CONTENT_MODE_LABELS } from '../constants/search.constants'
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
 export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
     const router = useRouter()
+<<<<<<< HEAD
     const isProperty = point.type === CONTENT_MODES.PROPERTIES
+=======
+    const isProperty = point.type === CONTENT_MODE_LABELS.properties
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
     const item = point.item as PropertyItem | UserItem
     const imageUrl = item.imageUrl
     const name = isProperty ? (item as PropertyItem).title : (item as UserItem).name
+<<<<<<< HEAD
     const priceLabel = useMemo(() => formatPriceLabel(item, isProperty), [item, isProperty])
+=======
+    const priceLabel = isProperty
+        ? (item as PropertyItem).price
+        : (item as UserItem).minBudget || (item as UserItem).maxBudget
+            ? `${(item as UserItem).minBudget ?? ''}${(item as UserItem).minBudget && (item as UserItem).maxBudget ? ' - ' : ''}${(item as UserItem).maxBudget ?? ''}`
+            : null
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
     const initials = name.charAt(0).toUpperCase()
     const detailUrl = isProperty
         ? `${ROUTING_PATHS.PROPERTY_DETAIL}/${point.id}`
         : `${ROUTING_PATHS.USER_DETAIL}/${point.id}`
 
+<<<<<<< HEAD
     const user = item as UserItem
     const isVerified = !isProperty && user.verified
     const lifestyles = !isProperty ? (user.lifestyles ?? []).slice(0, 2) : []
 
+=======
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
     const handleClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         router.push(detailUrl)
     }, [router, detailUrl])
+<<<<<<< HEAD
 
     const handleClose = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         onClose?.()
     }, [onClose])
+=======
+>>>>>>> ab60efc0618f6bbd008fea892b8c3d45b175a054
 
     return (
         <div className="p-2 min-w-64">
