@@ -1,11 +1,3 @@
-/**
- * @file google-maps.adapter.tsx
- * Google Maps implementation of MapProvider interface
- *
- * Wraps @react-google-maps/api components to provide a unified interface
- * that can be swapped with alternative map providers.
- */
-
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'

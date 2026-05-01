@@ -5,7 +5,7 @@ import { UserRepository } from '@/features/users/types/user-repository.types'
 export type ContentMode = typeof CONTENT_MODES[keyof typeof CONTENT_MODES]
 export type ViewMode = typeof VIEW_MODES[keyof typeof VIEW_MODES]
 
-// Re-export UI types from shared location for backward compatibility
+
 export type {
     BadgeItem,
     PropertyBadgeProps,
@@ -144,7 +144,7 @@ export interface MapBounds {
     swLng: number
 }
 
-// DIP - Search Service Types (Phase 3)
+
 export interface SearchResult<T> {
     data: T[]
     total: number
@@ -176,7 +176,7 @@ export interface SearchServiceFactory {
     ): SearchService
 }
 
-// DIP - Map Provider Types (Phase 2)
+
 export interface MapProvider {
     isLoaded(): boolean
     isLoading(): boolean
@@ -196,6 +196,6 @@ export interface MapProviderContextValue {
     setProvider: (provider: MapProvider | null) => void
 }
 
-// Re-export repository types for convenience
+
 export type { PropertyRepository, PropertySearchParams, PropertySearchResult } from '@/features/properties/types/property-repository.types'
 export type { UserRepository, UserSearchParams, UserSearchResult } from '@/features/users/types/user-repository.types'

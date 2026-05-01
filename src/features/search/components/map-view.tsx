@@ -1,13 +1,3 @@
-/**
- * @file map-view.tsx
- * DIP Refactoring Phase 2: MapProvider Abstraction
- *
- * This component now supports optional MapProvider injection for decoupling
- * from specific map libraries (Google Maps, Mapbox, Leaflet, etc.)
- *
- * Backward Compatibility: If no mapProvider prop is passed, Google Maps is used directly.
- */
-
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
