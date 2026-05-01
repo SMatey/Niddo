@@ -119,7 +119,7 @@ export function PropertyLocationPicker({ lat, lng, onLocationChange }: PropertyL
             <p className="mt-2 text-sm text-text-primary">
               {lat != null && lng != null
                 ? `${lat.toFixed(6)}, ${lng.toFixed(6)}`
-                : 'No hay coordenadas seleccionadas.'}
+                : PROPERTY_PUBLICATION_LABELS.helpers.noCoordinatesSelected}
             </p>
           </div>
 

@@ -81,7 +81,7 @@ export function PropertyImageUploader({
               <div className="relative h-48 overflow-hidden bg-surface-muted">
                 <img
                   src={image.previewUrl}
-                  alt={`Foto ${index + 1}`}
+                  alt={`${PROPERTY_PUBLICATION_LABELS.labels.imageAltPrefix} ${index + 1}`}
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute left-2 top-2 rounded-full bg-background/80 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-text-secondary">
@@ -90,7 +90,7 @@ export function PropertyImageUploader({
               </div>
               <div className="flex items-center justify-between gap-2 border-t border-border px-3 py-3 text-sm text-text-secondary">
                 <span className="flex items-center gap-2">
-                  <GripVertical className="h-4 w-4" /> Arrastrar
+                  <GripVertical className="h-4 w-4" /> {PROPERTY_PUBLICATION_LABELS.labels.dragHandle}
                 </span>
                 <button
                   type="button"

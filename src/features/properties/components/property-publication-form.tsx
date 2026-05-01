@@ -346,7 +346,7 @@ export function PropertyPublicationForm() {
                   <h2 className="text-lg font-semibold text-text-primary">
                     {PROPERTY_PUBLICATION_LABELS.sectionTitles.amenities}
                   </h2>
-                  <p className="text-sm text-text-secondary">Selecciona las amenidades que ofrece el inmueble</p>
+                  <p className="text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.amenitiesDescription}</p>
                 </div>
                 <PropertyAmenitiesSelector selectedAmenities={amenities} onToggleAmenity={toggleAmenity} />
               </div>
@@ -358,7 +358,7 @@ export function PropertyPublicationForm() {
                   <h2 className="text-lg font-semibold text-text-primary">
                     {PROPERTY_PUBLICATION_LABELS.sectionTitles.houseRules}
                   </h2>
-                  <p className="text-sm text-text-secondary">Define las normas de convivencia del inmueble.</p>
+                  <p className="text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.houseRulesDescription}</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -391,7 +391,7 @@ export function PropertyPublicationForm() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-text-secondary">Agrega reglas como no fumar, no fiestas o limpieza de mascotas.</p>
+                    <p className="text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.rulesExample}</p>
                   )}
                 </div>
               </div>
@@ -404,29 +404,29 @@ export function PropertyPublicationForm() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-text-primary">{PROPERTY_PUBLICATION_LABELS.sectionTitles.preview}</h2>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-                <p className="text-sm text-text-primary font-medium">Título</p>
-                <p>{watch('title') || 'Apartamento mediano 2 habitaciones'}</p>
+                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.title}</p>
+                <p>{watch('title') || PROPERTY_PUBLICATION_LABELS.placeholders.title}</p>
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-                <p className="text-sm text-text-primary font-medium">Precio aproximado</p>
-                <p>₡ {priceValue || '450,000'}/mes</p>
+                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.approximatePrice}</p>
+                <p>₡ {priceValue || PROPERTY_PUBLICATION_LABELS.placeholders.priceExample}/mes</p>
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-                <p className="text-sm text-text-primary font-medium">Ubicación</p>
-                <p>{watch('location') || 'San José, Costa Rica'}</p>
+                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.location}</p>
+                <p>{watch('location') || PROPERTY_PUBLICATION_LABELS.placeholders.location}</p>
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-                <p className="text-sm text-text-primary font-medium">Fechas de disponibilidad</p>
+                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.availabilityDates}</p>
                 <p>
                   {availableFrom && availableTo && !isExpired
                     ? `${availableFrom} hasta ${availableTo}`
-                    : 'Selecciona un rango válido para que esta publicación aparezca como disponible.'}
+                    : PROPERTY_PUBLICATION_LABELS.previewLabels.selectValidRange}
                 </p>
               </div>
             </div>
 
             <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-              <h3 className="mb-3 text-sm font-semibold text-text-primary">Enlace de navegación</h3>
+              <h3 className="mb-3 text-sm font-semibold text-text-primary">{PROPERTY_PUBLICATION_LABELS.previewLabels.navigationLink}</h3>
               {location ? (
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`}
@@ -434,14 +434,14 @@ export function PropertyPublicationForm() {
                   rel="noreferrer"
                   className="text-sm font-medium text-primary transition hover:text-primary/80"
                 >
-                  Ver en Google Maps
+                  {PROPERTY_PUBLICATION_LABELS.previewLabels.viewInGoogleMaps}
                 </a>
               ) : (
                 <p>{PROPERTY_PUBLICATION_LABELS.helpers.coordinatesMissing}</p>
               )}
 
               <div className="mt-6 rounded-2xl border border-border bg-surface p-4">
-                <p className="text-sm font-medium text-text-primary">Normas activas</p>
+                <p className="text-sm font-medium text-text-primary">{PROPERTY_PUBLICATION_LABELS.previewLabels.activeRules}</p>
                 {rules.length > 0 ? (
                   <ul className="mt-3 space-y-2 text-sm text-text-secondary">
                     {rules.map((rule, index) => (
@@ -451,7 +451,7 @@ export function PropertyPublicationForm() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-sm text-text-secondary">Aún no hay normas definidas.</p>
+                  <p className="mt-3 text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.noRulesDefined}</p>
                 )}
               </div>
             </div>
@@ -460,11 +460,11 @@ export function PropertyPublicationForm() {
 
         {formError ? <div className="rounded-lg border border-state-error/30 bg-state-error/10 p-4 text-sm text-state-error">{formError}</div> : null}
         {submitSuccess ? (
-          <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-700">✓ ¡Propiedad publicada correctamente! Ahora aparecerá en el catálogo.</div>
+          <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-700">{PROPERTY_PUBLICATION_LABELS.messages.success}</div>
         ) : null}
 
         <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-base">
-          {isSubmitting ? 'Publicando...' : PROPERTY_PUBLICATION_LABELS.buttons.submit}
+          {isSubmitting ? PROPERTY_PUBLICATION_LABELS.buttons.publishing : PROPERTY_PUBLICATION_LABELS.buttons.submit}
         </Button>
       </form>
     </div>

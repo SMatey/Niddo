@@ -30,10 +30,13 @@ export const PROPERTY_PUBLICATION_LABELS = {
       'Arrastra las fotos aquí o haz clic para seleccionar. Puedes reordenar y eliminar antes de publicar.',
     mapInstructions:
       'Haz clic en el mapa para marcar la ubicación exacta. Se guardarán las coordenadas y se generará un enlace de navegación.',
+    dragHandle: 'Arrastrar',
+    imageAltPrefix: 'Foto',
   },
   placeholders: {
     title: 'Apartamento mediano 2 habitaciones',
     price: '450,000/mes',
+    priceExample: '450,000',
     location: 'San José, Costa Rica',
     description:
       'Incluye limpieza semanal, internet estable y acceso a áreas comunes.',
@@ -46,6 +49,7 @@ export const PROPERTY_PUBLICATION_LABELS = {
     addRule: 'Añadir norma',
     useCurrentLocation: 'Usar mi ubicación actual',
     removePhoto: 'Eliminar foto',
+    publishing: 'Publicando...',
   },
   helpers: {
     dateHint:
@@ -54,7 +58,12 @@ export const PROPERTY_PUBLICATION_LABELS = {
       'La fecha de fin seleccionada ya pasó. Actualiza la disponibilidad para publicar.',
     coordinatesMissing:
       'Selecciona un punto en el mapa para generar coordenadas de navegación.',
+    noCoordinatesSelected: 'No hay coordenadas seleccionadas.',
     imageLimit: 'Puedes subir hasta 10 imágenes.',
+    amenitiesDescription: 'Selecciona las amenidades que ofrece el inmueble',
+    houseRulesDescription: 'Define las normas de convivencia del inmueble.',
+    rulesExample: 'Agrega reglas como no fumar, no fiestas o limpieza de mascotas.',
+    noRulesDefined: 'Aún no hay normas definidas.',
   },
   validation: {
     titleRequired: 'El título debe tener al menos 10 caracteres.',
@@ -64,6 +73,19 @@ export const PROPERTY_PUBLICATION_LABELS = {
     availableToRequired: 'Selecciona la fecha de fin.',
     coordinatesRequired:
       'Marca la ubicación en el mapa para guardar coordenadas.',
+  },
+  previewLabels: {
+    title: 'Título',
+    approximatePrice: 'Precio aproximado',
+    location: 'Ubicación',
+    availabilityDates: 'Fechas de disponibilidad',
+    selectValidRange: 'Selecciona un rango válido para que esta publicación aparezca como disponible.',
+    navigationLink: 'Enlace de navegación',
+    viewInGoogleMaps: 'Ver en Google Maps',
+    activeRules: 'Normas activas',
+  },
+  messages: {
+    success: '✓ ¡Propiedad publicada correctamente! Ahora aparecerá en el catálogo.',
   },
 } as const
 
