@@ -3,15 +3,18 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Menu, X } from 'lucide-react'
-import { useState } from 'react'
 import { useAuthModal } from '@/shared/hooks/useAuthModal'
 import { MODAL_LABELS } from '@/shared/constants/modal.constants'
-import { NAVIGATION } from '@/shared/constants/navigation.constants'
+import { NAVBAR_CONFIG } from './constants/navbar.constants'
+import { useMenuToggle } from './hooks'
 
-const NAVIGATION_LINKS = NAVIGATION.public
+const NAVIGATION_LINKS = [
+  { href: '/', label: 'Inicio' },
+  { href: '/explorar', label: 'Explorar' },
+]
 
 export function PublicNavbar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, setIsOpen } = useMenuToggle()
   const pathname = usePathname()
   const { onOpenWithTab } = useAuthModal()
 
@@ -28,7 +31,7 @@ export function PublicNavbar() {
               <div className="bg-blue-600 rounded-full p-2">
                 <Home className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">{NAVIGATION.brand.name}</span>
+              <span className="text-xl font-bold text-gray-900">{NAVBAR_CONFIG.APP_NAME}</span>
             </Link>
 
             {/* Links Centrales */}
@@ -75,7 +78,7 @@ export function PublicNavbar() {
             <div className="bg-blue-600 rounded-full p-2">
               <Home className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-gray-900">{NAVIGATION.brand.name}</span>
+            <span className="font-bold text-gray-900">{NAVBAR_CONFIG.APP_NAME}</span>
           </Link>
 
           {/* Menu Button */}
