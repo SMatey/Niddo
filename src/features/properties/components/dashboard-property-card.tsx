@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu';
 
-import { PROPERTY_CARD_CONTENT } from '../constants/dashboard';
+import { PROPERTY_CARD_CONTENT } from '../constants/dashboard.constants';
 import type { Property, PropertyStatus } from '../types';
 
 const currencyFormatter = new Intl.NumberFormat('es-MX', {

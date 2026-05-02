@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Plus, Building2 } from 'lucide-react';
 
 import { Button } from '@/shared/components/ui/button';
-import { DASHBOARD_CONTENT } from '@/features/properties/constants/dashboard';
+import { DASHBOARD_CONTENT } from '@/features/properties/constants/dashboard.constants';
 import { DashboardPropertyCard } from '@/features/properties/components/dashboard-property-card';
 import { mockProperties } from '@/features/properties/lib/mock-data';
 import type { Property, PropertyStatus } from '@/features/properties/types';
