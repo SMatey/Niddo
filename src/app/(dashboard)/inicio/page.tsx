@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { Hero, SearchBar, FeaturedProperties, FeaturedRoomies } from '@/features/home'
 

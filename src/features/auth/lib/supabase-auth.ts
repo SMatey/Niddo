@@ -57,7 +57,7 @@ export async function signUpWithPassword(values: RegisterInput): Promise<AuthRes
 			email: values.email,
 			password: values.password,
 			options: {
-				emailRedirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.FAVORITES}`,
+				emailRedirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.INICIO}`,
 				data: {
 					full_name: values.fullName,
 				},
@@ -77,7 +77,7 @@ export async function signInWithGoogle(): Promise<AuthResult> {
 		const { error } = await supabase.auth.signInWithOAuth({
 			provider: AUTH.PROVIDERS.GOOGLE,
 			options: {
-				redirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.FAVORITES}`,
+				redirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.INICIO}`,
 			},
 		})
 
@@ -120,7 +120,7 @@ export async function resendEmailVerification(email: string): Promise<AuthResult
 			type: 'signup',
 			email,
 			options: {
-				emailRedirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.FAVORITES}`,
+				emailRedirectTo: `${getSiteUrl()}${ROUTES.AUTH_CALLBACK}?next=${ROUTES.INICIO}`,
 			},
 		})
 
