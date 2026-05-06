@@ -2,16 +2,7 @@ import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { AUTH } from '@/features/auth/constants/auth.constants'
 import { ROUTES } from '@/shared/constants/routes.constants'
-
-export interface AuthResult {
-	error: string | null
-}
-
-export interface RegisterInput {
-	fullName: string
-	email: string
-	password: string
-}
+import type { AuthResult, RegisterInput } from '@/features/auth/lib/types/supabase-auth.types'
 
 const getSiteUrl = () => {
 	if (typeof window !== 'undefined') {

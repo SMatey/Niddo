@@ -3,6 +3,9 @@
 import { cn } from '@/lib/utils'
 import type { UserAvatarProps } from '../navbar.types'
 
+const isImageAvatar = (value: string) =>
+  value.startsWith('http://') || value.startsWith('https://') || value.startsWith('data:image/')
+
 export function UserAvatar({ avatar, onClick, size = 'md' }: UserAvatarProps) {
   const sizeClasses = {
     sm: 'w-6 h-6 text-xs',
@@ -19,7 +22,11 @@ export function UserAvatar({ avatar, onClick, size = 'md' }: UserAvatarProps) {
       )}
       type="button"
     >
-      {avatar}
+      {isImageAvatar(avatar) ? (
+        <img src={avatar} alt="Avatar del usuario" className="h-full w-full rounded-full object-cover" />
+      ) : (
+        avatar
+      )}
     </button>
   )
 }
