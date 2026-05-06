@@ -15,6 +15,28 @@ const parseNullableNumber = z.preprocess((value) => {
   return null
 }, z.number().min(0).nullable())
 
+const parsePriceNumber = z
+  .preprocess((value) => {
+    if (typeof value === 'string') {
+      const normalized = value.replace(/,/g, '').trim()
+      const parsed = Number(normalized)
+      return Number.isFinite(parsed) ? parsed : undefined
+    }
+
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : undefined
+    }
+
+    return undefined
+  },
+  z
+    .number({
+      invalid_type_error: PROPERTY_PUBLICATION_LABELS.validation.priceRequired,
+      required_error: PROPERTY_PUBLICATION_LABELS.validation.priceRequired,
+    })
+    .min(1, PROPERTY_PUBLICATION_LABELS.validation.priceRequired))
+  .transform((value) => Math.round(value))
+
 export const publicationSchema = z
   .object({
     title: z
@@ -22,7 +44,7 @@ export const publicationSchema = z
       .min(10, PROPERTY_PUBLICATION_LABELS.validation.titleRequired)
       .max(120),
     description: z.string().max(1000).optional().or(z.literal('')),
-    price: z.string().min(2, PROPERTY_PUBLICATION_LABELS.validation.priceRequired),
+    price: parsePriceNumber,
     location: z.string().min(5, PROPERTY_PUBLICATION_LABELS.validation.locationRequired),
     bedrooms: parseNullableNumber,
     bathrooms: parseNullableNumber,

@@ -86,6 +86,7 @@ export const MAP_LABELS = {
     apiKeyMissing: 'Google Maps API key no configurada',
     loading: 'Cargando mapa...',
     loadError: 'Error al cargar el mapa',
+    selectedUbication: 'Ubicación seleccionada: ',
 } as const
 
 export const MAP_CONFIG = {

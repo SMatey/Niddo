@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { AMENITIES_CATALOG } from '@/features/properties/constants/publication.constants'
+import { AMENITIES_CATALOG, PROPERTY_PUBLICATION_LABELS } from '@/features/properties/constants/publication.constants'
 import type { LucideIcon } from 'lucide-react'
 import {
   Wifi,
@@ -21,6 +21,7 @@ import {
   Shield,
   Users,
   Hammer,
+  X,
 } from 'lucide-react'
 
 interface PropertyAmenitiesSelectorProps {
@@ -113,7 +114,9 @@ export function PropertyAmenitiesSelector({
 
       {selectedAmenities.length > 0 && (
         <div className="mt-4 rounded-lg border border-border bg-background p-4">
-          <p className="mb-2 text-xs font-medium text-text-secondary">Amenidades seleccionadas:</p>
+          <p className="mb-2 text-xs font-medium text-text-secondary">
+            {PROPERTY_PUBLICATION_LABELS.previewLabels.selectedAmenities}
+          </p>
           <div className="flex flex-wrap gap-2">
             {selectedAmenities.map((amenity, index) => (
               <div
@@ -126,7 +129,7 @@ export function PropertyAmenitiesSelector({
                   onClick={() => handleToggle(amenity)}
                   className="text-text-secondary transition hover:text-state-error"
                 >
-                  ✕
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             ))}

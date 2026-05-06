@@ -5,9 +5,14 @@ export const PROPERTY_ACTIONS_MESSAGES = {
     unexpectedError: 'Error inesperado al crear la propiedad',
     unexpectedProcessing: 'Error inesperado al procesar tu solicitud',
     noImages: 'Sube al menos una foto del inmueble antes de publicar.',
+    NoUploadedImages: 'No se pudieron subir las imágenes. Intenta nuevamente.',
     noAmenities: 'Selecciona al menos una amenidad para tu publicación.',
   },
   status: {
     active: 'active',
   },
+  labels : {
+    propieties: 'propieties',
+    propietiesImages: 'propieties-images',
+  }
 } as const

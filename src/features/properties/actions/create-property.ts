@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import type { Property } from '@/lib/supabase/types'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
+import { uploadPropertyImages } from '@/features/properties/lib/property-image-upload'
 
 export interface CreatePropertyPayload extends PublicationFormValues {
   images: File[]
@@ -38,11 +39,11 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
 
     // Prepare property data
     const propertyData = {
-      id: `prop-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      id: `prop-${Date.now()}-${crypto.randomUUID()}`,
       owner_id: user.id,
       title: payload.title,
       description: payload.description || null,
-      price: Math.round(Number(payload.price.replace(/,/g, '')) || 0),
+      price: payload.price,
       location: payload.location,
       address: null,
       latitude: payload.latitude,
@@ -54,53 +55,28 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       rules: payload.rules || [],
       status: PROPERTY_ACTIONS_MESSAGES.status.active,
       available_from: payload.availableFrom || null,
-      images: [], // Will be populated if images are uploaded
+      images: [] as string[],
     }
 
-    // Upload images if provided
     if (payload.images && payload.images.length > 0) {
-      const uploadedImages: string[] = []
-
-      for (const file of payload.images) {
-        try {
-          const fileExt = file.name.split('.').pop()
-          const fileName = `${propertyData.id}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-          const filePath = `properties/${user.id}/${fileName}`
-
-          const { error: uploadError, data } = await supabase.storage
-            .from('property-images')
-            .upload(filePath, file)
-
-          if (uploadError) {
-            console.error('Error uploading image:', uploadError)
-            continue
-          }
-
-          if (data) {
-            const {
-              data: { publicUrl },
-            } = supabase.storage.from('property-images').getPublicUrl(filePath)
-
-            uploadedImages.push(publicUrl)
-          }
-        } catch (error) {
-          console.error('Error processing image upload:', error)
-          continue
-        }
-      }
-
-      propertyData.images = uploadedImages
+      propertyData.images = await uploadPropertyImages({
+        supabase,
+        bucket: PROPERTY_ACTIONS_MESSAGES.labels.propietiesImages,
+        userId: user.id,
+        propertyId: propertyData.id,
+        files: payload.images,
+      })
     }
 
     // Insert property into database
     const { data: createdProperty, error: insertError } = await supabase
-      .from('properties')
+      .from(PROPERTY_ACTIONS_MESSAGES.labels.propieties)
       .insert([propertyData])
       .select()
       .single()
 
     if (insertError) {
-      console.error('Database error:', insertError)
+      console.error(PROPERTY_ACTIONS_MESSAGES.errors.creationFailed, insertError)
       return {
         success: false,
         error: PROPERTY_ACTIONS_MESSAGES.errors.creationFailed + insertError.message,
@@ -112,7 +88,7 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       data: createdProperty as Property,
     }
   } catch (error) {
-    console.error('Unexpected error in createProperty:', error)
+    console.error(PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError, error)
     return {
       success: false,
       error: PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError,

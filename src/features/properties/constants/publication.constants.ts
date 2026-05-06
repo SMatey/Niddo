@@ -83,6 +83,7 @@ export const PROPERTY_PUBLICATION_LABELS = {
     navigationLink: 'Enlace de navegación',
     viewInGoogleMaps: 'Ver en Google Maps',
     activeRules: 'Normas activas',
+    selectedAmenities: 'Amenidades seleccionadas',
   },
   messages: {
     success: '✓ ¡Propiedad publicada correctamente! Ahora aparecerá en el catálogo.',
