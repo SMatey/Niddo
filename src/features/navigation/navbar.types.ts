@@ -28,6 +28,7 @@ export interface MobileDrawerProps {
   user: User
   activeHref: string
   onLinkClick: () => void
+  onLogout?: () => void | Promise<void>
   profileHref?: string
   profileLabel?: string
   logoutLabel?: string
@@ -37,6 +38,7 @@ export interface ProfileDropdownProps {
   user: User
   isOpen: boolean
   onClose: () => void
+  onLogout?: () => void | Promise<void>
   menuItems?: ProfileMenuItem[]
   profileHref?: string
   profileLabel?: string
@@ -57,5 +59,5 @@ export interface AuthenticatedNavbarProps {
   user: User
   notificationsCount?: number
   messagesCount?: number
-  onLogout?: () => void
+  onLogout?: () => void | Promise<void>
 }

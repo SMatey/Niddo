@@ -6,3 +6,20 @@ export const DASHBOARD_CONTENT = {
   emptyStateSubtext: 'Publica tu primera propiedad y conecta con roomies compatibles',
   newPublicationUrl: '/mis-publicaciones/nueva',
 } as const;
+
+export const PROPERTY_CARD_CONTENT = {
+  status: {
+    active: 'Activo',
+    draft: 'Borrador',
+    paused: 'Pausado',
+  },
+  menu: {
+    view: 'Ver publicación',
+    edit: 'Editar',
+    pause: 'Pausar',
+    activate: 'Activar',
+    delete: 'Eliminar',
+  },
+  pricePerMonth: '/mes',
+  publishedPrefix: 'Publicado el',
+} as const;

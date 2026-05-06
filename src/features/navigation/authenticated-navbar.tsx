@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Home, Search, MessageCircle, Building2, Heart, Settings, X, Menu } from 'lucide-react'
 import { NotificationIcon } from './components/notification-icon'
 import { MessageIcon } from './components/message-icon'
@@ -11,13 +11,14 @@ import { MobileDrawer } from './components/mobile-drawer'
 import { AUTHENTICATED_NAVBAR_CONFIG } from './constants/authenticated-navbar.constants'
 import { NAVBAR_CONFIG } from './constants/navbar.constants'
 import { useNavbarState } from './hooks'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import type { AuthenticatedNavbarProps } from './navbar.types'
 
 const iconMap = {
   home: Home,
   search: Search,
   message: MessageCircle,
-  user: Home, // Placeholder
+  user: Home, 
   building: Building2,
   heart: Heart,
   settings: Settings,
@@ -31,9 +32,26 @@ export function AuthenticatedNavbar({
 }: AuthenticatedNavbarProps) {
   const { isMenuOpen, setIsMenuOpen, isProfileOpen, setIsProfileOpen, profileRef } = useNavbarState()
   const pathname = usePathname()
+  const router = useRouter()
+  const { signOut } = useAuth()
   const { NAVIGATION_LINKS, MENU_LINKS } = AUTHENTICATED_NAVBAR_CONFIG
 
   const isActive = (href: string) => pathname === href
+
+  const handleLogout = async () => {
+    if (onLogout) {
+      await onLogout()
+      return
+    }
+
+    const result = await signOut()
+    if (result.error) {
+      window.alert(result.error)
+      return
+    }
+
+    router.push('/')
+  }
 
   // Mapear los links del menú con iconos
   const menuLinksWithIcons = MENU_LINKS.map((link) => ({
@@ -68,7 +86,7 @@ export function AuthenticatedNavbar({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/inicio" className="flex items-center gap-2">
               <div className="bg-blue-600 rounded-full p-2">
                 <Home className="w-6 h-6 text-white" />
               </div>
@@ -108,6 +126,7 @@ export function AuthenticatedNavbar({
                   user={user}
                   isOpen={isProfileOpen}
                   onClose={() => setIsProfileOpen(false)}
+                  onLogout={handleLogout}
                   menuItems={profileMenuItems as any}
                 />
               </div>
@@ -120,7 +139,7 @@ export function AuthenticatedNavbar({
       <nav className="bg-white border-b border-gray-200 md:hidden">
         <div className="px-4 py-4 flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/inicio" className="flex items-center gap-2">
             <div className="bg-blue-600 rounded-full p-2">
               <Home className="w-5 h-5 text-white" />
             </div>
@@ -150,6 +169,7 @@ export function AuthenticatedNavbar({
           user={user}
           activeHref={pathname}
           onLinkClick={() => setIsMenuOpen(false)}
+          onLogout={handleLogout}
         />
       </nav>
     </>

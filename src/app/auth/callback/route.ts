@@ -5,7 +5,7 @@ import { ROUTES } from '@/shared/constants/routes.constants'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') || ROUTES.FAVORITES
+  const next = requestUrl.searchParams.get('next') || ROUTES.INICIO
 
   if (!code) {
     return NextResponse.redirect(new URL(ROUTES.LOGIN, requestUrl.origin))

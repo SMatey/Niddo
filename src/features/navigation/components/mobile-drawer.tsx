@@ -11,6 +11,7 @@ export function MobileDrawer({
   user,
   activeHref,
   onLinkClick,
+  onLogout,
   profileHref = '/perfil',
   profileLabel = 'Ver perfil',
   logoutLabel = 'Cerrar Sesión',
@@ -57,7 +58,10 @@ export function MobileDrawer({
 
         {/* Logout */}
         <button
-          onClick={onLinkClick}
+          onClick={async () => {
+            await onLogout?.()
+            onLinkClick()
+          }}
           className="w-full flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 font-medium rounded-lg transition-colors text-sm"
         >
           <LogOut className="w-5 h-5" />
