@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
     (pathname === ROUTES.LOGIN || pathname === ROUTES.REGISTER) &&
     user
   ) {
-    const redirectTo = request.nextUrl.searchParams.get('redirect') || ROUTES.FAVORITES
+    const redirectTo = request.nextUrl.searchParams.get('redirect') || ROUTES.INICIO
     return NextResponse.redirect(new URL(redirectTo, request.url))
   }
 

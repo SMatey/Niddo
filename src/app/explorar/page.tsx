@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { FilterSidebar } from '@/features/search/components/filter-sidebar'
 import { ResultsDisplay } from '@/features/search/components/results-display'
 import { ExplorarHeader } from '@/features/search/components/explorar-header'
@@ -11,10 +12,32 @@ import { useUsers } from '@/features/users/hooks/use-users'
 import type { FilterState, ContentMode, ViewMode } from '@/features/search/types/search.types'
 
 export default function ExplorarPage() {
+  const searchParams = useSearchParams()
+  const searchParamsKey = searchParams.toString()
   const { filters, setFilters } = useSearchFilters()
   const [contentMode, setContentMode] = useState<ContentMode>('properties')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
+
+  useEffect(() => {
+    if (!searchParamsKey) {
+      return
+    }
+
+    const params = new URLSearchParams(searchParamsKey)
+    const tipo = params.get('tipo')
+    const ubicacion = params.get('ubicacion')
+
+    if (tipo === 'roomie') {
+      setContentMode('users')
+    } else if (tipo === 'vivienda') {
+      setContentMode('properties')
+    }
+
+    if (ubicacion && ubicacion.trim()) {
+      setFilters((prev) => ({ ...prev, location: ubicacion }))
+    }
+  }, [searchParamsKey, setFilters])
 
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters)
@@ -30,19 +53,14 @@ export default function ExplorarPage() {
   return (
     <main className="min-h-screen bg-surface-subtle">
       <div className="container mx-auto px-4 py-6">
-        <ExplorarHeader
-          onOpenFilters={() => setIsMobileFiltersOpen(true)}
-        />
+        <ExplorarHeader onOpenFilters={() => setIsMobileFiltersOpen(true)} />
 
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:block w-full lg:w-80 shrink-0">
             <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
           </div>
 
-          <MobileFiltersDrawer
-            isOpen={isMobileFiltersOpen}
-            onClose={() => setIsMobileFiltersOpen(false)}
-          >
+          <MobileFiltersDrawer isOpen={isMobileFiltersOpen} onClose={() => setIsMobileFiltersOpen(false)}>
             <FilterSidebar filters={filters} onFilterChange={handleFilterChange} contentMode={contentMode} />
           </MobileFiltersDrawer>
 
