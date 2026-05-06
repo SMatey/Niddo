@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { ROUTES } from '@/shared/constants/routes.constants'
+import { API_ENDPOINTS } from '@/shared/constants/api-endpoints.constants'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -45,9 +46,9 @@ export async function middleware(request: NextRequest) {
 
   // Rutas API protegidas para acciones reservadas
   const protectedApiPaths = [
-    '/api/favorites',
-    '/api/messages',
-    '/api/contact',
+    API_ENDPOINTS.protected.favorites,
+    API_ENDPOINTS.protected.messages,
+    API_ENDPOINTS.protected.contact,
   ]
 
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
