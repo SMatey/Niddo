@@ -14,10 +14,12 @@ export const HOME_DATA = {
     pageSize: 4,
     itemsToShow: 4,
     viewAllHref: '/explorar?tipo=roomie',
+    publishHref: '/mis-publicaciones',
     cta: {
       title: '¿Listo para encontrar tu match?',
       subtitle: 'Únete a miles de personas que ya encontraron su roomie o vivienda ideal',
       searchButtonLabel: 'Empezar a buscar',
+      searchHref: '/explorar',
       publishButtonLabel: 'Publicar mi espacio',
     },
     loginPrompt: {
@@ -27,12 +29,18 @@ export const HOME_DATA = {
     },
   },
   search_bar: {
-    typeOptions: {
-      vivienda: 'Busco Vivienda',
-      roomie: 'Busco Roomie',
-    },
+    types: [
+      { key: 'vivienda', label: 'Busco Vivienda', icon: 'home' },
+      { key: 'roomie', label: 'Busco Roomie', icon: 'users' },
+    ],
     placeholder: 'Ciudad, zona o colonia...',
     searchButtonLabel: 'Buscar',
+    defaultType: 'vivienda',
+    searchRoute: '/explorar',
+    searchParams: {
+      type: 'tipo',
+      location: 'ubicacion',
+    },
   },
   hero: {
     title: 'Encuentra tu ',

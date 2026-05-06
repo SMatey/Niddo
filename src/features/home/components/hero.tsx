@@ -1,4 +1,4 @@
-import { HOME_DATA } from '../home.data'
+import { HOME_DATA } from '../constants/home.constants'
 
 export function Hero() {
   const { title, titleHighlight, titleEnd, description } = HOME_DATA.hero

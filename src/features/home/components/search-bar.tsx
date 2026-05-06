@@ -1,62 +1,49 @@
 'use client'
 
-import { useState } from 'react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Search, Home, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { HOME_DATA } from '../home.data'
-
-type SearchType = 'vivienda' | 'roomie'
+import { useSearchBar } from '../hooks/use-search-bar'
 
 export function SearchBar() {
-  const { typeOptions, placeholder, searchButtonLabel } = HOME_DATA.search_bar
-  const [searchType, setSearchType] = useState<SearchType>('vivienda')
-  const [location, setLocation] = useState('')
-
-  const handleSearch = () => {
-    if (location.trim()) {
-      const params = new URLSearchParams({
-        tipo: searchType,
-        ubicacion: location,
-      })
-      window.location.href = `/explorar?${params.toString()}`
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    }
-  }
+  const {
+    types,
+    placeholder,
+    searchButtonLabel,
+    searchType,
+    setSearchType,
+    location,
+    setLocation,
+    handleSearch,
+    handleKeyPress,
+  } = useSearchBar()
+  const iconMap = {
+    home: Home,
+    users: Users,
+  } as const
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-4">
       <div className="flex gap-4 bg-background rounded-lg p-1 border border-border">
-        <button
-          onClick={() => setSearchType('vivienda')}
-          className={cn(
-            'flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md transition-all font-medium',
-            searchType === 'vivienda'
-              ? 'bg-white text-text-primary shadow-sm'
-              : 'text-text-muted hover:text-text-primary'
-          )}
-        >
-          <Home className="w-4 h-4" />
-          {typeOptions.vivienda}
-        </button>
-        <button
-          onClick={() => setSearchType('roomie')}
-          className={cn(
-            'flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md transition-all font-medium',
-            searchType === 'roomie'
-              ? 'bg-white text-text-primary shadow-sm'
-              : 'text-text-muted hover:text-text-primary'
-          )}
-        >
-          <Users className="w-4 h-4" />
-          {typeOptions.roomie}
-        </button>
+        {types.map((type) => {
+          const Icon = iconMap[type.icon as keyof typeof iconMap]
+          const isSelected = searchType === type.key
+
+          return (
+            <button
+              key={type.key}
+              onClick={() => setSearchType(type.key)}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-md transition-all font-medium',
+                isSelected ? 'bg-white text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              {type.label}
+            </button>
+          )
+        })}
       </div>
 
       <div className="flex gap-3">

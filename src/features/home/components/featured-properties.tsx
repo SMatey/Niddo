@@ -1,15 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PropertyCard } from '@/shared/components/ui/property-card'
-import { useProperties } from '@/features/properties/hooks/use-properties'
-import { HOME_DATA } from '../home.data'
+import { useFeaturedProperties } from '../hooks/use-featured-properties'
 import type { PropertyItem } from '@/features/search/types/search.types'
 
 export function FeaturedProperties() {
-  const { pageSize, itemsToShow, title, description, viewAllLabel, viewAllHref } = HOME_DATA.featured_properties
-  const { data: properties, isLoading } = useProperties(null, { initialPageSize: pageSize })
+  const { title, description, viewAllLabel, viewAllHref, itemsToShow, properties, isLoading } =
+    useFeaturedProperties()
 
   if (isLoading) {
     return (
@@ -19,7 +17,7 @@ export function FeaturedProperties() {
           <p className="text-text-muted">{description}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => (
+          {Array.from({ length: itemsToShow }).map((_, i) => (
             <div key={i} className="bg-surface rounded-lg border border-border h-72 animate-pulse" />
           ))}
         </div>

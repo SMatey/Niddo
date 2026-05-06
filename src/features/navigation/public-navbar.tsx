@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Menu, X } from 'lucide-react'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useAuthModal } from '@/shared/hooks/useAuthModal'
 import { MODAL_LABELS } from '@/shared/constants/modal.constants'
+import { AuthenticatedNavbar } from './authenticated-navbar'
 import { NAVBAR_CONFIG } from './constants/navbar.constants'
 import { useMenuToggle } from './hooks'
 
@@ -17,8 +19,21 @@ export function PublicNavbar() {
   const { isOpen, setIsOpen } = useMenuToggle()
   const pathname = usePathname()
   const { onOpenWithTab } = useAuthModal()
+  const { user, isInitialized } = useAuth()
 
   const isActive = (href: string) => pathname === href
+
+  if (isInitialized && user) {
+    return (
+      <AuthenticatedNavbar
+        user={{
+          name: user.user_metadata?.name || user.email || 'Usuario',
+          email: user.email,
+          avatar: user.user_metadata?.avatar?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U',
+        }}
+      />
+    )
+  }
 
   return (
     <>
