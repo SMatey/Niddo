@@ -45,3 +45,6 @@ supabase/.temp
 supabase/migrations/.temp
 src/lib/supabase/migrations
 .swc
+
+# .md de contexto
+CONTEXTO_IA_PROYECTO.md
