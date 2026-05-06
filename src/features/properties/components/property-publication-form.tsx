@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -47,7 +47,7 @@ export function PropertyPublicationForm() {
     defaultValues: {
       title: '',
       description: '',
-      price: '',
+      price: undefined,
       location: '',
       bedrooms: null,
       bathrooms: null,
@@ -96,7 +96,7 @@ export function PropertyPublicationForm() {
     addRule(ruleInput)
   }
 
-  const handleSubmitForm = async (values: PublicationFormValues) => {
+  const handleSubmitForm : SubmitHandler<PublicationFormValues> = async (values: PublicationFormValues) => {
     setFormError(null)
 
     if (selectedImages.length === 0) {
@@ -158,7 +158,7 @@ export function PropertyPublicationForm() {
         </div>
       </section>
 
-      <form onSubmit={handleSubmit(handleSubmitForm)} noValidate className="space-y-8">
+      <form onSubmit={handleSubmit((data) => handleSubmitForm(data))} noValidate className="space-y-8">
         <section className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
           <div className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-2">
