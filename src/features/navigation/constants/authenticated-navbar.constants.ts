@@ -2,7 +2,7 @@ export const AUTHENTICATED_NAVBAR_CONFIG = {
   NAVIGATION_LINKS: [
     {
       label: 'Inicio',
-      href: '/',
+      href: '/inicio',
       icon: 'home',
     },
     {
@@ -14,7 +14,7 @@ export const AUTHENTICATED_NAVBAR_CONFIG = {
   MENU_LINKS: [
     {
       label: 'Inicio',
-      href: '/',
+      href: '/inicio',
       icon: 'home',
     },
     {

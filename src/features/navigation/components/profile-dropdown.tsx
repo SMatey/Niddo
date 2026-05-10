@@ -9,6 +9,7 @@ export function ProfileDropdown({
   user,
   isOpen,
   onClose,
+  onLogout,
   menuItems = [],
   profileHref = '/perfil',
   profileLabel = 'Ver perfil',
@@ -51,7 +52,10 @@ export function ProfileDropdown({
 
         {/* Logout */}
         <button
-          onClick={onClose}
+          onClick={async () => {
+            await onLogout?.()
+            onClose()
+          }}
           className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-gray-100 text-sm border-t border-gray-200 mt-1 pt-2"
         >
           <LogOut className="w-4 h-4" />
