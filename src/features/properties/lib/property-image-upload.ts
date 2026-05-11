@@ -53,18 +53,43 @@ export async function uploadPropertyImages({
   propertyId,
   files,
 }: UploadPropertyImagesOptions): Promise<string[]> {
-  const uploadPromises = files.map((file) =>
-    uploadSinglePropertyImage({ supabase, bucket, userId, propertyId, file })
-  )
+  try {
+    const formData = new FormData();
+    formData.append('propertyId', propertyId);
+    
+    // Add all files
+    files.forEach((file, index) => {
+      formData.append('file', file);
+      formData.append('index', String(index));
+    });
 
-  const results = await Promise.allSettled(uploadPromises)
-
-  return results.reduce<string[]>((uploadedImages, result) => {
-    if (result.status === 'fulfilled') {
-      uploadedImages.push(result.value)
-    } else {
-      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, result.reason)
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    
+    if (!token) {
+      throw new Error("No session found for uploading images");
     }
-    return uploadedImages
-  }, [])
+
+    // Call the Edge Function to handle optimized WebP upload
+    const { data, error } = await supabase.functions.invoke('property-images-upload', {
+      body: formData,
+      headers: {
+        // Fetch handles FormData content type automatically, don't set it manually
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (error) {
+      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, error);
+      throw error;
+    }
+
+    // Extracts ordered URLs
+    const urls = (data?.urls || []).map((item: { url: string }) => item.url);
+    return urls;
+  } catch (err) {
+    console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, err);
+    return [];
+  }
 }
+

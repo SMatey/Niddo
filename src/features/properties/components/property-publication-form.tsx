@@ -13,9 +13,16 @@ import { PropertyImageUploader } from '@/features/properties/components/property
 import { PropertyLocationPicker } from '@/features/properties/components/property-location-picker'
 import { PropertyAmenitiesSelector } from '@/features/properties/components/property-amenities-selector'
 import { createProperty, type CreatePropertyPayload } from '@/features/properties/actions/create-property'
+import { updateProperty, type UpdatePropertyPayload } from '@/features/properties/actions/update-property'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
 
-export function PropertyPublicationForm() {
+export interface PropertyPublicationFormProps {
+  initialData?: any; // The property data to edit
+  propertyId?: string;
+}
+
+export function PropertyPublicationForm({ initialData, propertyId }: PropertyPublicationFormProps) {
+  const isEditing = Boolean(initialData && propertyId);
   const {
     selectedImages,
     imageError,
@@ -32,7 +39,28 @@ export function PropertyPublicationForm() {
     toggleAmenity,
     addRule,
     removeRule,
+    setAmenities,
+    setRules,
+    setSelectedImages,
   } = usePropertyPublication()
+
+  // Pre-fill data if editing
+  useEffect(() => {
+    if (initialData) {
+      if (initialData.latitude && initialData.longitude) {
+        updateLocation({ lat: initialData.latitude, lng: initialData.longitude })
+      }
+      if (initialData.amenities) setAmenities(initialData.amenities)
+      if (initialData.rules) setRules(initialData.rules)
+      if (initialData.images) {
+        const previewImages = initialData.images.map((url: string, index: number) => ({
+          id: `existing-img-${index}-${Date.now()}`,
+          previewUrl: url,
+        }))
+        setSelectedImages(previewImages)
+      }
+    }
+  }, [initialData])
 
   const {
     register,
@@ -45,19 +73,19 @@ export function PropertyPublicationForm() {
   } = useForm<PublicationFormValues>({
     resolver: zodResolver(publicationSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      price: undefined,
-      location: '',
-      bedrooms: null,
-      bathrooms: null,
-      squareMeters: null,
-      availableFrom: '',
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      price: initialData?.price || undefined,
+      location: initialData?.location || '',
+      bedrooms: initialData?.bedrooms || null,
+      bathrooms: initialData?.bathrooms || null,
+      squareMeters: initialData?.area || null,
+      availableFrom: initialData?.available_from || '',
       availableTo: '',
-      latitude: null,
-      longitude: null,
-      amenities: [],
-      rules: [],
+      latitude: initialData?.latitude || null,
+      longitude: initialData?.longitude || null,
+      amenities: initialData?.amenities || [],
+      rules: initialData?.rules || [],
     },
   })
 
@@ -123,25 +151,44 @@ export function PropertyPublicationForm() {
     }
 
     try {
-      const payload: CreatePropertyPayload = {
-        ...values,
-        latitude: location.lat,
-        longitude: location.lng,
-        images: selectedImages.map((image) => image.file),
-        navigationUrl: `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`,
-      }
-
-      const result = await createProperty(payload)
-
-      if (result.success) {
-        setSubmitSuccess(true)
-        setFormError(null)
-        reset()
-        clearImages()
-        // Show success message for a few seconds
-        setTimeout(() => setSubmitSuccess(false), 5000)
+      if (isEditing && propertyId) {
+        const payload: UpdatePropertyPayload = {
+          ...values,
+          latitude: location.lat,
+          longitude: location.lng,
+          images: selectedImages.map(img => img.file || img.previewUrl), // Mixed files and existing URLs
+          navigationUrl: `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`,
+        }
+        
+        const result = await updateProperty(propertyId, payload)
+        
+        if (result.success) {
+          setSubmitSuccess(true)
+          setFormError(null)
+          setTimeout(() => setSubmitSuccess(false), 5000)
+        } else {
+          setFormError(result.error || "No se pudo actualizar la propiedad")
+        }
       } else {
-        setFormError(result.error || PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError)
+        const payload: CreatePropertyPayload = {
+          ...values,
+          latitude: location.lat,
+          longitude: location.lng,
+          images: selectedImages.map((image) => image.file as File),
+          navigationUrl: `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`,
+        }
+
+        const result = await createProperty(payload)
+
+        if (result.success) {
+          setSubmitSuccess(true)
+          setFormError(null)
+          reset()
+          clearImages()
+          setTimeout(() => setSubmitSuccess(false), 5000)
+        } else {
+          setFormError(result.error || PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError)
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error)

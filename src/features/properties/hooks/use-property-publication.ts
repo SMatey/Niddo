@@ -139,5 +139,8 @@ export function usePropertyPublication() {
     removeAmenity,
     addRule,
     removeRule,
+    setAmenities,
+    setRules,
+    setSelectedImages,
   }
 }
