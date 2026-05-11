@@ -41,7 +41,6 @@ Deno.serve(async (req) => {
       area: payload.area,
       status: payload.status ?? 'draft', // Draft by default
       images: payload.images ?? [], // Assume images are sent securely
-      amenities: payload.amenities ?? [], // Direct amenities string array fallback
       owner_id: user.id, // Enforce ownership
       updated_at: new Date().toISOString()
     }
@@ -57,6 +56,18 @@ Deno.serve(async (req) => {
         .single()
       
       if (error) throw error
+
+      if (payload.amenities && Array.isArray(payload.amenities)) {
+        await supabase.from('property_amenities').delete().eq('property_id', payload.id);
+        if (payload.amenities.length > 0) {
+            const amenitiesData = payload.amenities.map((amenityId: string) => ({
+                property_id: payload.id,
+                amenity_id: amenityId
+            }))
+            await supabase.from('property_amenities').insert(amenitiesData);
+        }
+      }
+
       return new Response(JSON.stringify(data), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     } else {
       const { data, error } = await supabase
@@ -66,6 +77,15 @@ Deno.serve(async (req) => {
         .single()
       
       if (error) throw error
+
+      if (payload.amenities && Array.isArray(payload.amenities) && payload.amenities.length > 0) {
+        const amenitiesData = payload.amenities.map((amenityId: string) => ({
+            property_id: data.id,
+            amenity_id: amenityId
+        }))
+        await supabase.from('property_amenities').insert(amenitiesData);
+      }
+
       return new Response(JSON.stringify(data), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
   } catch (err) {

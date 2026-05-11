@@ -37,7 +37,7 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       }
     }
 
-    // Prepare property data
+    // Prepare property data (without amenities, since they belong in property_amenities)
     const propertyData = {
       id: `prop-${Date.now()}-${crypto.randomUUID()}`,
       owner_id: user.id,
@@ -51,7 +51,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       bedrooms: payload.bedrooms || 1,
       bathrooms: payload.bathrooms || 1,
       area: payload.squareMeters || 0,
-      amenities: payload.amenities || [],
       rules: payload.rules || [],
       status: PROPERTY_ACTIONS_MESSAGES.status.active,
       available_from: payload.availableFrom || null,
@@ -80,6 +79,23 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       return {
         success: false,
         error: PROPERTY_ACTIONS_MESSAGES.errors.creationFailed + insertError.message,
+      }
+    }
+
+    // Insert amenities into related table
+    if (payload.amenities && payload.amenities.length > 0) {
+      const amenitiesData = payload.amenities.map(amenityId => ({
+        property_id: propertyData.id,
+        amenity_id: amenityId
+      }))
+      
+      const { error: amenitiesError } = await supabase
+        .from('property_amenities')
+        .insert(amenitiesData)
+
+      if (amenitiesError) {
+        console.error("Warning: Could not save property amenities", amenitiesError)
+        // We do not fail the whole creation for this, but could depending on business rules.
       }
     }
 

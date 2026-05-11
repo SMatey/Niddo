@@ -32,7 +32,6 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
       bedrooms: payload.bedrooms || 1,
       bathrooms: payload.bathrooms || 1,
       area: payload.squareMeters || 0,
-      amenities: payload.amenities || [],
       rules: payload.rules || [],
     }
 
