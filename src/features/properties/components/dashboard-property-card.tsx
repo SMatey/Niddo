@@ -95,7 +95,7 @@ export function DashboardPropertyCard({
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="cursor-pointer"
-                    onClick={() => onToggleStatus(property.id, property.status)}
+                    onSelect={() => onToggleStatus(property.id, property.status)}
                   >
                     {property.status === 'active' ? (
                       <><Pause className="mr-2 h-4 w-4" /> {PROPERTY_CARD_CONTENT.menu.pause}</>
@@ -106,7 +106,7 @@ export function DashboardPropertyCard({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-                    onClick={() => onDelete(property.id)}
+                    onSelect={() => onDelete(property.id)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     {PROPERTY_CARD_CONTENT.menu.delete}
