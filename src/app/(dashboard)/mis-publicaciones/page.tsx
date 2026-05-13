@@ -19,14 +19,28 @@ export default function MisPublicacionesPage() {
   const handleToggleStatus = async (id: string, currentStatus: PropertyStatus) => {
     try {
       setActionLoadingId(id);
-      const supabase = createClient();
+      
+      const session = await createClient().auth.getSession();
+      const token = session.data.session?.access_token;
+      
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const functionUrl = `${supabaseUrl}/functions/v1/property-status-update`;
+
       const newStatus = currentStatus === 'active' ? 'paused' : 'active';
       
-      const { error } = await supabase.functions.invoke('property-status-update', {
-        body: { id, status: newStatus }
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id, status: newStatus })
       });
       
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
       
       // Refresh list to show changes
       refresh();

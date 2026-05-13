@@ -70,19 +70,27 @@ export async function uploadPropertyImages({
       throw new Error("No session found for uploading images");
     }
 
-    // Call the Edge Function to handle optimized WebP upload
-    const { data, error } = await supabase.functions.invoke('property-images-upload', {
+    // Call the Edge Function using raw fetch to properly handle multipart/form-data boundary
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const functionUrl = `${supabaseUrl}/functions/v1/property-images-upload`;
+    
+    const response = await fetch(functionUrl, {
+      method: 'POST',
       body: formData,
       headers: {
-        // Fetch handles FormData content type automatically, don't set it manually
-        Authorization: `Bearer ${token}`
+        // Do NOT set Content-Type manually, let the browser set it with the boundary!
+        'Authorization': `Bearer ${token}`,
+        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       }
     });
 
-    if (error) {
-      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, error);
-      throw error;
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, errorText);
+      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
     }
+
+    const data = await response.json();
 
     // Extracts ordered URLs
     const urls = (data?.urls || []).map((item: { url: string }) => item.url);
