@@ -4,14 +4,10 @@ import { Input } from '@/shared/components/ui/input'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
 import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS } from '../constants/search.constants'
-import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
+import type { FilterState, FilterSidebarProps, ContentMode, FilterSidebarWithModeProps } from '../types/search.types'
 import { useFilterState } from '../hooks/use-filter-state'
 
 export type { FilterState, FilterSidebarProps }
-
-interface FilterSidebarWithModeProps extends FilterSidebarProps {
-    contentMode: ContentMode
-}
 
 const CONTENT_MODE_CONFIG = {
     [CONTENT_MODES.PROPERTIES]: {

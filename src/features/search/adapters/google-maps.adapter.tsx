@@ -3,15 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, Point, MapBounds, ContentMode } from '../types/search.types'
-import type { MapProvider, MapProviderProps } from '../types/search.types'
+import type { MapProvider, MapProviderProps, GoogleMapsProviderProps } from '../types/search.types'
 import { MapInfoWindow } from '../components/map-info-window'
 import { MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
-
-interface GoogleMapsProviderProps extends MapProviderProps {
-    onBoundsChange?: (bounds: MapBounds) => void
-    children?: React.ReactNode
-}
-
 
 export class GoogleMapsProvider implements MapProvider {
     private apiKey: string

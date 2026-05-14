@@ -1,25 +1,9 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import type { FilterState, ContentMode, ViewMode, MapBounds } from '../types/search.types'
+import type { FilterState, ContentMode, ViewMode, MapBounds, ExplorarContextValue } from '../types/search.types'
 import { VIEW_MODES, CONTENT_MODES } from '../constants/search.constants'
 import { useSearchFilters } from '@/features/search/hooks/use-search-filters'
-
-interface ExplorarContextValue {
-    filters: FilterState
-    setFilters: (filters: FilterState) => void
-    contentMode: ContentMode
-    setContentMode: (mode: ContentMode) => void
-    viewMode: ViewMode
-    setViewMode: (mode: ViewMode) => void
-    mapBounds: MapBounds | null
-    setMapBounds: (bounds: MapBounds | null) => void
-    handleBoundsChange: (bounds: MapBounds) => void
-    isMobileFiltersOpen: boolean
-    setIsMobileFiltersOpen: (open: boolean) => void
-    handleViewModeChange: (newViewMode: ViewMode) => void
-    handleFilterChange: (newFilters: FilterState) => void
-}
 
 const ExplorarContext = createContext<ExplorarContextValue | null>(null)
 

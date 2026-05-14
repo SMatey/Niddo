@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
-import { ROUTING_PATHS, CONTENT_MODES } from '../constants/search.constants'
+import { ROUTING_PATHS, CONTENT_MODES, MAP_LABELS } from '../constants/search.constants'
 
 function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): string | null {
     if (isProperty) {
@@ -14,7 +14,7 @@ function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): s
         const min = user.minBudget ?? ''
         const max = user.maxBudget ?? ''
         const separator = user.minBudget && user.maxBudget ? ' - ' : ''
-        return `Budget: ${min}${separator}${max}`
+        return `${MAP_LABELS.budgetPrefix} ${min}${separator}${max}`
     }
     return null
 }
@@ -77,7 +77,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
                         <button
                             onClick={handleClose}
                             className="p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
-                            aria-label="Cerrar"
+                            aria-label={MAP_LABELS.close}
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -108,7 +108,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
                 onClick={handleClick}
                 className="block mt-2 p-2 -mx-2 -mb-2 rounded-lg hover:bg-slate-50 transition-colors duration-150 cursor-pointer text-center text-sm text-blue-600 hover:text-blue-700"
             >
-                Ver detalles
+                {MAP_LABELS.viewDetails}
             </a>
         </div>
     )

@@ -71,6 +71,8 @@ export interface ListViewProps {
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
+    hoveredId?: string | null
+    onHover?: (id: string | null) => void
 }
 
 export interface MapViewProps {
@@ -79,6 +81,8 @@ export interface MapViewProps {
     contentMode: ContentMode
     isLoading?: boolean
     onBoundsChange?: (bounds: MapBounds) => void
+    hoveredId?: string | null
+    onHover?: (id: string | null) => void
 }
 
 export interface ResultsDisplayProps {
@@ -95,6 +99,8 @@ export interface ResultsDisplayProps {
     totalPages?: number
     onPageChange?: (page: number) => void
     onBoundsChange?: (bounds: MapBounds) => void
+    hoveredId?: string | null
+    onHover?: (id: string | null) => void
 }
 
 export interface PropertyDetail extends PropertyItem {
@@ -199,3 +205,52 @@ export interface MapProviderContextValue {
 
 export type { PropertyRepository, PropertySearchParams, PropertySearchResult } from '@/features/properties/types/property-repository.types'
 export type { UserRepository, UserSearchParams, UserSearchResult } from '@/features/users/types/user-repository.types'
+
+export interface UseFilterStateOptions {
+    onFilterChange?: (filters: FilterState) => void
+}
+
+export interface UseFilterStateResult {
+    filters: FilterState
+    updateFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
+    toggleTag: (tag: string) => void
+    clearFilters: () => void
+}
+
+export interface SearchServiceContextValue {
+    propertiesService: import('@/features/properties/lib/supabase-properties').PropertiesService
+    usersService: import('@/features/users/lib/supabase-users').UsersService
+    propertyRepository: PropertyRepository
+    userRepository: UserRepository
+}
+
+export interface SearchServiceProviderProps {
+    children: React.ReactNode
+    propertyRepository?: PropertyRepository
+    userRepository?: UserRepository
+}
+
+export interface ExplorarContextValue {
+    filters: FilterState
+    setFilters: (filters: FilterState) => void
+    contentMode: ContentMode
+    setContentMode: (mode: ContentMode) => void
+    viewMode: ViewMode
+    setViewMode: (mode: ViewMode) => void
+    mapBounds: MapBounds | null
+    setMapBounds: (bounds: MapBounds | null) => void
+    handleBoundsChange: (bounds: MapBounds) => void
+    isMobileFiltersOpen: boolean
+    setIsMobileFiltersOpen: (open: boolean) => void
+    handleViewModeChange: (newViewMode: ViewMode) => void
+    handleFilterChange: (newFilters: FilterState) => void
+}
+
+export interface GoogleMapsProviderProps extends MapProviderProps {
+    onBoundsChange?: (bounds: MapBounds) => void
+    children?: React.ReactNode
+}
+
+export interface FilterSidebarWithModeProps extends FilterSidebarProps {
+    contentMode: ContentMode
+}

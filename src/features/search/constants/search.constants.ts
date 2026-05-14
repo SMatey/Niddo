@@ -85,6 +85,9 @@ export const MAP_LABELS = {
     apiKeyMissing: 'Google Maps API key no configurada',
     loading: 'Cargando mapa...',
     loadError: 'Error al cargar el mapa',
+    budgetPrefix: 'Presupuesto:',
+    close: 'Cerrar',
+    viewDetails: 'Ver detalles',
 } as const
 
 export const MAP_COORDINATES = {

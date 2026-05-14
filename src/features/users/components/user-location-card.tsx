@@ -5,9 +5,7 @@ import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
 import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 import type { UserDetail } from '@/features/search/types/search.types'
 
-interface UserLocationCardProps {
-  user: UserDetail
-}
+import type { UserLocationCardProps } from '../types/users.types'
 
 export function UserLocationCard({ user }: UserLocationCardProps) {
   if (!user.lat || !user.lng) {

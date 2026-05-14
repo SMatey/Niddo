@@ -9,7 +9,6 @@ import { MobileFiltersDrawer } from '@/features/search/components/mobile-filters
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
 import { VIEW_MODES, CONTENT_MODES } from '@/features/search/constants/search.constants'
-import { useSearchServiceRepositories } from '@/features/search/context/search-service.context'
 
 function ExplorarPageContent() {
   const {
@@ -25,19 +24,16 @@ function ExplorarPageContent() {
     mapBounds,
   } = useExplorarContext()
 
-  const { propertyRepository, userRepository } = useSearchServiceRepositories()
 
   const currentBounds = viewMode === VIEW_MODES.MAP ? mapBounds : null
 
   const propertiesResult = useProperties(
     contentMode === CONTENT_MODES.PROPERTIES ? filters : null,
-    currentBounds,
-    { repository: propertyRepository }
+    currentBounds
   )
   const usersResult = useUsers(
     contentMode === CONTENT_MODES.USERS ? filters : null,
-    currentBounds,
-    { repository: userRepository }
+    currentBounds
   )
 
   const resultConfig = {

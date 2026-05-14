@@ -1,2 +1,2 @@
 export { useUsers } from './hooks/use-users'
-export * from './lib/supabase-users'
+export { UsersService } from './lib/supabase-users'
