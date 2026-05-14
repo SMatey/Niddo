@@ -8,26 +8,48 @@ import { UserBudgetCard } from '@/features/users/components/user-budget-card'
 import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-card'
 import { UserLocationCard } from '@/features/users/components/user-location-card'
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
+import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
+import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
+import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
+import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
 
-export default function UserDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const id = params.id as string
+function UserDetailLoadingState() {
+  return (
+    <main className="min-h-screen bg-surface-subtle">
+      <div className="container mx-auto px-4 py-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 w-32 rounded bg-surface-muted" />
+          <div className="h-32 max-w-2xl rounded-lg bg-surface-muted" />
+          <div className="h-24 rounded-lg bg-surface-muted" />
+        </div>
+      </div>
+    </main>
+  )
+}
+
+function UserModerationErrorState({ onBack }: { onBack: () => void }) {
+  return (
+    <main className="min-h-screen bg-surface-subtle">
+      <div className="container mx-auto max-w-5xl px-4 py-6">
+        <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
+          <p className="text-sm text-state-error">{REPORT_FORM.UI.MODERATION_ERROR}</p>
+          <div className="mt-4">
+            <Button type="button" variant="outline" onClick={onBack}>
+              {REPORT_FORM.UI.BACK_TO_PREVIOUS}
+            </Button>
+          </div>
+        </section>
+      </div>
+    </main>
+  )
+}
+
+function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
   const { data: user, isLoading } = useUser(id)
 
   if (isLoading) {
-    return (
-      <main className="min-h-screen bg-surface-subtle">
-        <div className="container mx-auto px-4 py-6">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 w-32 bg-surface-muted rounded" />
-            <div className="h-32 bg-surface-muted rounded-lg max-w-2xl" />
-            <div className="h-24 bg-surface-muted rounded-lg" />
-          </div>
-        </div>
-      </main>
-    )
+    return <UserDetailLoadingState />
   }
 
   if (!user) {
@@ -46,9 +68,9 @@ export default function UserDetailPage() {
         <DetailHeader
           isFavorite={user.isFavorite ?? false}
           onFavoriteToggle={() => {}}
-          onBack={() => router.back()}
+          onBack={onBack}
         />
-        
+
         <UserProfileHeader user={user} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,4 +82,31 @@ export default function UserDetailPage() {
       </div>
     </main>
   )
+}
+
+export default function UserDetailPage() {
+  const params = useParams()
+  const router = useRouter()
+  const id = params.id as string
+  const { moderationStatus, isLoading, error } = useReviewReportModeration('profile', id)
+
+  if (isLoading) {
+    return <UserDetailLoadingState />
+  }
+
+  if (error) {
+    return <UserModerationErrorState onBack={() => router.back()} />
+  }
+
+  if (moderationStatus?.isHidden) {
+    return (
+      <main className="min-h-screen bg-surface-subtle">
+        <div className="container mx-auto max-w-5xl px-4 py-6">
+          <ModeratedContentState targetType="profile" onBack={() => router.back()} />
+        </div>
+      </main>
+    )
+  }
+
+  return <UserDetailContent id={id} onBack={() => router.back()} />
 }

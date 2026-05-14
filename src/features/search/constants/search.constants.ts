@@ -88,6 +88,7 @@ export const MAP_LABELS = {
     budgetPrefix: 'Presupuesto:',
     close: 'Cerrar',
     viewDetails: 'Ver detalles',
+    selectedUbication: 'Ubicación seleccionada: ',
 } as const
 
 export const MAP_COORDINATES = {

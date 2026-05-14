@@ -1,2 +1,7 @@
 export { useUsers } from './hooks/use-users'
-export { UsersService } from './lib/supabase-users'
+export { useMyProfile } from './hooks/use-my-profile'
+export * from './lib/supabase-users'
+export { profileFormSchema, toProfileFormDefaults } from './schemas/profile-form.schema'
+export type { ProfileFormSchemaValues } from './schemas/profile-form.schema'
+export { PROFILE_FORM } from './constants/profile-form.constants'
+export type { ProfileFormValues, EditableProfile } from './types/profile-form.types'
