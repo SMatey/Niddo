@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import type { UserAvatarProps } from '../navbar.types'
+import type { UserAvatarProps } from '../interface/navbar.types'
 
 const isImageAvatar = (value: string) =>
   value.startsWith('http://') || value.startsWith('https://') || value.startsWith('data:image/')

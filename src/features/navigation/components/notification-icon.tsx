@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
-import type { NotificationIconProps } from '../navbar.types'
+import type { NotificationIconProps } from '../interface/navbar.types'
 
 export function NotificationIcon({ unreadCount, href = '/notificaciones' }: NotificationIconProps) {
   return (

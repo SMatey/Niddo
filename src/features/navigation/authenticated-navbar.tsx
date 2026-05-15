@@ -12,7 +12,7 @@ import { AUTHENTICATED_NAVBAR_CONFIG } from './constants/authenticated-navbar.co
 import { NAVBAR_CONFIG } from './constants/navbar.constants'
 import { useNavbarState } from './hooks'
 import { useAuth } from '@/features/auth/hooks/use-auth'
-import type { AuthenticatedNavbarProps } from './navbar.types'
+import type { AuthenticatedNavbarProps } from './interface/navbar.types'
 
 const iconMap = {
   home: Home,
