@@ -28,6 +28,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@supabase/mcp-utils": "^0.5.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
@@ -36,6 +37,7 @@
     "autoprefixer": "^10.4.20",
     "jest": "^30.3.0",
     "postcss": "^8.5",
+    "supabase-mcp": "^1.5.0",
     "tailwindcss": "^4.2.0",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"

@@ -3,7 +3,7 @@
 import { MapView } from '@/features/search/components/map-view'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
 import { CONTENT_MODES } from '@/features/search/constants/search.constants'
-import type { UserDetail } from '@/features/search/types/search.types'
+import type { UserDetail } from '@/features/search/types/domain.types'
 
 import type { UserLocationCardProps } from '../types/users.types'
 
@@ -20,6 +20,7 @@ export function UserLocationCard({ user }: UserLocationCardProps) {
           users={[user]}
           properties={[]}
           contentMode={CONTENT_MODES.USERS}
+          isDetailView={true}
         />
       </div>
     </div>

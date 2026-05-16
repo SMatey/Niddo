@@ -7,7 +7,7 @@ import { Button } from '@/shared/components/ui/button'
 import { UserAvatar, UserInfo } from '@/shared/components/ui/user-avatar'
 import { BudgetBadge } from '@/shared/components/ui/budget-badge'
 import { useFeaturedRoomies } from '../hooks/use-featured-roomies'
-import type { UserItem } from '@/features/search/types/search.types'
+import type { UserItem } from '@/features/search/types/domain.types'
 
 export function FeaturedRoomies() {
   const {

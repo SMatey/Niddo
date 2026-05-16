@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import type { UserItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { UserItem, FilterState, MapBounds } from '@/features/search/types/domain.types'
 import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
 import { UsersService } from '../lib/supabase-users'
 import { SupabaseUserRepository } from '../repositories/supabase-user.repository'

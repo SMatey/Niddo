@@ -20,7 +20,7 @@ export function useFeaturedRoomies() {
     cta,
     loginPrompt,
   } = HOME_DATA.featured_roomies
-  const { data: users, isLoading } = useUsers(null, { initialPageSize: pageSize })
+  const { data: users, isLoading } = useUsers(null, null, { initialPageSize: pageSize })
   const { user, isInitialized } = useAuth()
   const { onOpenWithTab } = useAuthModal()
   const [isPromptOpen, setIsPromptOpen] = useState(false)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { PropertyDetail } from '@/features/search/types/search.types'
+import type { PropertyDetail } from '@/features/search/types/domain.types'
 import { SUPABASE_HEADERS, SUPABASE_ENDPOINTS, API_ERROR_MESSAGES } from '@/lib/supabase/constants'
 
 import type { UsePropertyResult } from '../types/properties.types'

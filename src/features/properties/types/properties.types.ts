@@ -1,4 +1,4 @@
-import type { PropertyItem, FilterState, MapBounds, PropertyDetail } from '@/features/search/types/search.types'
+import type { PropertyItem, FilterState, MapBounds, PropertyDetail } from '@/features/search/types/domain.types'
 import type { PropertiesService } from '../lib/supabase-properties'
 
 export interface UsePropertiesOptions {

@@ -26,7 +26,8 @@ export class SupabasePropertyRepository implements PropertyRepository {
             searchParams.set(SEARCH_PARAMS.MAX_PRICE, filters.maxPrice)
         }
         if (filters?.lifestyles?.length) {
-            searchParams.set(SEARCH_PARAMS.LIFESTYLES, filters.lifestyles.join(','))
+            // When searching properties, lifestyles filter is actually amenity labels
+            searchParams.set(SEARCH_PARAMS.AMENITIES, filters.lifestyles.join(','))
         }
 
         if (bounds) {

@@ -2,22 +2,11 @@
 
 import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
+import type { PropertyItem, UserItem } from '../types/domain.types'
+import type { MapInfoWindowProps } from '../types/ui.types'
 import { ROUTING_PATHS, CONTENT_MODES, MAP_LABELS } from '../constants/search.constants'
 
-function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): string | null {
-    if (isProperty) {
-        return (item as PropertyItem).price
-    }
-    const user = item as UserItem
-    if (user.minBudget || user.maxBudget) {
-        const min = user.minBudget ?? ''
-        const max = user.maxBudget ?? ''
-        const separator = user.minBudget && user.maxBudget ? ' - ' : ''
-        return `${MAP_LABELS.budgetPrefix} ${min}${separator}${max}`
-    }
-    return null
-}
+import { formatPriceLabel } from '../utils/formatters.utils'
 
 export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
     const router = useRouter()

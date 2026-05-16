@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import type { Property } from '@/lib/supabase/types'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
@@ -22,7 +22,7 @@ export interface CreatePropertyResponse {
  */
 export async function createProperty(payload: CreatePropertyPayload): Promise<CreatePropertyResponse> {
   try {
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     // Get current user
     const {

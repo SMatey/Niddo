@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { FilterState } from '../types/search.types'
+import type { FilterState } from '../types/domain.types'
 import { SEARCH_DEFAULT_FILTERS } from '../constants/search.constants'
 
 export function useSearchFilters() {

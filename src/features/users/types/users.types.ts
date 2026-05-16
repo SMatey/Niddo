@@ -1,4 +1,4 @@
-import type { UserItem, UserDetail } from '@/features/search/types/search.types'
+import type { UserItem, UserDetail } from '@/features/search/types/domain.types'
 import type { UsersService } from '../lib/supabase-users'
 
 export interface UseUsersOptions {

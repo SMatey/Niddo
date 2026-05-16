@@ -1,4 +1,4 @@
-import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/domain.types'
 
 export interface PropertySearchParams {
     filters: FilterState | null

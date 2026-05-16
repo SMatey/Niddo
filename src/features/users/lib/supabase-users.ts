@@ -1,4 +1,4 @@
-import type { FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { FilterState, MapBounds } from '@/features/search/types/domain.types'
 import type { UserRepository, UserSearchResult } from '../types/user-repository.types'
 
 export interface UsersSearchParams {

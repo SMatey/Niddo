@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/domain.types'
 import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
 import { PropertiesService } from '../lib/supabase-properties'
 import { SupabasePropertyRepository } from '../repositories/supabase-property.repository'

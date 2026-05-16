@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Home, Search, X, Menu } from 'lucide-react'
 import { useState } from 'react'
-import { NAVBAR_CONFIG } from './navbar/constants/navbar.constants'
+import { NAVBAR_CONFIG } from '@/features/navigation/constants/navbar.constants'
 
 const iconMap = {
   home: Home,

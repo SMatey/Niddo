@@ -1,4 +1,4 @@
-import type { FilterState } from '../types/search.types'
+import type { FilterState } from '../types/domain.types'
 
 export const CARD_LABELS = {
     noImage: 'Sin imagen',
@@ -101,7 +101,7 @@ export const MAP_COORDINATES = {
 export const MAP_CONFIG = {
     containerStyle: {
         width: '100%',
-        height: '100%',
+        height: '500px', // Set a default fixed height to avoid 0px height issues
     },
     defaultCenter: MAP_COORDINATES.SAN_JOSE,
     defaultZoom: 12,
@@ -205,4 +205,21 @@ export const CONTENT_MODES = {
 export const VIEW_MODES = {
     LIST: 'list',
     MAP: 'map',
+} as const
+
+export const CONTENT_MODE_CONFIG = {
+    [CONTENT_MODES.PROPERTIES]: {
+        tags: AMENITY_TAGS,
+        tagLabel: FILTER_LABELS.amenities,
+        priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
+        minPrice: 'minPrice' as const,
+        maxPrice: 'maxPrice' as const,
+    },
+    [CONTENT_MODES.USERS]: {
+        tags: LIFESTYLES,
+        tagLabel: FILTER_LABELS.lifestyle,
+        priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
+        minPrice: 'minBudget' as const,
+        maxPrice: 'maxBudget' as const,
+    },
 } as const

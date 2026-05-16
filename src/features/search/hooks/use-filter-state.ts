@@ -1,4 +1,5 @@
-import type { FilterState, UseFilterStateOptions, UseFilterStateResult } from '../types/search.types'
+import type { FilterState } from '../types/domain.types'
+import type { UseFilterStateOptions, UseFilterStateResult } from '../types/context.types'
 import { SEARCH_DEFAULT_FILTERS, FILTER_KEYS } from '../constants/search.constants'
 
 export function useFilterState(
