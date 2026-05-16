@@ -16,6 +16,7 @@ import { ModeratedContentState } from '@/features/reviews/components/moderated-c
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 
 function PropertyDetailLoadingState() {
   return (
@@ -98,7 +99,11 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
           <div className="bg-surface rounded-lg border border-border p-4 space-y-3 md:col-span-2 lg:col-span-3">
             <h3 className="font-semibold text-text-primary">{PROPERTY_DETAIL_LABELS.location}</h3>
             <div className="h-48 rounded-lg overflow-hidden">
-              <MapView properties={[property]} users={[]} contentMode="properties" />
+              <MapView
+                properties={[property]}
+                users={[]}
+                contentMode={CONTENT_MODES.PROPERTIES}
+              />
             </div>
           </div>
           <PropertyAmenitiesCard amenities={property.amenities ?? []} />
