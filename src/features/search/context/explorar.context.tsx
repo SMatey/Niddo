@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { useSearchParams } from 'next/navigation'
 import type { FilterState, ContentMode, ViewMode, MapBounds } from '../types/search.types'
 import { VIEW_MODES, CONTENT_MODES } from '../constants/search.constants'
 import { useSearchFilters } from '@/features/search/hooks/use-search-filters'
@@ -29,6 +30,29 @@ export function ExplorarProvider({ children }: { children: ReactNode }) {
     const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODES.LIST)
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false)
     const [mapBounds, setMapBounds] = useState<MapBounds | null>(null)
+
+    const searchParams = useSearchParams()
+    const searchParamsKey = searchParams.toString()
+
+    useEffect(() => {
+        if (!searchParamsKey) {
+            return
+        }
+
+        const params = new URLSearchParams(searchParamsKey)
+        const tipo = params.get('tipo')
+        const ubicacion = params.get('ubicacion')
+
+        if (tipo === 'roomie') {
+            setContentMode(CONTENT_MODES.USERS)
+        } else if (tipo === 'vivienda') {
+            setContentMode(CONTENT_MODES.PROPERTIES)
+        }
+
+        if (ubicacion && ubicacion.trim()) {
+            setFilters((prev) => ({ ...prev, location: ubicacion }))
+        }
+    }, [searchParamsKey, setFilters])
 
     const handleFilterChange = useCallback((newFilters: FilterState) => {
         setFilters(newFilters)
