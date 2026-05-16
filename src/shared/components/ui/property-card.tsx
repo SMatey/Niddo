@@ -19,35 +19,11 @@ export function PropertyCard({
   bathrooms,
   squareMeters,
   amenities = [],
-  petFriendly,
-  smoker,
   isFavorite = false,
   onFavoriteToggle,
   className,
 }: PropertyCardProps) {
   const badges: BadgeItem[] = []
-
-  if (petFriendly) {
-    badges.push({
-      type: 'pet-friendly',
-      label: CARD_LABELS.petAllowed,
-      variant: 'success',
-    })
-  }
-
-  if (smoker) {
-    badges.push({
-      type: 'smoking-allowed',
-      label: CARD_LABELS.smoker,
-      variant: 'warning',
-    })
-  } else {
-    badges.push({
-      type: 'no-smoking',
-      label: CARD_LABELS.noSmokers,
-      variant: 'info',
-    })
-  }
 
   return (
     <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>

@@ -1,8 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
-import type { PropertyItem, FilterState } from '@/features/search/types/search.types'
+
+
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
+import { SupabasePropertyRepository } from '../repositories/supabase-property.repository'
+import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
+import { usePropertyRepository } from '../context/property-repository.context'
 
 export interface UsePropertiesOptions {
     initialPageSize?: number
+    repository?: PropertyRepository
 }
 
 export interface UsePropertiesResult {
@@ -17,17 +24,38 @@ export interface UsePropertiesResult {
     error: Error | null
 }
 
+function boundsKey(bounds: MapBounds | null): string {
+    if (!bounds) return ''
+    return `${bounds.neLat},${bounds.neLng},${bounds.swLat},${bounds.swLng}`
+}
+
 export function useProperties(
     filters: FilterState | null,
+    bounds: MapBounds | null = null,
     options: UsePropertiesOptions = {}
 ) {
     const [page, setPage] = useState(1)
-    const pageSize = options.initialPageSize ?? 9
+    const pageSize = options.initialPageSize ?? PAGINATION_CONFIG.defaultPageSize
 
     const [data, setData] = useState<PropertyItem[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<Error | null>(null)
     const [total, setTotal] = useState(0)
+
+    let repository: PropertyRepository
+    try {
+        repository = usePropertyRepository()
+    } catch {
+        repository = options.repository ?? new SupabasePropertyRepository(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        )
+    }
+
+    const stableBoundsKey = boundsKey(bounds)
+    const stableBounds = useMemo(() => bounds, [stableBoundsKey])
+
+    const prevBoundsKeyRef = useRef(stableBoundsKey)
 
     const handleSetPage = useCallback((newPage: number) => {
         setPage(newPage)
@@ -38,49 +66,47 @@ export function useProperties(
     }, [filters])
 
     useEffect(() => {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const functionUrl = `${supabaseUrl}/functions/v1/properties-search`
+        const controller = new AbortController()
+
+        if (filters === null) {
+            setData([])
+            setTotal(0)
+            setIsLoading(false)
+            return
+        }
+
+        const isBoundsOnlyChange = prevBoundsKeyRef.current !== stableBoundsKey && data.length > 0
+        prevBoundsKeyRef.current = stableBoundsKey
 
         async function fetchProperties() {
-            setIsLoading(true)
+            if (!isBoundsOnlyChange) {
+                setIsLoading(true)
+            }
             setError(null)
 
-            const params = new URLSearchParams({
-                page: String(page),
-                pageSize: String(pageSize),
-            })
-            if (filters?.location) params.set('location', filters.location)
-            if (filters?.minPrice) params.set('minPrice', filters.minPrice)
-            if (filters?.maxPrice) params.set('maxPrice', filters.maxPrice)
-            if (filters?.petFriendly) params.set('petFriendly', 'true')
-            if (filters?.smoker) params.set('smoker', 'true')
-            if (filters?.lifestyles?.length) {
-                params.set('amenities', filters.lifestyles.join(','))
-            }
-
-            const response = await fetch(`${functionUrl}?${params}`, {
-                headers: {
-                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-                },
-            })
-
-            if (!response.ok) {
-                setError(new Error(`HTTP ${response.status}`))
+            try {
+                const result = await repository.search({
+                    filters,
+                    bounds: stableBounds,
+                    page,
+                    pageSize,
+                })
+                setData(result.items)
+                setTotal(result.total)
+                setIsLoading(false)
+            } catch (err) {
+                if ((err as Error).name === 'AbortError') return
+                setError(err as Error)
                 setData([])
                 setTotal(0)
                 setIsLoading(false)
-                return
             }
-
-            const result = await response.json()
-            setData(result.items ?? [])
-            setTotal(result.total ?? 0)
-            setIsLoading(false)
         }
 
         fetchProperties()
-    }, [filters, page, pageSize])
+
+        return () => controller.abort()
+    }, [filters, page, pageSize, stableBoundsKey, repository])
 
     return {
         data,

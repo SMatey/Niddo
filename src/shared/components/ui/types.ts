@@ -8,9 +8,6 @@ export interface PropertyCardProps {
     bathrooms?: number
     squareMeters?: number
     amenities?: string[]
-    petFriendly?: boolean
-    smoker?: boolean
-    lifestyles?: string[]
     isFavorite?: boolean
     onFavoriteToggle?: () => void
     className?: string
@@ -47,7 +44,7 @@ export interface Tab {
 }
 
 export interface TabsProps {
-    tabs: Tab[]
+    tabs: readonly Tab[]
     value: string
     onChange: (value: string) => void
     className?: string
