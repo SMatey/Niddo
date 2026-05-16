@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { ExplorarProvider, useExplorarContext } from '@/features/search/context/explorar.context'
 import { ExplorarUIProvider, useExplorarUIContext } from '@/features/search/context/explorar-ui.context'
 import { SearchServiceProvider } from '@/features/search/context/search-service.context'
+import { MapProvider } from '@/features/search/providers/map-provider'
 import { FilterSidebar } from '@/features/search/components/filter-sidebar'
 import { ResultsDisplay } from '@/features/search/components/results-display'
 import { ExplorarHeader } from '@/features/search/components/explorar-header'
@@ -137,8 +138,6 @@ function ExplorarPageContent() {
     </main>
   )
 }
-
-import { MapProvider } from '@/features/search/providers/map-provider'
 
 export default function ExplorarPage() {
   return (
