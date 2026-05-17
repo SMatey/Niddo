@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     const formData = await req.formData()
     const propertyId = formData.get('propertyId') as string
     const files = formData.getAll('file') as File[]
-    const fileIndexes = formData.getAll('index') as string[] // Used for specific ordering
+    const fileIndexes = formData.getAll('index') as string[] 
 
     if (!files.length) {
       throw new Error('No files provided')
@@ -66,16 +66,17 @@ Deno.serve(async (req) => {
             image.resize(1200, Image.RESIZE_AUTO)
         }
 
-        // Compress to WEBP
-        const webpBuffer = await image.encodeWEBP(80) // 80% quality
+        // Compress to JPEG
+        const jpegBuffer = await image.encodeJPEG(80) // 80% quality
         
         const timestamp = Date.now()
-        const storagePath = `properties/${user.id}/${propertyId || 'temp'}/${timestamp}_${idx}.webp`
+        const storagePath = `properties/${user.id}/${propertyId || 'temp'}/${timestamp}_${idx}.jpg`
 
+        // Usamos jpegBuffer.buffer (ArrayBuffer) que supabase-js soporta nativamente
         const { data, error } = await supabaseAdmin.storage
-          .from('property-media') // Ensure this bucket exists
-          .upload(storagePath, webpBuffer, {
-              contentType: 'image/webp',
+          .from('property-media') 
+          .upload(storagePath, jpegBuffer.buffer, {
+              contentType: 'image/jpeg',
               upsert: true
           })
 
