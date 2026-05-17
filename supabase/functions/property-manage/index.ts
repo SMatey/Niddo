@@ -38,6 +38,8 @@ Deno.serve(async (req) => {
       bedrooms: payload.bedrooms,
       bathrooms: payload.bathrooms,
       area: payload.area,
+      rules: payload.rules ?? [], // Aseguramos que guarde las reglas
+      available_from: payload.available_from ?? null, // Aseguramos disponibilidad
       status: payload.status ?? 'draft', // Draft by default
       images: payload.images ?? [], // Assume images are sent securely
       owner_id: user.id, // Enforce ownership

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
 import { uploadPropertyImages } from '@/features/properties/lib/property-image-upload'
@@ -33,6 +34,8 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
       bathrooms: payload.bathrooms || 1,
       area: payload.squareMeters || 0,
       rules: payload.rules || [],
+      amenities: payload.amenities || [],
+      available_from: payload.availableFrom || null,
     }
 
     // Handle new images upload
@@ -51,6 +54,28 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
     }
 
     propertyData.images = allImageUrls;
+
+    // Ensure amenities exist in the amenities catalogue before updating relations
+    if (payload.amenities && payload.amenities.length > 0) {
+      const supabaseAdmin = createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+
+      const amenitiesToUpsert = payload.amenities.map(amenity => ({
+        id: amenity,
+        label: amenity,
+        category: 'general'
+      }))
+      
+      const { error: upsertError } = await supabaseAdmin
+        .from('amenities')
+        .upsert(amenitiesToUpsert, { onConflict: 'id', ignoreDuplicates: true })
+
+      if (upsertError) {
+        console.error("Warning: Could not upsert amenities catalogue on update", upsertError)
+      }
+    }
 
     // Use Edge function OR direct backend update
     const { data, error } = await supabase.functions.invoke('property-manage', {

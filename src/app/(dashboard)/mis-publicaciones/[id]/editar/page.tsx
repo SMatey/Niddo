@@ -19,12 +19,22 @@ export default function EditPropertyPage() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from('properties')
-        .select('*')
+        .select(`
+          *,
+          property_amenities (
+            amenity_id
+          )
+        `)
         .eq('id', id)
         .single();
         
       if (!error && data) {
-        setProperty(data)
+        // Map property_amenities to simple string array to match form structure
+        const mappedData = {
+          ...data,
+          amenities: data.property_amenities?.map((pa: any) => pa.amenity_id) || []
+        }
+        setProperty(mappedData)
       }
       setLoading(false)
     }

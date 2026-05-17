@@ -88,7 +88,7 @@ export function DashboardPropertyCard({
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/mis-publicaciones/editar/${property.id}`} className="cursor-pointer">
+                    <Link href={`/mis-publicaciones/${property.id}/editar`} className="cursor-pointer">
                       <Edit2 className="mr-2 h-4 w-4" />
                       {PROPERTY_CARD_CONTENT.menu.edit}
                     </Link>
