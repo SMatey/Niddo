@@ -12,7 +12,7 @@ export const PROPERTY_ACTIONS_MESSAGES = {
     active: 'active',
   },
   labels : {
-    propieties: 'propieties',
-    propietiesImages: 'propieties-images',
+    propieties: 'properties',
+    propietiesImages: 'property-media',
   }
 } as const
