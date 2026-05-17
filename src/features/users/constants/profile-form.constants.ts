@@ -14,6 +14,26 @@ export const PROFILE_FORM = {
     MAX_SIZE_BYTES: 3 * 1024 * 1024,
     ACCEPTED_TYPES: ['image/jpeg', 'image/png', 'image/webp'] as const,
   },
+  ID_DOCUMENT: {
+    MAX_SIZE_BYTES: 5 * 1024 * 1024,
+    ACCEPTED_TYPES: ['image/jpeg', 'image/jpg', 'application/pdf'] as const,
+    VALIDATION: {
+      FILE_TYPE: 'Formato no permitido. Usa JPG o PDF.',
+      FILE_SIZE: 'El archivo excede el tamano maximo de 5 MB.',
+      AUTH_REQUIRED: 'Usuario no autenticado.',
+      NO_FILE: 'Selecciona un archivo.'
+    },
+    UI: {
+      MODAL_TITLE: 'Subir documento de identidad',
+      CLOSE: 'Cerrar',
+      PREVIEW_HINT: 'Selecciona JPG o PDF (<= 5MB) para previsualizar.',
+      OPEN_BUTTON: 'Subir carnet',
+      UPLOAD_BUTTON: 'Subir',
+      UPLOADING: 'Subiendo...',
+      CANCEL: 'Cancelar',
+      SUCCESS: 'Documento subido correctamente.'
+    }
+  },
   VALIDATION: {
     NAME_MIN: 'El nombre debe tener al menos 2 caracteres.',
     NAME_MAX: 'El nombre no puede superar 80 caracteres.',
