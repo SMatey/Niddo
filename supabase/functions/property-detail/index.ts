@@ -1,6 +1,3 @@
-// supabase/functions/property-detail/index.ts
-// Edge Function para detalle de propiedad
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {

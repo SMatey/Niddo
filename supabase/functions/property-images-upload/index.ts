@@ -72,7 +72,6 @@ Deno.serve(async (req) => {
         const timestamp = Date.now()
         const storagePath = `properties/${user.id}/${propertyId || 'temp'}/${timestamp}_${idx}.jpg`
 
-        // Usamos jpegBuffer.buffer (ArrayBuffer) que supabase-js soporta nativamente
         const { data, error } = await supabaseAdmin.storage
           .from('property-media') 
           .upload(storagePath, jpegBuffer.buffer, {

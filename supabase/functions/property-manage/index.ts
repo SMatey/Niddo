@@ -38,11 +38,11 @@ Deno.serve(async (req) => {
       bedrooms: payload.bedrooms,
       bathrooms: payload.bathrooms,
       area: payload.area,
-      rules: payload.rules ?? [], // Aseguramos que guarde las reglas
-      available_from: payload.available_from ?? null, // Aseguramos disponibilidad
-      status: payload.status ?? 'draft', // Draft by default
-      images: payload.images ?? [], // Assume images are sent securely
-      owner_id: user.id, // Enforce ownership
+      rules: payload.rules ?? [], 
+      available_from: payload.available_from ?? null,
+      status: payload.status ?? 'draft', 
+      images: payload.images ?? [], 
+      owner_id: user.id, 
       updated_at: new Date().toISOString()
     }
 
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         .from('properties')
         .update(propertyData)
         .eq('id', payload.id)
-        .eq('owner_id', user.id) // Security check
+        .eq('owner_id', user.id) 
         .select()
         .single()
       
