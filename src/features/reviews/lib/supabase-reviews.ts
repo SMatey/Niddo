@@ -126,7 +126,7 @@ async function getPropertyReviewTarget(targetId: string): Promise<ReviewTargetRe
   }
 
   return {
-    data: toPropertyReviewTarget(property, toPublicationProfile(profileResult.data)),
+    data: toPropertyReviewTarget(property, createPublicationProfile(profileResult.data)),
     error: null,
   }
 }
@@ -286,7 +286,7 @@ export async function getProfileReviews(profileId: string): Promise<ProfileRevie
   }
 
   return {
-    data: createProfileReviewList(profileId, (data ?? []) as ReviewRow[]) as ProfileReviewItem[],
+    data: createProfileReviewList(profileId, (data ?? []) as unknown as ReviewRow[]) as ProfileReviewItem[],
     error: null,
   }
 }

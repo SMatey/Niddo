@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
@@ -14,7 +14,7 @@ export interface UpdatePropertyPayload extends PublicationFormValues {
 export async function updateProperty(propertyId: string, payload: UpdatePropertyPayload) {
   try {
     // For Deno edge functions update via token (or normal client)
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 

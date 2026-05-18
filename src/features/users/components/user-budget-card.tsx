@@ -2,7 +2,7 @@
 
 import { BudgetBadge } from '@/shared/components/ui/budget-badge'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
-import type { UserDetail } from '@/features/search/types/search.types'
+import type { UserDetail } from '@/features/search/types/domain.types'
 
 interface UserBudgetCardProps {
   user: UserDetail

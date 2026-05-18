@@ -1,1 +1,1 @@
-export * from './lib/match-score'
+// search feature public API

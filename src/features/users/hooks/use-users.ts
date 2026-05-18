@@ -1,41 +1,22 @@
-/**
- * @file use-users.ts
- * DIP Refactoring Phase 1 - UserRepository
- *
- * This hook now depends on UserRepository interface for data access.
- * The repository is injected via options.repository or falls back to SupabaseUserRepository.
- * This enables dependency injection for testing and flexibility.
- *
- * Future: Consider using a service locator or IoC container for centralized repository registration
- */
-
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import type { UserItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { UserItem, FilterState, MapBounds } from '@/features/search/types/domain.types'
 import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
-import type { UserRepository } from '@/features/users/types/user-repository.types'
+import { UsersService } from '../lib/supabase-users'
 import { SupabaseUserRepository } from '../repositories/supabase-user.repository'
+import { useSearchServices } from '@/features/search/context/search-service.context'
+import type { UseUsersOptions } from '../types/users.types'
 
-export interface UseUsersOptions {
-    initialPageSize?: number
-    repository?: UserRepository
-}
-
-export interface UseUsersResult {
-    data: UserItem[]
-    total: number
-    page: number
-    pageSize: number
-    setPage: (page: number) => void
-    totalPages: number
-    hasMore: boolean
-    isLoading: boolean
-    error: Error | null
-}
-
-// Serialize bounds to a stable string for use as a dependency key
 function boundsKey(bounds: MapBounds | null): string {
     if (!bounds) return ''
     return `${bounds.neLat},${bounds.neLng},${bounds.swLat},${bounds.swLng}`
+}
+
+function createDefaultService(): UsersService {
+    const repository = new SupabaseUserRepository(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    return new UsersService(repository)
 }
 
 export function useUsers(
@@ -43,14 +24,6 @@ export function useUsers(
     bounds: MapBounds | null = null,
     options: UseUsersOptions = {}
 ) {
-    const repo = useMemo(() => {
-        if (options.repository) return options.repository
-        return new SupabaseUserRepository(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
-    }, [options.repository])
-
     const [page, setPage] = useState(1)
     const pageSize = options.initialPageSize ?? PAGINATION_CONFIG.defaultPageSize
 
@@ -59,19 +32,30 @@ export function useUsers(
     const [error, setError] = useState<Error | null>(null)
     const [total, setTotal] = useState(0)
 
-    // Stabilize bounds reference — only change when actual values change
+    // Resolve service: explicit injection > context > default (no context)
+    let contextServices: { usersService: UsersService } | null = null
+    try {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        contextServices = useSearchServices()
+    } catch {
+        // Not wrapped in SearchServiceProvider — use fallback
+    }
+
+    const service = useMemo(
+        () => options.service ?? contextServices?.usersService ?? createDefaultService(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [options.service, contextServices?.usersService]
+    )
+
     const stableBoundsKey = boundsKey(bounds)
     const stableBounds = useMemo(() => bounds, [stableBoundsKey])
-
-    // Track previous bounds key to detect bounds-only changes
     const prevBoundsKeyRef = useRef(stableBoundsKey)
 
     const handleSetPage = useCallback((newPage: number) => {
         setPage(newPage)
     }, [])
 
-    // Only reset page on filter changes, NOT on bounds changes
-    // (bounds-based queries bypass pagination on the backend)
+    // Reset page when filters change (not on bounds)
     useEffect(() => {
         setPage(1)
     }, [filters])
@@ -79,7 +63,6 @@ export function useUsers(
     useEffect(() => {
         const controller = new AbortController()
 
-        // Skip fetch when filters is null (content mode not showing users)
         if (filters === null) {
             setData([])
             setTotal(0)
@@ -87,8 +70,6 @@ export function useUsers(
             return
         }
 
-        // Only show loading skeleton when there's no existing data (initial load)
-        // On bounds changes, keep previous markers visible (stale-while-revalidate)
         const isBoundsOnlyChange = prevBoundsKeyRef.current !== stableBoundsKey && data.length > 0
         prevBoundsKeyRef.current = stableBoundsKey
 
@@ -99,17 +80,11 @@ export function useUsers(
             setError(null)
 
             try {
-                const result = await repo.search({
-                    filters,
-                    bounds: stableBounds,
-                    page,
-                    pageSize,
-                })
+                const result = await service.search({ filters, bounds: stableBounds, page, pageSize })
                 setData(result.items)
                 setTotal(result.total)
                 setIsLoading(false)
             } catch (err) {
-                // Ignore aborted requests
                 if ((err as Error).name === 'AbortError') return
                 setError(err as Error)
                 setIsLoading(false)
@@ -119,7 +94,7 @@ export function useUsers(
         fetchUsers()
 
         return () => controller.abort()
-    }, [filters, page, pageSize, stableBoundsKey, repo])
+    }, [filters, page, pageSize, stableBoundsKey, service])
 
     return {
         data,

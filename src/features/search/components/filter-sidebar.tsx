@@ -3,32 +3,10 @@
 import { Input } from '@/shared/components/ui/input'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS } from '../constants/search.constants'
-import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
+import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS, CONTENT_MODE_CONFIG } from '../constants/search.constants'
+import type { FilterState, ContentMode } from '../types/domain.types'
+import type { FilterSidebarProps, FilterSidebarWithModeProps } from '../types/ui.types'
 import { useFilterState } from '../hooks/use-filter-state'
-
-export type { FilterState, FilterSidebarProps }
-
-interface FilterSidebarWithModeProps extends FilterSidebarProps {
-    contentMode: ContentMode
-}
-
-const CONTENT_MODE_CONFIG = {
-    [CONTENT_MODES.PROPERTIES]: {
-        tags: AMENITY_TAGS,
-        tagLabel: FILTER_LABELS.amenities,
-        priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
-        minPrice: 'minPrice' as const,
-        maxPrice: 'maxPrice' as const,
-    },
-    [CONTENT_MODES.USERS]: {
-        tags: LIFESTYLES,
-        tagLabel: FILTER_LABELS.lifestyle,
-        priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
-        minPrice: 'minBudget' as const,
-        maxPrice: 'maxBudget' as const,
-    },
-} as const
 
 export function FilterSidebar({ filters, onFilterChange, contentMode = CONTENT_MODES.PROPERTIES }: FilterSidebarWithModeProps) {
     const config = CONTENT_MODE_CONFIG[contentMode]

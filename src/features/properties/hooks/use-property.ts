@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react'
-import type { PropertyDetail } from '@/features/search/types/search.types'
+import type { PropertyDetail } from '@/features/search/types/domain.types'
 import { SUPABASE_HEADERS, SUPABASE_ENDPOINTS, API_ERROR_MESSAGES } from '@/lib/supabase/constants'
 
-export interface UsePropertyResult {
-    data: PropertyDetail | null
-    isLoading: boolean
-    error: Error | null
-}
+import type { UsePropertyResult } from '../types/properties.types'
 
 export function useProperty(id: string) {
     const [data, setData] = useState<PropertyDetail | null>(null)

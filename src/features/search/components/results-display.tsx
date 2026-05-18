@@ -4,10 +4,11 @@ import { Pagination } from '@/shared/components/ui/pagination'
 import { Tabs } from '@/shared/components/ui/tabs'
 import { ListView } from './list-view'
 import { MapView } from './map-view'
-import { RESULTS_TABS, LAYOUT_CONFIG, VIEW_MODES } from '../constants/search.constants'
-import type { ContentMode, ViewMode, PropertyItem, UserItem, ResultsDisplayProps } from '../types/search.types'
-
-export type { ContentMode, ViewMode }
+import { PropertyCard } from '@/shared/components/ui/property-card'
+import { UserCard } from '@/shared/components/ui/user-card'
+import { RESULTS_TABS, VIEW_MODES, CONTENT_MODES } from '../constants/search.constants'
+import type { ContentMode, ViewMode, PropertyItem, UserItem } from '../types/domain.types'
+import type { ResultsDisplayProps } from '../types/ui.types'
 
 export function ResultsDisplay({
   contentMode,
@@ -24,6 +25,30 @@ export function ResultsDisplay({
   onPageChange,
   onBoundsChange,
 }: ResultsDisplayProps) {
+  const items = contentMode === CONTENT_MODES.PROPERTIES ? properties : users
+
+  const renderItem = (item: any) => {
+    if (contentMode === CONTENT_MODES.PROPERTIES) {
+      const property = item as PropertyItem
+      return (
+        <PropertyCard
+          key={property.id}
+          {...property}
+          onFavoriteToggle={onPropertyFavoriteToggle ? () => onPropertyFavoriteToggle(property.id) : undefined}
+        />
+      )
+    }
+
+    const user = item as UserItem
+    return (
+      <UserCard
+        key={user.id}
+        {...user}
+        onFavoriteToggle={onUserFavoriteToggle ? () => onUserFavoriteToggle(user.id) : undefined}
+      />
+    )
+  }
+
   return (
     <div className="h-full flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-3 shrink-0">
@@ -46,11 +71,8 @@ export function ResultsDisplay({
       {viewMode === VIEW_MODES.LIST ? (
         <>
           <ListView
-            properties={properties}
-            users={users}
-            contentMode={contentMode}
-            onPropertyFavoriteToggle={onPropertyFavoriteToggle}
-            onUserFavoriteToggle={onUserFavoriteToggle}
+            items={items}
+            renderItem={renderItem}
             isLoading={isLoading}
           />
           {onPageChange && (
@@ -62,17 +84,7 @@ export function ResultsDisplay({
           )}
         </>
       ) : (
-        <div style={{ height: 'var(--map-height)' }} className="[--map-height:16rem] lg:[--map-height:12rem] h-[calc(100vh-var(--map-height))]">
-          <style jsx>{`
-            div {
-              height: ${LAYOUT_CONFIG.MAP_HEIGHT_MOBILE};
-            }
-            @media (min-width: 1024px) {
-              div {
-                height: ${LAYOUT_CONFIG.MAP_HEIGHT_DESKTOP};
-              }
-            }
-          `}</style>
+        <div className="flex-1 min-h-[500px] lg:min-h-[600px]">
           <MapView
             properties={properties}
             users={users}

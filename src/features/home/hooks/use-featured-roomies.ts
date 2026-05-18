@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useUsers } from '@/features/users/hooks/use-users'
 import { useAuthModal } from '@/shared/hooks/useAuthModal'
-import { HOME_DATA, EMPTY_FILTERS } from '../constants/home.constants'
+import { HOME_DATA, EMPTY_FILTERS } from '../constants/home.constants'  
 
 export function useFeaturedRoomies() {
   const router = useRouter()
