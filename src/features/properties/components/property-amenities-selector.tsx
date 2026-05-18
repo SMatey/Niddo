@@ -97,7 +97,7 @@ export function PropertyAmenitiesSelector({
                   key={amenity.id}
                   type="button"
                   onClick={() => handleToggle(amenity.label)}
-                  className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 transition-all ${
+                  className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 transition-all cursor-pointer ${
                     isSelected
                       ? 'border-primary bg-primary/10 text-primary'
                       : 'border-border bg-background text-text-secondary hover:border-border-focus hover:text-text-primary'
@@ -127,7 +127,7 @@ export function PropertyAmenitiesSelector({
                 <button
                   type="button"
                   onClick={() => handleToggle(amenity)}
-                  className="text-text-secondary transition hover:text-state-error"
+                  className="text-text-secondary transition hover:text-state-error cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
