@@ -1,7 +1,11 @@
-export type ContentMode = 'properties' | 'users'
-export type ViewMode = 'list' | 'map'
+import { PropertyRepository } from '@/features/properties/types/property-repository.types'
+import { CONTENT_MODES, VIEW_MODES } from '../constants/search.constants'
+import { UserRepository } from '@/features/users/types/user-repository.types'
 
-// Re-export UI types from shared location for backward compatibility
+export type ContentMode = typeof CONTENT_MODES[keyof typeof CONTENT_MODES]
+export type ViewMode = typeof VIEW_MODES[keyof typeof VIEW_MODES]
+
+
 export type {
     BadgeItem,
     PropertyBadgeProps,
@@ -17,14 +21,13 @@ export interface FilterState {
     maxPrice: string
     minBudget: string
     maxBudget: string
-    petFriendly: boolean
-    smoker: boolean
     lifestyles: string[]
 }
 
 export interface FilterSidebarProps {
     filters: FilterState
     onFilterChange?: (filters: FilterState) => void
+    contentMode?: ContentMode
 }
 
 export interface PropertyItem {
@@ -38,8 +41,6 @@ export interface PropertyItem {
     squareMeters?: number
     lat?: number
     lng?: number
-    petFriendly?: boolean
-    smoker?: boolean
     amenities?: string[]
     isFavorite?: boolean
 }
@@ -67,7 +68,6 @@ export interface ListViewProps {
     properties?: PropertyItem[]
     users?: UserItem[]
     contentMode: ContentMode
-    filters?: FilterState | null
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
@@ -77,8 +77,8 @@ export interface MapViewProps {
     properties?: PropertyItem[]
     users?: UserItem[]
     contentMode: ContentMode
-    filters?: FilterState | null
     isLoading?: boolean
+    onBoundsChange?: (bounds: MapBounds) => void
 }
 
 export interface ResultsDisplayProps {
@@ -88,15 +88,13 @@ export interface ResultsDisplayProps {
     onViewChange: (mode: ViewMode) => void
     properties?: PropertyItem[]
     users?: UserItem[]
-    filters?: FilterState | null
     onPropertyFavoriteToggle?: (id: string) => void
     onUserFavoriteToggle?: (id: string) => void
     isLoading?: boolean
-    totalProperties?: number
-    totalUsers?: number
     currentPage?: number
     totalPages?: number
     onPageChange?: (page: number) => void
+    onBoundsChange?: (bounds: MapBounds) => void
 }
 
 export interface PropertyDetail extends PropertyItem {
@@ -126,39 +124,78 @@ export interface MobileFiltersDrawerProps {
     children: React.ReactNode
 }
 
-export type BadgeVariant = 'success' | 'info' | 'warning'
-
-export interface BadgeItem {
-    type: string
-    label: string
-    variant: BadgeVariant
-}
-
-export interface PropertyBadgeProps {
-    badges?: BadgeItem[]
-    className?: string
-}
-
-export type PageButtonType = 'page' | 'prev' | 'next' | 'ellipsis'
-
-export interface PageButton {
-    type: PageButtonType
-    page?: number
-    label: string
-    disabled?: boolean
-}
-
-export interface PaginationProps {
-    currentPage: number
-    totalPages: number
-    onPageChange: (page: number) => void
-    className?: string
-}
-
 export interface Point {
     id: string
     lat: number
     lng: number
     item: PropertyItem | UserItem
-    type: 'property' | 'user'
+    type: ContentMode
 }
+
+export interface MapInfoWindowProps {
+    point: Point
+    onClose?: () => void
+}
+
+export interface MapBounds {
+    neLat: number
+    neLng: number
+    swLat: number
+    swLng: number
+}
+
+
+export interface SearchResult<T> {
+    data: T[]
+    total: number
+    page: number
+    pageSize: number
+    totalPages: number
+    hasMore: boolean
+    isLoading: boolean
+    error: Error | null
+    setPage: (page: number) => void
+}
+
+export interface SearchService {
+    searchProperties(
+        filters: FilterState | null,
+        bounds: MapBounds | null
+    ): SearchResult<PropertyItem>
+
+    searchUsers(
+        filters: FilterState | null,
+        bounds: MapBounds | null
+    ): SearchResult<UserItem>
+}
+
+export interface SearchServiceFactory {
+    createSearchService(
+        propertyRepository: PropertyRepository,
+        userRepository: UserRepository
+    ): SearchService
+}
+
+
+export interface MapProvider {
+    isLoaded(): boolean
+    isLoading(): boolean
+    hasError(): boolean
+    getError(): string | null
+    renderMarker(point: Point): React.ReactNode
+    renderInfoWindow(point: Point, onClose: () => void): React.ReactNode
+}
+
+export interface MapProviderProps {
+    children?: React.ReactNode
+    apiKey?: string
+}
+
+export interface MapProviderContextValue {
+    provider: MapProvider | null
+    setProvider: (provider: MapProvider | null) => void
+}
+
+
+export type { PropertyRepository, PropertySearchParams, PropertySearchResult } from '@/features/properties/types/property-repository.types'
+export type { UserRepository, UserSearchParams, UserSearchResult } from '@/features/users/types/user-repository.types'

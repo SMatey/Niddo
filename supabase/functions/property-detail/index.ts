@@ -1,6 +1,3 @@
-// supabase/functions/property-detail/index.ts
-// Edge Function para detalle de propiedad
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
@@ -42,7 +39,8 @@ Deno.serve(async (req) => {
     const { data: propertyData, error: propertyError } = await supabase
       .from('properties')
       .select(`
-        *,
+        id, owner_id, title, description, images, price, location, address,
+        latitude, longitude, bedrooms, bathrooms, area, rules, status, available_from,
         profiles!owner_id ( id, name, avatar, is_verified, trust_score, joined_date )
       `)
       .eq('id', id)
@@ -78,8 +76,6 @@ Deno.serve(async (req) => {
       squareMeters: propertyData.area,
       lat: propertyData.latitude ?? undefined,
       lng: propertyData.longitude ?? undefined,
-      petFriendly: amenityIds.includes('pet-friendly'),
-      smoker: amenityIds.includes('no-smoking'),
       amenities: amenityLabels,
       isFavorite: false,
       description: propertyData.description ?? undefined,

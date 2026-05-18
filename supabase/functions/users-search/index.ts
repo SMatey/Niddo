@@ -48,6 +48,37 @@ Deno.serve(async (req) => {
     const page = Math.max(1, Number(url.searchParams.get('page') ?? 1))
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
+    const MAX_BOUND_RESULTS = 200
+
+    // Bounds parameters for map view progressive loading
+    const neLatParam = url.searchParams.get('neLat')
+    const neLngParam = url.searchParams.get('neLng')
+    const swLatParam = url.searchParams.get('swLat')
+    const swLngParam = url.searchParams.get('swLng')
+
+    // Parse and validate all bounds parameters
+    const neLat = neLatParam !== null ? Number(neLatParam) : null
+    const neLng = neLngParam !== null ? Number(neLngParam) : null
+    const swLat = swLatParam !== null ? Number(swLatParam) : null
+    const swLng = swLngParam !== null ? Number(swLngParam) : null
+
+    // Validate that all bounds are valid numbers
+    const allBoundsValid = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)
+
+    // Validate that bounds form a valid area (not degenerate)
+    const boundsArea = allBoundsValid
+      ? Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
+      : 0
+    const hasValidBounds = allBoundsValid && boundsArea > 0
+
+    // Normalize bounds: ensure sw < ne for latitude and longitude
+    const normalizedBounds = hasValidBounds ? {
+        minLat: Math.min(swLat as number, neLat as number),
+        maxLat: Math.max(swLat as number, neLat as number),
+        minLng: Math.min(swLng as number, neLng as number),
+        maxLng: Math.max(swLng as number, neLng as number),
+    } : null
 
     // Fetch tag labels map
     const { data: tagData } = await supabase
@@ -105,8 +136,18 @@ Deno.serve(async (req) => {
         profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
       }
 
-      const { data: profilesData, error: profilesError, count } = await profilesQuery
-        .range(offset, offset + pageSize - 1)
+      // Filter by map bounds using normalized bounds to ensure correct filtering
+      if (normalizedBounds !== null) {
+        profilesQuery = profilesQuery
+          .gte('latitude', normalizedBounds.minLat)
+          .lte('latitude', normalizedBounds.maxLat)
+          .gte('longitude', normalizedBounds.minLng)
+          .lte('longitude', normalizedBounds.maxLng)
+      }
+
+      const { data: profilesData, error: profilesError, count } = hasValidBounds
+        ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
+        : await profilesQuery.range(offset, offset + pageSize - 1)
 
       if (profilesError) {
         throw profilesError
@@ -136,8 +177,10 @@ Deno.serve(async (req) => {
         return formatUser(p, tagLabels)
       })
 
+      const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+
       return new Response(
-        JSON.stringify({ items, total: count ?? items.length }),
+        JSON.stringify({ items, total: count ?? items.length, hasMore }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -158,8 +201,18 @@ Deno.serve(async (req) => {
       profilesQuery = profilesQuery.lte('budget_max', Number(maxBudget))
     }
 
-    const { data: profilesData, error: profilesError, count } = await profilesQuery
-      .range(offset, offset + pageSize - 1)
+    // Filter by map bounds using normalized bounds to ensure correct filtering
+    if (normalizedBounds !== null) {
+      profilesQuery = profilesQuery
+        .gte('latitude', normalizedBounds.minLat)
+        .lte('latitude', normalizedBounds.maxLat)
+        .gte('longitude', normalizedBounds.minLng)
+        .lte('longitude', normalizedBounds.maxLng)
+    }
+
+    const { data: profilesData, error: profilesError, count } = hasValidBounds
+      ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
+      : await profilesQuery.range(offset, offset + pageSize - 1)
 
     if (profilesError) {
       throw profilesError
@@ -189,8 +242,10 @@ Deno.serve(async (req) => {
       return formatUser(p, tagLabels)
     })
 
+    const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+
     return new Response(
-      JSON.stringify({ items, total: count ?? items.length }),
+      JSON.stringify({ items, total: count ?? items.length, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

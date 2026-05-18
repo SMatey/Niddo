@@ -53,18 +53,51 @@ export async function uploadPropertyImages({
   propertyId,
   files,
 }: UploadPropertyImagesOptions): Promise<string[]> {
-  const uploadPromises = files.map((file) =>
-    uploadSinglePropertyImage({ supabase, bucket, userId, propertyId, file })
-  )
+  try {
+    const formData = new FormData();
+    formData.append('propertyId', propertyId);
+    
+    // Add all files
+    files.forEach((file, index) => {
+      formData.append('file', file);
+      formData.append('index', String(index));
+    });
 
-  const results = await Promise.allSettled(uploadPromises)
-
-  return results.reduce<string[]>((uploadedImages, result) => {
-    if (result.status === 'fulfilled') {
-      uploadedImages.push(result.value)
-    } else {
-      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, result.reason)
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    
+    if (!token) {
+      throw new Error("No session found for uploading images");
     }
-    return uploadedImages
-  }, [])
+
+    // Call the Edge Function using raw fetch to properly handle multipart/form-data boundary
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const functionUrl = `${supabaseUrl}/functions/v1/property-images-upload`;
+    
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        // Do NOT set Content-Type manually, let the browser set it with the boundary!
+        'Authorization': `Bearer ${token}`,
+        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, errorText);
+      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    // Extracts ordered URLs
+    const urls = (data?.urls || []).map((item: { url: string }) => item.url);
+    return urls;
+  } catch (err) {
+    console.error(PROPERTY_ACTIONS_MESSAGES.errors.NoUploadedImages, err);
+    return [];
+  }
 }
+

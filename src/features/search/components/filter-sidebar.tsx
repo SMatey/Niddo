@@ -1,12 +1,11 @@
 'use client'
 
 import { Input } from '@/shared/components/ui/input'
-import { Toggle } from '@/shared/components/ui/toggle'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS } from '../constants/search.constants'
+import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS } from '../constants/search.constants'
 import type { FilterState, FilterSidebarProps, ContentMode } from '../types/search.types'
-import { DEFAULT_FILTERS } from '../hooks/use-search-filters'
+import { useFilterState } from '../hooks/use-filter-state'
 
 export type { FilterState, FilterSidebarProps }
 
@@ -14,25 +13,26 @@ interface FilterSidebarWithModeProps extends FilterSidebarProps {
     contentMode: ContentMode
 }
 
-export function FilterSidebar({ filters, onFilterChange, contentMode = 'properties' }: FilterSidebarWithModeProps) {
-    const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-        onFilterChange?.({ ...filters, [key]: value })
-    }
+const CONTENT_MODE_CONFIG = {
+    [CONTENT_MODES.PROPERTIES]: {
+        tags: AMENITY_TAGS,
+        tagLabel: FILTER_LABELS.amenities,
+        priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
+        minPrice: 'minPrice' as const,
+        maxPrice: 'maxPrice' as const,
+    },
+    [CONTENT_MODES.USERS]: {
+        tags: LIFESTYLES,
+        tagLabel: FILTER_LABELS.lifestyle,
+        priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
+        minPrice: 'minBudget' as const,
+        maxPrice: 'maxBudget' as const,
+    },
+} as const
 
-    const toggleTag = (tag: string) => {
-        const current = filters.lifestyles
-        const updated = current.includes(tag)
-            ? current.filter((l) => l !== tag)
-            : [...current, tag]
-        updateFilter('lifestyles', updated)
-    }
-
-    const clearFilters = () => {
-        onFilterChange?.(DEFAULT_FILTERS)
-    }
-
-    const availableTags = contentMode === 'properties' ? AMENITY_TAGS : LIFESTYLES
-    const tagLabel = contentMode === 'properties' ? 'Amenidades' : 'Estilo de vida'
+export function FilterSidebar({ filters, onFilterChange, contentMode = CONTENT_MODES.PROPERTIES }: FilterSidebarWithModeProps) {
+    const config = CONTENT_MODE_CONFIG[contentMode]
+    const { updateFilter, toggleTag, clearFilters } = useFilterState(filters, { onFilterChange })
 
     return (
         <aside className="w-full space-y-6 p-4 bg-surface rounded-lg border border-border">
@@ -51,54 +51,24 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = 'properti
                 <Input
                     placeholder={FILTER_LABELS.locationPlaceholder}
                     value={filters.location}
-                    onChange={(e) => updateFilter('location', e.target.value)}
+                    onChange={(e) => updateFilter(FILTER_KEYS.LOCATION, e.target.value)}
                 />
             </div>
 
-            {contentMode === 'properties' && (
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
-                    <PriceRange
-                        minValue={filters.minPrice}
-                        maxValue={filters.maxPrice}
-                        onMinChange={(v) => updateFilter('minPrice', v)}
-                        onMaxChange={(v) => updateFilter('maxPrice', v)}
-                    />
-                </div>
-            )}
-
-            {contentMode === 'users' && (
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
-                    <PriceRange
-                        minValue={filters.minBudget}
-                        maxValue={filters.maxBudget}
-                        onMinChange={(v) => updateFilter('minBudget', v)}
-                        onMaxChange={(v) => updateFilter('maxBudget', v)}
-                    />
-                </div>
-            )}
-
-            {contentMode === 'properties' && (
-                <div className="space-y-3">
-                    <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.lifestyle}</label>
-                    <Toggle
-                        checked={filters.petFriendly}
-                        onChange={(v) => updateFilter('petFriendly', v)}
-                        label={FILTER_LABELS.petFriendly}
-                    />
-                    <Toggle
-                        checked={filters.smoker}
-                        onChange={(v) => updateFilter('smoker', v)}
-                        label={FILTER_LABELS.smoker}
-                    />
-                </div>
-            )}
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-text-secondary">{FILTER_LABELS.budget}</label>
+                <PriceRange
+                    minValue={filters[config.minPrice] as string}
+                    maxValue={filters[config.maxPrice] as string}
+                    onMinChange={(v) => updateFilter(config.priceFilter.min, v)}
+                    onMaxChange={(v) => updateFilter(config.priceFilter.max, v)}
+                />
+            </div>
 
             <div className="space-y-2">
-                <label className="text-sm font-medium text-text-secondary">{tagLabel}</label>
+                <label className="text-sm font-medium text-text-secondary">{config.tagLabel}</label>
                 <div className="flex flex-wrap gap-2">
-                    {availableTags.map((tag) => (
+                    {config.tags.map((tag) => (
                         <Tag
                             key={tag}
                             selected={filters.lifestyles.includes(tag)}

@@ -1,47 +1,38 @@
-// TODO: [US-52] Implement progressive marker loading based on map viewport bounds
-// - Current pagination doesn't work well with map view (all results loaded at once)
-// - Need to fetch markers progressively as user pans/zooms the map
-// - Consider using Google Maps `onBoundsChanged` or `onIdle` to trigger fetches
-// - Implementation should update URL params and debounce rapid map movements
-// - Track state with useReducer for complex pagination logic in map mode
-
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
-import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point } from '../types/search.types'
-import { filterItems } from '../utils/filter-items'
+import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point, MapBounds } from '../types/search.types'
 import { MapInfoWindow } from './map-info-window'
-import { MAP_LABELS, MAP_CONFIG } from '../constants/search.constants'
+import { MAP_LABELS, MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
+import { toPoints } from '../utils/map.utils'
 
-function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode): Point[] {
-    return items
-        .filter((item) => item.lat != null && item.lng != null)
-        .map((item) => ({
-            id: item.id,
-            lat: item.lat!,
-            lng: item.lng!,
-            item,
-            type: contentMode === 'properties' ? 'property' : 'user',
-        }))
-}
-
-export function MapView({ properties = [], users = [], contentMode, filters, isLoading }: MapViewProps) {
+export function MapView({
+    properties = [],
+    users = [],
+    contentMode,
+    isLoading,
+    onBoundsChange,
+}: MapViewProps) {
     const [isClient, setIsClient] = useState(false)
     const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
+    const mapRef = useRef<google.maps.Map | null>(null)
 
     useEffect(() => {
         setIsClient(true)
     }, [])
+
+    useEffect(() => {
+        setSelectedPoint(null)
+    }, [contentMode])
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
     const { isLoaded, loadError } = useJsApiLoader({
         googleMapsApiKey: apiKey,
     })
 
-    const allItems: (PropertyItem | UserItem)[] = contentMode === 'properties' ? properties : users
-    const filteredItems = filterItems(allItems, contentMode, filters)
-    const points = toPoints(filteredItems, contentMode)
+    const allItems: (PropertyItem | UserItem)[] = contentMode === CONTENT_MODES.PROPERTIES ? properties : users
+    const points = toPoints(allItems, contentMode)
 
     const onMarkerClick = useCallback((point: Point) => {
         setSelectedPoint(point)
@@ -50,6 +41,32 @@ export function MapView({ properties = [], users = [], contentMode, filters, isL
     const onInfoWindowClose = useCallback(() => {
         setSelectedPoint(null)
     }, [])
+
+    const onLoad = useCallback((map: google.maps.Map) => {
+        mapRef.current = map
+    }, [])
+
+    const onUnmount = useCallback(() => {
+        mapRef.current = null
+    }, [])
+
+    const handleIdle = useCallback(() => {
+        if (!mapRef.current || !onBoundsChange) return
+
+        const bounds = mapRef.current.getBounds()
+        if (bounds) {
+            const ne = bounds.getNorthEast()
+            const sw = bounds.getSouthWest()
+
+            const mapBounds: MapBounds = {
+                neLat: ne.lat(),
+                neLng: ne.lng(),
+                swLat: sw.lat(),
+                swLng: sw.lng(),
+            }
+            onBoundsChange(mapBounds)
+        }
+    }, [onBoundsChange])
 
     if (!apiKey) {
         return (
@@ -85,17 +102,25 @@ export function MapView({ properties = [], users = [], contentMode, filters, isL
 
     return (
         <div className="w-full h-full rounded-lg border border-border overflow-hidden">
+            <style>{`
+                .gm-style-iw button[aria-label="Close"] {
+                    display: none !important;
+                }
+            `}</style>
             <GoogleMap
                 mapContainerStyle={MAP_CONFIG.containerStyle}
                 center={MAP_CONFIG.defaultCenter}
                 zoom={MAP_CONFIG.defaultZoom}
                 options={MAP_CONFIG.options}
+                onLoad={onLoad}
+                onUnmount={onUnmount}
+                onIdle={handleIdle}
             >
                 {points.map((point) => (
                     <Marker
                         key={point.id}
                         position={{ lat: point.lat, lng: point.lng }}
-                        title={point.type === 'property' ? (point.item as PropertyItem).title : (point.item as UserItem).name}
+                        title={point.type === CONTENT_MODES.PROPERTIES ? (point.item as PropertyItem).title : (point.item as UserItem).name}
                         onClick={() => onMarkerClick(point)}
                     />
                 ))}
@@ -104,7 +129,7 @@ export function MapView({ properties = [], users = [], contentMode, filters, isL
                         position={{ lat: selectedPoint.lat, lng: selectedPoint.lng }}
                         onCloseClick={onInfoWindowClose}
                     >
-                        <MapInfoWindow point={selectedPoint} />
+                        <MapInfoWindow point={selectedPoint} onClose={onInfoWindowClose} />
                     </InfoWindow>
                 )}
             </GoogleMap>

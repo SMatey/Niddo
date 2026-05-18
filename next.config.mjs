@@ -5,6 +5,14 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
+  serverActions: {
+    bodySizeLimit: '10mb',
+  },
   turbopack: {
     root: __dirname,
   },
@@ -21,6 +29,11 @@ const nextConfig = {
         pathname: '/**',
       }
     ],
+  },
+  experimental: {
+    turbopack: {
+      root: '.',
+    },
   },
 }
 
