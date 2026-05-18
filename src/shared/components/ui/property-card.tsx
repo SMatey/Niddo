@@ -21,7 +21,6 @@ export function PropertyCard({
   amenities = [],
   isFavorite = false,
   onFavoriteToggle,
-  favoriteButton,
   className,
 }: PropertyCardProps) {
   const badges: BadgeItem[] = []
@@ -38,19 +37,11 @@ export function PropertyCard({
             </div>
           )}
         </Link>
-        {(favoriteButton || onFavoriteToggle) && (
         {id && (
           <div
             className="absolute top-3 right-3 z-10"
             onClick={(e) => e.stopPropagation()}
           >
-            {favoriteButton ?? (
-              <FavoriteButton
-                isFavorite={isFavorite}
-                onToggle={onFavoriteToggle!}
-                inactiveClassName="bg-white/80 text-text-muted border-white/80 hover:border-red-400 hover:text-red-500"
-              />
-            )}
             <FavoritePropertyButton
               propertyId={id}
             />
