@@ -28,8 +28,6 @@ export function FavoritePropertyItem({ id }: FavoritePropertyItemProps) {
       bathrooms={data.bathrooms}
       squareMeters={data.squareMeters}
       amenities={data.amenities}
-      petFriendly={data.petFriendly}
-      smoker={data.smoker}
     />
   )
 }

@@ -5,7 +5,7 @@ import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, Point, MapBounds } from '../types/domain.types'
 import type { MapViewProps } from '../types/ui.types'
 import { MapInfoWindow } from './map-info-window'
-import { MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
+import { MAP_CONFIG, MAP_LABELS, CONTENT_MODES } from '../constants/search.constants'
 import { toPoints } from '../utils/map.utils'
 import { MapLoadingState, useMap } from '@/features/search/providers/map-provider'
 

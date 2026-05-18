@@ -107,8 +107,9 @@ export interface BudgetBadgeProps {
 
 export interface DetailHeaderProps {
     isFavorite: boolean
-    onFavoriteToggle: () => void
+    onFavoriteToggle?: () => void
     onBack?: () => void
+    favoriteButton?: React.ReactNode
 }
 
 export type BadgeVariant = 'success' | 'info' | 'warning'
