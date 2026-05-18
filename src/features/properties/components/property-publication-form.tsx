@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/ui/button'
@@ -22,6 +23,7 @@ export interface PropertyPublicationFormProps {
 }
 
 export function PropertyPublicationForm({ initialData, propertyId }: PropertyPublicationFormProps) {
+  const router = useRouter()
   const isEditing = Boolean(initialData && propertyId);
   const {
     selectedImages,
@@ -91,6 +93,7 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
 
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
 
   const availableFrom = watch('availableFrom')
   const availableTo = watch('availableTo')
@@ -165,7 +168,10 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
         if (result.success) {
           setSubmitSuccess(true)
           setFormError(null)
-          setTimeout(() => setSubmitSuccess(false), 5000)
+          setTimeout(() => {
+            setSubmitSuccess(false)
+            router.push('/mis-publicaciones')
+          }, 2000)
         } else {
           setFormError(result.error || "No se pudo actualizar la propiedad")
         }
@@ -185,7 +191,10 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
           setFormError(null)
           reset()
           clearImages()
-          setTimeout(() => setSubmitSuccess(false), 5000)
+          setTimeout(() => {
+            setSubmitSuccess(false)
+            router.push('/mis-publicaciones')
+          }, 2000)
         } else {
           setFormError(result.error || PROPERTY_ACTIONS_MESSAGES.errors.unexpectedError)
         }
@@ -194,6 +203,51 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
       console.error('Error submitting form:', error)
       setFormError(PROPERTY_ACTIONS_MESSAGES.errors.unexpectedProcessing)
     }
+  }
+
+  const handleSaveDraft = async () => {
+    setIsSavingDraft(true)
+    try {
+      const draftData = {
+        timestamp: new Date().toISOString(),
+        isEditing,
+        propertyId,
+        formData: {
+          title: watch('title'),
+          description: watch('description'),
+          price: watch('price'),
+          location: watch('location'),
+          bedrooms: watch('bedrooms'),
+          bathrooms: watch('bathrooms'),
+          squareMeters: watch('squareMeters'),
+          availableFrom: watch('availableFrom'),
+          availableTo: watch('availableTo'),
+          latitude: location?.lat,
+          longitude: location?.lng,
+          amenities,
+          rules,
+        },
+        images: selectedImages.map(img => ({
+          id: img.id,
+          previewUrl: img.previewUrl,
+          isNew: !!img.file
+        }))
+      }
+      localStorage.setItem('propertyDraft', JSON.stringify(draftData))
+      // Show success message temporarily
+      const previousError = formError
+      setFormError('Borrador guardado exitosamente')
+      setTimeout(() => setFormError(previousError), 3000)
+    } catch (error) {
+      console.error('Error saving draft:', error)
+      setFormError('No se pudo guardar el borrador')
+    } finally {
+      setIsSavingDraft(false)
+    }
+  }
+
+  const handleExit = () => {
+    router.push('/mis-publicaciones')
   }
 
   return (
@@ -430,7 +484,7 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
                         <span>{rule}</span>
                         <button
                           type="button"
-                          className="text-text-secondary transition hover:text-state-error"
+                          className="text-text-secondary transition hover:text-state-error cursor-pointer"
                           onClick={() => removeRule(index)}
                         >
                           ✕
@@ -510,9 +564,28 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
           <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-sm text-green-700">{PROPERTY_PUBLICATION_LABELS.messages.success}</div>
         ) : null}
 
-        <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-base">
-          {isSubmitting ? PROPERTY_PUBLICATION_LABELS.buttons.publishing : PROPERTY_PUBLICATION_LABELS.buttons.submit}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button type="submit" disabled={isSubmitting} className="flex-1 py-3 text-base">
+            {isSubmitting ? PROPERTY_PUBLICATION_LABELS.buttons.publishing : PROPERTY_PUBLICATION_LABELS.buttons.submit}
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            disabled={isSavingDraft} 
+            onClick={handleSaveDraft}
+            className="flex-1 py-3 text-base cursor-pointer"
+          >
+            Guardar Borrador
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={handleExit}
+            className="flex-1 py-3 text-base cursor-pointer"
+          >
+            Salir
+          </Button>
+        </div>
       </form>
     </div>
   )
