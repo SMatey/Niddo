@@ -19,6 +19,7 @@ export function UserCard({
     verified = false,
     isFavorite = false,
     onFavoriteToggle,
+    favoriteButton,
     minBudget,
     maxBudget,
     confidenceScore,
