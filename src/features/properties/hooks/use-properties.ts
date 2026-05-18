@@ -1,11 +1,11 @@
 
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo, useContext } from 'react'
 import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/search.types'
 import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
 import { SupabasePropertyRepository } from '../repositories/supabase-property.repository'
 import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
-import { usePropertyRepository } from '../context/property-repository.context'
+import { PropertyRepositoryContext } from '../context/property-repository.context'
 
 export interface UsePropertiesOptions {
     initialPageSize?: number

@@ -1,3 +1,14 @@
+import type { FilterState } from '@/features/search/types/search.types'
+
+export const EMPTY_FILTERS: FilterState = {
+  location: '',
+  minPrice: '',
+  maxPrice: '',
+  minBudget: '',
+  maxBudget: '',
+  lifestyles: [],
+}
+
 export const HOME_DATA = {
   featured_properties: {
     title: 'Propiedades destacadas',
