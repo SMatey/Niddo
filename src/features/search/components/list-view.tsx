@@ -1,5 +1,6 @@
 import { PropertyCard } from '@/shared/components/ui/property-card'
 import { UserCard } from '@/shared/components/ui/user-card'
+import { FavoritePropertyButton, FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
 import { CARD_LABELS, LAYOUT_CONFIG, CONTENT_MODES } from '../constants/search.constants'
 import type { PropertyItem, UserItem, ListViewProps } from '../types/search.types'
 
@@ -21,7 +22,7 @@ export function ListView({ properties = [], users = [], contentMode, onPropertyF
                 squareMeters={item.squareMeters}
                 amenities={item.amenities}
                 isFavorite={item.isFavorite}
-                onFavoriteToggle={onPropertyFavoriteToggle ? () => onPropertyFavoriteToggle(item.id) : undefined}
+                favoriteButton={<FavoritePropertyButton propertyId={item.id} />}
             />
         )
         : (item: UserItem) => (
@@ -39,7 +40,7 @@ export function ListView({ properties = [], users = [], contentMode, onPropertyF
                 maxBudget={item.maxBudget}
                 confidenceScore={item.confidenceScore}
                 lifestyles={item.lifestyles}
-                onFavoriteToggle={onUserFavoriteToggle ? () => onUserFavoriteToggle(item.id) : undefined}
+                favoriteButton={<FavoriteProfileButton profileId={item.id} />}
             />
         )
 

@@ -5,7 +5,8 @@ import { Tag } from './tag'
 import { UserAvatar, UserInfo } from './user-avatar'
 import { ConfidenceBar } from './confidence-bar'
 import { BudgetBadge } from './budget-badge'
-import { FavoriteButton } from './favorite-button'
+//import { FavoriteButton } from './favorite-button'
+import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
 import type { UserCardProps } from './types'
 
 export function UserCard({
@@ -18,6 +19,7 @@ export function UserCard({
     verified = false,
     isFavorite = false,
     onFavoriteToggle,
+    favoriteButton,
     minBudget,
     maxBudget,
     confidenceScore,
@@ -26,14 +28,13 @@ export function UserCard({
 }: UserCardProps) {
     return (
         <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
-            {onFavoriteToggle && (
+            {id && (
                 <div
                     className="px-4 pt-4 flex justify-end"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <FavoriteButton
-                        isFavorite={isFavorite}
-                        onToggle={onFavoriteToggle}
+                    <FavoriteProfileButton
+                        profileId={id}
                     />
                 </div>
             )}
