@@ -1,19 +1,4 @@
-// Re-export all shared UI types from the central types location
-export type {
-    TagProps,
-    Tab,
-    TabsProps,
-    ToggleProps,
-    PriceRangeProps,
-    PropertyCardProps,
-    UserCardProps,
-    UserAvatarProps,
-    UserInfoProps,
-    FavoriteButtonProps,
-    ConfidenceBarProps,
-    BudgetBadgeProps,
-    DetailHeaderProps,
-} from '@/shared/components/ui/types'
+import { ReactNode } from 'react'
 
 // Additional shared types
 export interface TagProps {
@@ -122,6 +107,7 @@ export interface BudgetBadgeProps {
 
 export interface DetailHeaderProps {
     isFavorite: boolean
-    onFavoriteToggle: () => void
+    onFavoriteToggle?: () => void
+    favoriteButton?: ReactNode
     onBack?: () => void
 }

@@ -18,6 +18,7 @@ export function UserCard({
     verified = false,
     isFavorite = false,
     onFavoriteToggle,
+    favoriteButton,
     minBudget,
     maxBudget,
     confidenceScore,
@@ -26,15 +27,17 @@ export function UserCard({
 }: UserCardProps) {
     return (
         <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
-            {onFavoriteToggle && (
+            {(favoriteButton || onFavoriteToggle) && (
                 <div
                     className="px-4 pt-4 flex justify-end"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <FavoriteButton
-                        isFavorite={isFavorite}
-                        onToggle={onFavoriteToggle}
-                    />
+                    {favoriteButton ?? (
+                        <FavoriteButton
+                            isFavorite={isFavorite}
+                            onToggle={onFavoriteToggle!}
+                        />
+                    )}
                 </div>
             )}
             <Link href={`/usuario/${id}`} className="block">

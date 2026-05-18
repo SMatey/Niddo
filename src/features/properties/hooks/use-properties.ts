@@ -42,15 +42,21 @@ export function useProperties(
     const [error, setError] = useState<Error | null>(null)
     const [total, setTotal] = useState(0)
 
-    let repository: PropertyRepository
+    let repository: PropertyRepository | null = null
     try {
         repository = usePropertyRepository()
     } catch {
-        repository = options.repository ?? new SupabasePropertyRepository(
+        // If context not available, create a fallback instance
+        // This will be recreated but wrapped in useMemo below to stabilize it
+    }
+
+    const stableRepository = useMemo(() => {
+        if (repository) return repository
+        return options.repository ?? new SupabasePropertyRepository(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         )
-    }
+    }, [repository, options.repository])
 
     const stableBoundsKey = boundsKey(bounds)
     const stableBounds = useMemo(() => bounds, [stableBoundsKey])
@@ -85,7 +91,7 @@ export function useProperties(
             setError(null)
 
             try {
-                const result = await repository.search({
+                const result = await stableRepository.search({
                     filters,
                     bounds: stableBounds,
                     page,
@@ -106,7 +112,7 @@ export function useProperties(
         fetchProperties()
 
         return () => controller.abort()
-    }, [filters, page, pageSize, stableBoundsKey, repository])
+    }, [filters, page, pageSize, stableBoundsKey, stableRepository])
 
     return {
         data,
