@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export interface PropertyCardProps {
     id: string
     title: string
@@ -10,6 +12,7 @@ export interface PropertyCardProps {
     amenities?: string[]
     isFavorite?: boolean
     onFavoriteToggle?: () => void
+    favoriteButton?: ReactNode
     className?: string
 }
 
@@ -23,6 +26,7 @@ export interface UserCardProps {
     verified?: boolean
     isFavorite?: boolean
     onFavoriteToggle?: () => void
+    favoriteButton?: ReactNode
     minBudget?: string
     maxBudget?: string
     confidenceScore?: number

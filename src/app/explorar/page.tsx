@@ -121,8 +121,6 @@ function ExplorarPageContent() {
                 viewMode={viewMode}
                 onContentChange={setContentMode}
                 onViewChange={handleViewModeChange}
-                onPropertyFavoriteToggle={() => { }}
-                onUserFavoriteToggle={() => { }}
                 onBoundsChange={handleBoundsChange}
                 properties={properties}
                 users={users}

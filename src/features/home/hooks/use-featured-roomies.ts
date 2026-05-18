@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useUsers } from '@/features/users/hooks/use-users'
 import { useAuthModal } from '@/shared/hooks/useAuthModal'
-import { HOME_DATA } from '../constants/home.constants'
+import { HOME_DATA, EMPTY_FILTERS } from '../constants/home.constants'
 
 export function useFeaturedRoomies() {
   const router = useRouter()
@@ -20,7 +20,7 @@ export function useFeaturedRoomies() {
     cta,
     loginPrompt,
   } = HOME_DATA.featured_roomies
-  const { data: users, isLoading } = useUsers(null, null, { initialPageSize: pageSize })
+  const { data: users, isLoading } = useUsers(EMPTY_FILTERS, null, { initialPageSize: pageSize })
   const { user, isInitialized } = useAuth()
   const { onOpenWithTab } = useAuthModal()
   const [isPromptOpen, setIsPromptOpen] = useState(false)
