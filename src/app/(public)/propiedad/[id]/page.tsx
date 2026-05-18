@@ -16,6 +16,7 @@ import { ModeratedContentState } from '@/features/reviews/components/moderated-c
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { FavoritePropertyButton } from '@/features/favorites/components/favorite-button-container'
 import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 
 function PropertyDetailLoadingState() {
@@ -74,7 +75,7 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
       <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
         <DetailHeader
           isFavorite={property.isFavorite ?? false}
-          onFavoriteToggle={() => {}}
+          favoriteButton={<FavoritePropertyButton propertyId={id} />}
           onBack={onBack}
         />
 

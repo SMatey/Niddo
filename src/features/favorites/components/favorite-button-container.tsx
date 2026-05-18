@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { FavoriteButton } from '@/shared/components/ui/favorite-button'
 import { isPropertyFavorited, isProfileFavorited } from '../lib/supabase-favorites'
-import { useFavorites } from '../hooks/use-favorites'
+import { useFavorites } from '..'
 import type { FavoriteButtonProps } from '@/shared/types/types'
 
 interface FavoritePropertyButtonProps extends Omit<FavoriteButtonProps, 'isFavorite' | 'onToggle'> {
@@ -50,6 +50,7 @@ export function FavoritePropertyButton({
       isFavorite={isFavorite}
       onToggle={handleToggle}
       {...props}
+      className="cursor-pointer"
     />
   )
 }
@@ -98,6 +99,7 @@ export function FavoriteProfileButton({
       isFavorite={isFavorite}
       onToggle={handleToggle}
       {...props}
+      className="cursor-pointer"
     />
   )
 }

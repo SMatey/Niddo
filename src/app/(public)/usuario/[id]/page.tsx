@@ -13,6 +13,7 @@ import { ModeratedContentState } from '@/features/reviews/components/moderated-c
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
 
 function UserDetailLoadingState() {
   return (
@@ -67,7 +68,7 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
       <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
         <DetailHeader
           isFavorite={user.isFavorite ?? false}
-          onFavoriteToggle={() => {}}
+          favoriteButton={<FavoriteProfileButton profileId={id} />}
           onBack={onBack}
         />
 
