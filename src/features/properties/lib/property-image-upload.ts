@@ -1,5 +1,3 @@
-'use server'
-
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
 
