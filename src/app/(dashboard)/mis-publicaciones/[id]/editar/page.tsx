@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from 'react'
 import { PropertyPublicationForm } from '@/features/properties/components/property-publication-form'
 import { useParams } from 'next/navigation'
