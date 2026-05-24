@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
+  // 1. Configuración de CORS para permitir que el navegador web lea esta respuesta
   const corsHeaders = {
     'Access-Control-Allow-Origin': req.headers.get('origin') ?? '*',
     'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
@@ -12,11 +13,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // 2. Conexión a la Base de Datos usando la Llave Maestra (Service Role)
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // 3. Captura del ID del inmueble desde la URL (ej. /funcion?id=123)
     const url = new URL(req.url)
     const id = url.searchParams.get('id')
 
@@ -27,7 +29,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Fetch amenities catalog
+    // 4. Descarga del catálogo general de amenidades para usarlo como traductor
     const { data: amenityData } = await supabase
       .from('amenities')
       .select('id, label')
@@ -35,7 +37,7 @@ Deno.serve(async (req) => {
     const amenityIdToLabel: Record<string, string> = {}
     ;(amenityData ?? []).forEach(a => { amenityIdToLabel[a.id] = a.label })
 
-    // Fetch property with owner info
+    // 5. Consulta Principal: Trae la propiedad y hace un JOIN automático con el perfil del dueño
     const { data: propertyData, error: propertyError } = await supabase
       .from('properties')
       .select(`
@@ -53,17 +55,20 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Fetch property amenities
+    // 6. Busca qué amenidades específicas tiene esta propiedad
     const { data: propertyAmenities } = await supabase
       .from('property_amenities')
       .select('amenity_id')
       .eq('property_id', id)
 
+    // 7. Traduce los IDs de las amenidades a sus nombres reales usando el catálogo
     const amenityIds = (propertyAmenities ?? []).map(a => a.amenity_id)
     const amenityLabels = amenityIds.map(id => amenityIdToLabel[id] ?? id)
 
+    // 8. Extrae limpiamente la información del perfil del dueño
     const ownerRow = (propertyData as Record<string, unknown>).profiles as Record<string, unknown> | null
 
+    // 9. Empaquetado Final: Formatea todos los datos en una estructura plana y amigable para el frontend
     const detail = {
       id: propertyData.id,
       title: propertyData.title,
@@ -88,6 +93,7 @@ Deno.serve(async (req) => {
       rules: propertyData.rules ?? [],
     }
 
+    // 10. Envía el paquete terminado al cliente
     return new Response(JSON.stringify(detail), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

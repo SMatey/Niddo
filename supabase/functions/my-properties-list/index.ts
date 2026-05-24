@@ -52,7 +52,6 @@ Deno.serve(async (req) => {
       query = query.eq('status', status)
     }
 
-    // Ejecución: Cortamos el pastel usando el offset y el tamaño de página (pageSize)
     const { data: properties, error: dbError, count } = await query.range(offset, offset + pageSize - 1)
 
     if (dbError) throw dbError
