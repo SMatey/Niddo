@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { Plus, Building2, Loader2 } from 'lucide-react';
