@@ -18,14 +18,10 @@ export interface CreatePropertyResponse {
   error?: string
 }
 
-/**
- * Creates a new property listing in the database
- */
 export async function createProperty(payload: CreatePropertyPayload): Promise<CreatePropertyResponse> {
   try {
     const supabase = await createServerClient()
 
-    // Get current user
     const {
       data: { user },
       error: authError,
@@ -38,8 +34,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       }
     }
 
-    // Prepare property data (without amenities, since they belong in property_amenities)
-    // and initially without images, because we need the property ID first for bucket storage.
     const propertyData = {
       id: `prop-${Date.now()}-${crypto.randomUUID()}`,
       owner_id: user.id,
@@ -59,7 +53,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       images: [] as string[],
     }
 
-    // Insert property into database FIRST
     const { data: createdProperty, error: insertError } = await supabase
       .from(PROPERTY_ACTIONS_MESSAGES.labels.propieties)
       .insert([propertyData])
@@ -74,7 +67,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       }
     }
 
-    // Now upload images using the created property.id
     if (payload.images && payload.images.length > 0) {
       const uploadedUrls = await uploadPropertyImages({
         supabase,
@@ -84,7 +76,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
         files: payload.images,
       })
 
-      // Update the property with the uploaded image URLs
       if (uploadedUrls.length > 0) {
         const { error: updateError } = await supabase
           .from(PROPERTY_ACTIONS_MESSAGES.labels.propieties)
@@ -99,15 +90,12 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
       }
     }
 
-    // Insert amenities into related table
     if (payload.amenities && payload.amenities.length > 0) {
-      // Use service role to bypass RLS for inserting new amenities
       const supabaseAdmin = createSupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       )
 
-      // Ensure amenities exist in the amenities table (using the amenity string as ID and Label temporarily)
       const amenitiesToUpsert = payload.amenities.map(amenity => ({
         id: amenity,
         label: amenity,
@@ -122,7 +110,6 @@ export async function createProperty(payload: CreatePropertyPayload): Promise<Cr
         console.error("Warning: Could not upsert amenities catalogue", upsertError)
       }
 
-      // Now insert the relations using normal client
       const amenitiesData = payload.amenities.map(amenityId => ({
         property_id: propertyData.id,
         amenity_id: amenityId

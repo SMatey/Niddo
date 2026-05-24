@@ -27,7 +27,6 @@ export default function EditPropertyPage() {
         .single();
         
       if (!error && data) {
-        // Map property_amenities to simple string array to match form structure
         const mappedData = {
           ...data,
           amenities: data.property_amenities?.map((pa: any) => pa.amenity_id) || []
