@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { PropertyCard } from '@/shared/components/ui/property-card'
 import { useFeaturedProperties } from '../hooks/use-featured-properties'
-import type { PropertyItem } from '@/features/search/types/search.types'
+import type { PropertyItem } from '@/features/search/types/domain.types'
 
 export function FeaturedProperties() {
   const { title, description, viewAllLabel, viewAllHref, itemsToShow, properties, isLoading } =
@@ -49,8 +49,6 @@ export function FeaturedProperties() {
             bathrooms={property.bathrooms}
             squareMeters={property.squareMeters}
             amenities={property.amenities}
-            petFriendly={property.petFriendly}
-            smoker={property.smoker}
             isFavorite={property.isFavorite}
           />
         ))}

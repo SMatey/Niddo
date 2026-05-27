@@ -1,36 +1,74 @@
-'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, Building2 } from 'lucide-react';
+import { Plus, Building2, Loader2 } from 'lucide-react';
 
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/shared/components/ui/button';
 import { DASHBOARD_CONTENT } from '@/features/properties/constants/dashboard.constants';
 import { DashboardPropertyCard } from '@/features/properties/components/dashboard-property-card';
-import { mockProperties } from '@/features/properties/lib/mock-data';
-import type { Property, PropertyStatus } from '@/features/properties/types';
+import { useMyProperties } from '@/features/properties/hooks/use-my-properties';
+import type { PropertyStatus } from '@/features/properties/types';
 
 export default function MisPublicacionesPage() {
-  // Inicializamos el estado con nuestros datos de prueba
-  const [properties, setProperties] = useState<Property[]>(mockProperties);
+  const { properties, isLoading, refresh } = useMyProperties();
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Lógica para cambiar el estado (Activo <-> Pausado)
-  const handleToggleStatus = (id: string, currentStatus: PropertyStatus) => {
-    setProperties((prev) =>
-      prev.map((prop) => {
-        if (prop.id === id) {
-          const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-          return { ...prop, status: newStatus };
-        }
-        return prop;
-      })
-    );
+  const handleToggleStatus = async (id: string, currentStatus: PropertyStatus) => {
+    try {
+      setActionLoadingId(id);
+      
+      const session = await createClient().auth.getSession();
+      const token = session.data.session?.access_token;
+      
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const functionUrl = `${supabaseUrl}/functions/v1/property-status-update`;
+
+      const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      
+      refresh();
+    } catch (e) {
+      console.error("No se pudo cambiar el estado", e);
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   // Lógica para eliminar la propiedad
-  const handleDelete = (id: string) => {
-    // Nota: Más adelante aquí abriremos un Modal de confirmación en lugar de borrar directo
-    setProperties((prev) => prev.filter((prop) => prop.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer.')) return;
+    
+    try {
+      setActionLoadingId(id);
+      const supabase = createClient();
+      
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
+      refresh();
+    } catch (e) {
+      console.error("Error al eliminar la propiedad", e);
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   return (
@@ -55,8 +93,13 @@ export default function MisPublicacionesPage() {
         </Button>
       </section>
 
-      {/* Renderizado Condicional: Lista vs Empty State */}
-      {properties.length > 0 ? (
+      {/* Loading state */}
+      {isLoading ? (
+        <section className="flex min-h-60 flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="mt-4 text-muted-foreground text-sm">Cargando publicaciones...</p>
+        </section>
+      ) : properties.length > 0 ? (
         <section className="flex flex-col gap-5">
           {properties.map((property) => (
             <DashboardPropertyCard

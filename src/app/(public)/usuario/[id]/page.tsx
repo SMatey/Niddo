@@ -7,12 +7,16 @@ import { UserStatsCard } from '@/features/users/components/user-stats-card'
 import { UserBudgetCard } from '@/features/users/components/user-budget-card'
 import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-card'
 import { UserLocationCard } from '@/features/users/components/user-location-card'
+import { MapProvider } from '@/features/search/providers/map-provider'
+
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
+import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
 
 function UserDetailLoadingState() {
   return (
@@ -67,9 +71,13 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
       <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
         <DetailHeader
           isFavorite={user.isFavorite ?? false}
-          onFavoriteToggle={() => {}}
+          favoriteButton={<FavoriteProfileButton profileId={id} />}
           onBack={onBack}
         />
+
+        <div className="flex justify-end">
+          <ReviewEntryButton className="w-full sm:w-auto" targetId={id} targetType="profile" />
+        </div>
 
         <UserProfileHeader user={user} />
 
@@ -108,5 +116,9 @@ export default function UserDetailPage() {
     )
   }
 
-  return <UserDetailContent id={id} onBack={() => router.back()} />
+  return (
+    <MapProvider>
+      <UserDetailContent id={id} onBack={() => router.back()} />
+    </MapProvider>
+  )
 }

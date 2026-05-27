@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { UserDetail } from '@/features/search/types/search.types'
+import type { UserDetail } from '@/features/search/types/domain.types'
 
 export interface UseUserResult {
     data: UserDetail | null

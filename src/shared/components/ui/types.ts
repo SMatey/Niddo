@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export interface PropertyCardProps {
     id: string
     title: string
@@ -8,11 +10,9 @@ export interface PropertyCardProps {
     bathrooms?: number
     squareMeters?: number
     amenities?: string[]
-    petFriendly?: boolean
-    smoker?: boolean
-    lifestyles?: string[]
     isFavorite?: boolean
     onFavoriteToggle?: () => void
+    favoriteButton?: ReactNode
     className?: string
 }
 
@@ -26,6 +26,7 @@ export interface UserCardProps {
     verified?: boolean
     isFavorite?: boolean
     onFavoriteToggle?: () => void
+    favoriteButton?: ReactNode
     minBudget?: string
     maxBudget?: string
     confidenceScore?: number
@@ -47,7 +48,7 @@ export interface Tab {
 }
 
 export interface TabsProps {
-    tabs: Tab[]
+    tabs: readonly Tab[]
     value: string
     onChange: (value: string) => void
     className?: string
@@ -106,8 +107,9 @@ export interface BudgetBadgeProps {
 
 export interface DetailHeaderProps {
     isFavorite: boolean
-    onFavoriteToggle: () => void
+    onFavoriteToggle?: () => void
     onBack?: () => void
+    favoriteButton?: React.ReactNode
 }
 
 export type BadgeVariant = 'success' | 'info' | 'warning'

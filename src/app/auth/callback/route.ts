@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { ROUTES } from '@/shared/constants/routes.constants'
 
 export async function GET(request: Request) {
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL(ROUTES.LOGIN, requestUrl.origin))
   }
 
-  const supabase = await createClient()
+  const supabase = await createServerClient()
   const { error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {

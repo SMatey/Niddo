@@ -2,7 +2,7 @@
 
 import { Tag } from '@/shared/components/ui/tag'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
-import type { UserDetail } from '@/features/search/types/search.types'
+import type { UserDetail } from '@/features/search/types/domain.types'
 
 interface UserLifestylesCardProps {
   user: UserDetail

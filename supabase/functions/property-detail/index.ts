@@ -1,9 +1,7 @@
-// supabase/functions/property-detail/index.ts
-// Edge Function para detalle de propiedad
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
+  // Configuración de CORS para permitir que el navegador web lea esta respuesta
   const corsHeaders = {
     'Access-Control-Allow-Origin': req.headers.get('origin') ?? '*',
     'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
@@ -15,11 +13,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Conexión a la Base de Datos usando la Llave Maestra (Service Role)
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
+    // Captura del ID del inmueble desde la URL (ej. /funcion?id=123)
     const url = new URL(req.url)
     const id = url.searchParams.get('id')
 
@@ -30,7 +29,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Fetch amenities catalog
+    // Descarga del catálogo general de amenidades para usarlo como traductor
     const { data: amenityData } = await supabase
       .from('amenities')
       .select('id, label')
@@ -38,11 +37,12 @@ Deno.serve(async (req) => {
     const amenityIdToLabel: Record<string, string> = {}
     ;(amenityData ?? []).forEach(a => { amenityIdToLabel[a.id] = a.label })
 
-    // Fetch property with owner info
+    // onsulta Principal: Trae la propiedad y hace un JOIN automático con el perfil del dueño
     const { data: propertyData, error: propertyError } = await supabase
       .from('properties')
       .select(`
-        *,
+        id, owner_id, title, description, images, price, location, address,
+        latitude, longitude, bedrooms, bathrooms, area, rules, status, available_from,
         profiles!owner_id ( id, name, avatar, is_verified, trust_score, joined_date )
       `)
       .eq('id', id)
@@ -55,17 +55,20 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Fetch property amenities
+    // Busca qué amenidades específicas tiene esta propiedad
     const { data: propertyAmenities } = await supabase
       .from('property_amenities')
       .select('amenity_id')
       .eq('property_id', id)
 
+    // Traduce los IDs de las amenidades a sus nombres reales usando el catálogo
     const amenityIds = (propertyAmenities ?? []).map(a => a.amenity_id)
     const amenityLabels = amenityIds.map(id => amenityIdToLabel[id] ?? id)
 
+    // Extrae limpiamente la información del perfil del dueño
     const ownerRow = (propertyData as Record<string, unknown>).profiles as Record<string, unknown> | null
 
+    // Empaquetado Final: Formatea todos los datos en una estructura plana y amigable para el frontend
     const detail = {
       id: propertyData.id,
       title: propertyData.title,
@@ -78,8 +81,6 @@ Deno.serve(async (req) => {
       squareMeters: propertyData.area,
       lat: propertyData.latitude ?? undefined,
       lng: propertyData.longitude ?? undefined,
-      petFriendly: amenityIds.includes('pet-friendly'),
-      smoker: amenityIds.includes('no-smoking'),
       amenities: amenityLabels,
       isFavorite: false,
       description: propertyData.description ?? undefined,
@@ -92,6 +93,7 @@ Deno.serve(async (req) => {
       rules: propertyData.rules ?? [],
     }
 
+    // Envía el paquete terminado al cliente
     return new Response(JSON.stringify(detail), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

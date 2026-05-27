@@ -48,7 +48,6 @@ CREATE TABLE properties (
   bedrooms INTEGER DEFAULT 1 CHECK (bedrooms >= 0),
   bathrooms INTEGER DEFAULT 1 CHECK (bathrooms >= 0),
   area INTEGER DEFAULT 0 CHECK (area >= 0),
-  amenities TEXT[] DEFAULT '{}',
   rules TEXT[] DEFAULT '{}',
   status TEXT DEFAULT 'active' CHECK (status IN ('active', 'draft', 'paused')),
   available_from DATE,
@@ -238,41 +237,51 @@ INSERT INTO profile_lifestyle_tags (profile_id, tag_id) VALUES
   ('user-6', 'remote-work'), ('user-6', 'no-smoking'), ('user-6', 'clean-freak'), ('user-6', 'gym-lover');
 
 -- Properties con coordenadas geográficas
-INSERT INTO properties (id, owner_id, title, description, images, price, location, address, latitude, longitude, bedrooms, bathrooms, area, amenities, rules, status, available_from, created_at) VALUES
+INSERT INTO properties (id, owner_id, title, description, images, price, location, address, latitude, longitude, bedrooms, bathrooms, area, rules, status, available_from, created_at) VALUES
   ('prop-1', 'user-6', 'Habitación en Condesa con terraza', 'Hermosa habitación en departamento compartido con terraza. Excelente ubicación a pasos de Parque México. Incluye servicios, internet de alta velocidad y limpieza semanal de áreas comunes.',
    ARRAY['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop'],
    9500, 'Condesa, CDMX', 'Av. Ámsterdam 123, Condesa', 19.4111, -99.1733, 1, 2, 15,
-   ARRAY['WiFi','Terraza','Lavadora','Cocina equipada','Gimnasio'], ARRAY['No fumar','No fiestas','Mascotas pequeñas OK'], 'active', '2024-04-01', '2024-03-10'),
+   ARRAY['No fumar','No fiestas','Mascotas pequeñas OK'], 'active', '2024-04-01', '2024-03-10'),
 
   ('prop-2', 'user-6', 'Estudio independiente en Roma Norte',
    'Estudio completamente equipado con entrada independiente. Ideal para profesionistas. Zona segura con vigilancia 24/7. A 5 min del metro Insurgentes.',
    ARRAY['https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?w=800&h=600&fit=crop'],
    12000, 'Roma Norte, CDMX', 'Calle Córdoba 45, Roma Norte', 19.4195, -99.1619, 1, 1, 35,
-   ARRAY['WiFi','Aire acondicionado','Cocina','Estacionamiento','Seguridad 24/7'], ARRAY['No fumar dentro','Contrato mínimo 6 meses'], 'active', '2024-03-15', '2024-03-05'),
+   ARRAY['No fumar dentro','Contrato mínimo 6 meses'], 'active', '2024-03-15', '2024-03-05'),
 
   ('prop-3', 'user-5', 'Cuarto amplio en Polanco',
    'Habitación grande con baño propio en departamento de lujo. Áreas comunes amplias, cocina gourmet, sala de TV. Edificio con amenidades completas.',
    ARRAY['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&h=600&fit=crop'],
    15000, 'Polanco, CDMX', 'Av. Presidente Masaryk 200, Polanco', 19.4320, -99.1937, 1, 1, 25,
-   ARRAY['WiFi','Gimnasio','Alberca','Roof garden','Concierge','Pet friendly'], ARRAY['No fumar','Mascotas OK con depósito'], 'active', '2024-04-15', '2024-03-12'),
+   ARRAY['No fumar','Mascotas OK con depósito'], 'active', '2024-04-15', '2024-03-12'),
 
   ('prop-4', 'user-2', 'Depa compartido en Del Valle',
    'Buscamos roomie para completar el depa. Somos 2 profesionistas tranquilos. El cuarto tiene buena luz natural y closet amplio.',
    ARRAY['https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1502672023488-70e25813eb80?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1560185008-b033106af5c3?w=800&h=600&fit=crop'],
    7500, 'Del Valle, CDMX', 'Calle Adolfo Prieto 800, Del Valle', 19.3895, -99.1686, 1, 2, 12,
-   ARRAY['WiFi','Lavadora','Netflix','Cocina equipada'], ARRAY['No fumar','No mascotas','Orden en áreas comunes'], 'active', '2024-03-20', '2024-03-08'),
+   ARRAY['No fumar','No mascotas','Orden en áreas comunes'], 'active', '2024-03-20', '2024-03-08'),
 
   ('prop-5', 'user-1', 'Habitación cerca de CU',
    'Ideal para estudiantes de la UNAM. Habitación cómoda en casa compartida. Ambiente estudiantil y tranquilo. Internet incluido.',
    ARRAY['https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&h=600&fit=crop'],
    5500, 'Coyoacán, CDMX', 'Av. Universidad 1500, Coyoacán', 19.3467, -99.1617, 1, 1, 10,
-   ARRAY['WiFi','Escritorio','Closet','Jardín común'], ARRAY['No fiestas entre semana','Silencio después de 11pm'], 'active', '2024-04-01', '2024-03-14'),
+   ARRAY['No fiestas entre semana','Silencio después de 11pm'], 'active', '2024-04-01', '2024-03-14'),
 
   ('prop-6', 'user-5', 'Loft moderno en Santa Fe',
    'Loft de diseño contemporáneo con vista panorámica. Perfecto para ejecutivos. Incluye 1 cajón de estacionamiento y acceso a business center.',
    ARRAY['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=800&h=600&fit=crop','https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&h=600&fit=crop'],
    18000, 'Santa Fe, CDMX', 'Av. Santa Fe 440, Santa Fe', 19.3595, -99.2614, 1, 1, 45,
-   ARRAY['WiFi','Gimnasio','Business Center','Estacionamiento','Seguridad 24/7','Vista panorámica'], ARRAY['No fumar','No mascotas grandes'], 'active', '2024-05-01', '2024-03-15');
+   ARRAY['No fumar','No mascotas grandes'], 'active', '2024-05-01', '2024-03-15');
+
+-- Property Amenities (from previous array data)
+INSERT INTO property_amenities (property_id, amenity_id) VALUES
+  ('prop-1', 'wifi'), ('prop-1', 'terraza'), ('prop-1', 'lavadora'), ('prop-1', 'cocina-equipada'), ('prop-1', 'gimnasio'),
+  ('prop-2', 'wifi'), ('prop-2', 'aire-acondicionado'), ('prop-2', 'cocina'), ('prop-2', 'estacionamiento'), ('prop-2', 'seguridad-247'),
+  ('prop-3', 'wifi'), ('prop-3', 'gimnasio'), ('prop-3', 'alberca'), ('prop-3', 'roof-garden'), ('prop-3', 'concierge'), ('prop-3', 'pet-friendly'),
+  ('prop-4', 'wifi'), ('prop-4', 'lavadora'), ('prop-4', 'netflix'), ('prop-4', 'cocina-equipada'),
+  ('prop-5', 'wifi'), ('prop-5', 'escritorio'), ('prop-5', 'closet'), ('prop-5', 'jardin-comun'),
+  ('prop-6', 'wifi'), ('prop-6', 'gimnasio'), ('prop-6', 'business-center'), ('prop-6', 'estacionamiento'), ('prop-6', 'seguridad-247'), ('prop-6', 'vista-panoramica')
+ON CONFLICT DO NOTHING;
 
 -- Property Lifestyle Tags
 INSERT INTO property_lifestyle_tags (property_id, tag_id) VALUES

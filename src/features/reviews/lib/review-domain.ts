@@ -1,4 +1,4 @@
-import { REVIEW_FORM } from '../constants/review-form.constants.ts'
+import { REVIEW_FORM } from '../constants/review-form.constants'
 
 export type ReviewTargetType = 'profile' | 'property'
 

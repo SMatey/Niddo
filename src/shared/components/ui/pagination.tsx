@@ -1,12 +1,12 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { PAGINATION_CLASSES } from '@/features/search/constants/search.constants'
+import { PAGINATION_CLASSES, PAGINATION_CONFIG, PAGINATION_LABELS } from '@/features/search/constants/search.constants'
 import { buildPaginationButtons } from '@/features/search/utils/build-pagination'
 import type { PaginationProps } from './types'
 
 export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
-    const buttons = buildPaginationButtons(currentPage, totalPages)
+    const buttons = buildPaginationButtons(currentPage, totalPages, PAGINATION_CONFIG, PAGINATION_LABELS)
 
     if (buttons.length === 0) return null
 

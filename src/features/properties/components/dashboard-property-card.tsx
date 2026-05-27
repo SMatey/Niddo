@@ -54,7 +54,7 @@ export function DashboardPropertyCard({
         {/* Contenedor de Imagen */}
         <div className="relative w-full h-56 sm:h-auto sm:w-72 lg:w-80 shrink-0 bg-muted">
           <Image
-            src={property.images[0] || '/placeholder-property.jpg'}
+            src={property.images && property.images.length > 0 ? property.images[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80'}
             alt={`Imagen de ${property.title}`}
             fill
             className="object-cover"
@@ -88,14 +88,14 @@ export function DashboardPropertyCard({
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/mis-publicaciones/editar/${property.id}`} className="cursor-pointer">
+                    <Link href={`/mis-publicaciones/${property.id}/editar`} className="cursor-pointer">
                       <Edit2 className="mr-2 h-4 w-4" />
                       {PROPERTY_CARD_CONTENT.menu.edit}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     className="cursor-pointer"
-                    onClick={() => onToggleStatus(property.id, property.status)}
+                    onSelect={() => onToggleStatus(property.id, property.status)}
                   >
                     {property.status === 'active' ? (
                       <><Pause className="mr-2 h-4 w-4" /> {PROPERTY_CARD_CONTENT.menu.pause}</>
@@ -106,7 +106,7 @@ export function DashboardPropertyCard({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-                    onClick={() => onDelete(property.id)}
+                    onSelect={() => onDelete(property.id)}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     {PROPERTY_CARD_CONTENT.menu.delete}

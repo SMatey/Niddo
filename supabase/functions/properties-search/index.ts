@@ -21,8 +21,6 @@ function formatProperty(row: Record<string, unknown>, amenityLabels: string[]) {
     squareMeters: row.area,
     lat: row.latitude ?? undefined,
     lng: row.longitude ?? undefined,
-    petFriendly: amenityLabels.includes('Pet friendly'),
-    smoker: amenityLabels.includes('No fumar'),
     amenities: amenityLabels,
     isFavorite: false,
   }
@@ -43,12 +41,40 @@ Deno.serve(async (req) => {
     const location = url.searchParams.get('location') ?? ''
     const minPrice = url.searchParams.get('minPrice') ? Number(url.searchParams.get('minPrice')) : null
     const maxPrice = url.searchParams.get('maxPrice') ? Number(url.searchParams.get('maxPrice')) : null
-    const petFriendly = url.searchParams.get('petFriendly') === 'true'
-    const smoker = url.searchParams.get('smoker') === 'true'
     const amenities = url.searchParams.get('amenities')?.split(',').filter(Boolean) ?? []
     const page = Math.max(1, Number(url.searchParams.get('page') ?? 1))
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
+
+    // Bounds parameters for map view progressive loading
+    const neLatParam = url.searchParams.get('neLat')
+    const neLngParam = url.searchParams.get('neLng')
+    const swLatParam = url.searchParams.get('swLat')
+    const swLngParam = url.searchParams.get('swLng')
+
+    // Parse and validate all bounds parameters
+    const neLat = neLatParam !== null ? Number(neLatParam) : null
+    const neLng = neLngParam !== null ? Number(neLngParam) : null
+    const swLat = swLatParam !== null ? Number(swLatParam) : null
+    const swLng = swLngParam !== null ? Number(swLngParam) : null
+
+    // Validate that all bounds are valid numbers
+    const allBoundsValid = neLat !== null && neLng !== null && swLat !== null && swLng !== null &&
+        !isNaN(neLat) && !isNaN(neLng) && !isNaN(swLat) && !isNaN(swLng)
+
+    // Validate that bounds form a valid area (not degenerate)
+    const boundsArea = allBoundsValid
+      ? Math.abs(neLat - swLat) * Math.abs(neLng - swLng)
+      : 0
+    const hasValidBounds = allBoundsValid && boundsArea > 0
+
+    // Normalize bounds: ensure sw < ne for latitude and longitude
+    const normalizedBounds = hasValidBounds ? {
+        minLat: Math.min(swLat as number, neLat as number),
+        maxLat: Math.max(swLat as number, neLat as number),
+        minLng: Math.min(swLng as number, neLng as number),
+        maxLng: Math.max(swLng as number, neLng as number),
+    } : null
 
     // Fetch amenities catalog for label mapping
     const { data: amenityData } = await supabase
@@ -67,7 +93,7 @@ Deno.serve(async (req) => {
       .from('properties')
       .select(`
         id, owner_id, title, description, images, price, location, address,
-        latitude, longitude, bedrooms, bathrooms, area, amenities, rules,
+        latitude, longitude, bedrooms, bathrooms, area, rules,
         status, available_from,
         profiles!owner_id ( name, avatar, is_verified, trust_score )
       `, { count: 'exact' })
@@ -83,27 +109,13 @@ Deno.serve(async (req) => {
       propertiesQuery = propertiesQuery.lte('price', maxPrice)
     }
 
-    // Filter by pet-friendly and/or no-smoking via property_amenities (OR logic)
-    if (petFriendly || smoker) {
-      // Fetch both amenity types in one query
-      const amenityIdsToFetch: string[] = []
-      if (petFriendly) amenityIdsToFetch.push('pet-friendly')
-      if (smoker) amenityIdsToFetch.push('no-smoking')
-
-      const { data: amenityMatches } = await supabase
-        .from('property_amenities')
-        .select('property_id, amenity_id')
-        .in('amenity_id', amenityIdsToFetch)
-
-      const matchedPropertyIds = [...new Set((amenityMatches ?? []).map(m => m.property_id))]
-      if (matchedPropertyIds.length > 0) {
-        propertiesQuery = propertiesQuery.in('id', matchedPropertyIds)
-      } else {
-        return new Response(
-          JSON.stringify({ items: [], total: 0 }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        )
-      }
+    // Filter by map bounds using normalized bounds to ensure correct filtering
+    if (normalizedBounds !== null) {
+      propertiesQuery = propertiesQuery
+        .gte('latitude', normalizedBounds.minLat)
+        .lte('latitude', normalizedBounds.maxLat)
+        .gte('longitude', normalizedBounds.minLng)
+        .lte('longitude', normalizedBounds.maxLng)
     }
 
     // Filter by amenities via property_amenities
@@ -136,8 +148,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    const { data: propertiesData, error: propertiesError, count } = await propertiesQuery
-      .range(offset, offset + pageSize - 1)
+    // If bounds are present and valid, limit results to avoid massive payloads; otherwise paginate
+    const MAX_BOUND_RESULTS = 200
+    const { data: propertiesData, error: propertiesError, count } = hasValidBounds
+      ? await propertiesQuery.range(0, MAX_BOUND_RESULTS - 1)
+      : await propertiesQuery.range(offset, offset + pageSize - 1)
 
     if (propertiesError) {
       throw propertiesError
@@ -177,8 +192,10 @@ Deno.serve(async (req) => {
       }
     })
 
+    const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+
     return new Response(
-      JSON.stringify({ items, total: count ?? items.length }),
+      JSON.stringify({ items, total: count ?? items.length, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

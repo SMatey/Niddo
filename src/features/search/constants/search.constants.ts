@@ -1,3 +1,5 @@
+import type { FilterState } from '../types/domain.types'
+
 export const CARD_LABELS = {
     noImage: 'Sin imagen',
     bedroom: 'hab',
@@ -10,10 +12,6 @@ export const CARD_LABELS = {
     upTo: 'Hasta',
     noMapPoints: 'No hay puntos geográficos para mostrar en el mapa',
     noResults: 'No hay resultados para mostrar',
-    petAllowed: 'Mascotas permitidas',
-    noPets: 'No mascotas',
-    noSmokers: 'No fumadores',
-    smoker: 'Fumadores',
 } as const
 
 export const FILTER_LABELS = {
@@ -21,10 +19,9 @@ export const FILTER_LABELS = {
     location: 'Ubicación',
     budget: 'Presupuesto',
     lifestyle: 'Estilo de vida',
+    amenities: 'Amenidades',
     other: 'Otros',
     locationPlaceholder: 'Ciudad, barrio o dirección...',
-    petFriendly: 'Solo mascotas permitidas',
-    smoker: 'Solo no fumar',
     clearFilters: 'Limpiar filtros',
     filtersButton: 'Filtros',
     closeFilters: 'Cerrar',
@@ -53,6 +50,8 @@ export const LIFESTYLES = [
     'Social',
     'Estudiante',
     'Vegano',
+    'Pet friendly',
+    'No fumador',
 ] as const
 
 export const AMENITY_TAGS = [
@@ -86,18 +85,25 @@ export const MAP_LABELS = {
     apiKeyMissing: 'Google Maps API key no configurada',
     loading: 'Cargando mapa...',
     loadError: 'Error al cargar el mapa',
+    budgetPrefix: 'Presupuesto:',
+    close: 'Cerrar',
+    viewDetails: 'Ver detalles',
     selectedUbication: 'Ubicación seleccionada: ',
+} as const
+
+export const MAP_COORDINATES = {
+    SAN_JOSE: {
+        lat: 9.9281,
+        lng: -84.0907,
+    },
 } as const
 
 export const MAP_CONFIG = {
     containerStyle: {
         width: '100%',
-        height: '100%',
+        height: '500px', // Set a default fixed height to avoid 0px height issues
     },
-    defaultCenter: {
-        lat: 9.9281,
-        lng: -84.0907,
-    },
+    defaultCenter: MAP_COORDINATES.SAN_JOSE,
     defaultZoom: 12,
     options: {
         disableDefaultUI: false,
@@ -144,10 +150,76 @@ export const PAGINATION_CLASSES = {
 
 export const PAGINATION_CONFIG = {
     maxVisiblePages: 5,
+    defaultPageSize: 9,
+    firstPage: 1,
+    bufferThreshold: 2,
 } as const
 
 export const PAGINATION_LABELS = {
     previous: 'Anterior',
     next: 'Siguiente',
     ellipsis: '...',
+} as const
+
+export const ROUTING_PATHS = {
+    PROPERTY_DETAIL: '/propiedad',
+    USER_DETAIL: '/usuario',
+} as const
+
+export const SEARCH_DEFAULT_FILTERS: FilterState = {
+    location: '',
+    minPrice: '',
+    maxPrice: '',
+    minBudget: '',
+    maxBudget: '',
+    lifestyles: [],
+}
+
+export const FILTER_KEYS = {
+    LOCATION: 'location',
+    MIN_PRICE: 'minPrice',
+    MAX_PRICE: 'maxPrice',
+    MIN_BUDGET: 'minBudget',
+    MAX_BUDGET: 'maxBudget',
+    LIFESTYLES: 'lifestyles',
+} as const
+
+export const LAYOUT_CONFIG = {
+    MAP_HEIGHT_MOBILE: 'calc(100vh - 16rem)',
+    MAP_HEIGHT_DESKTOP: 'calc(100vh - 12rem)',
+    SKELETON_COUNT: 6,
+    DRAWER_MAX_WIDTH: 'max-w-sm',
+    INFO_WINDOW_MIN_WIDTH: 'min-w-48',
+} as const
+
+export const MAP_VIEW_CONFIG = {
+    BOUNDS_DEBOUNCE_MS: 400,
+    MAX_MARKERS: 100,
+} as const
+
+export const CONTENT_MODES = {
+    PROPERTIES: 'properties',
+    USERS: 'users',
+} as const
+
+export const VIEW_MODES = {
+    LIST: 'list',
+    MAP: 'map',
+} as const
+
+export const CONTENT_MODE_CONFIG = {
+    [CONTENT_MODES.PROPERTIES]: {
+        tags: AMENITY_TAGS,
+        tagLabel: FILTER_LABELS.amenities,
+        priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
+        minPrice: 'minPrice' as const,
+        maxPrice: 'maxPrice' as const,
+    },
+    [CONTENT_MODES.USERS]: {
+        tags: LIFESTYLES,
+        tagLabel: FILTER_LABELS.lifestyle,
+        priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
+        minPrice: 'minBudget' as const,
+        maxPrice: 'maxBudget' as const,
+    },
 } as const

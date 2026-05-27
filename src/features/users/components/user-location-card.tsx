@@ -2,11 +2,10 @@
 
 import { MapView } from '@/features/search/components/map-view'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
-import type { UserDetail } from '@/features/search/types/search.types'
+import { CONTENT_MODES } from '@/features/search/constants/search.constants'
+import type { UserDetail } from '@/features/search/types/domain.types'
 
-interface UserLocationCardProps {
-  user: UserDetail
-}
+import type { UserLocationCardProps } from '../types/users.types'
 
 export function UserLocationCard({ user }: UserLocationCardProps) {
   if (!user.lat || !user.lng) {
@@ -20,7 +19,8 @@ export function UserLocationCard({ user }: UserLocationCardProps) {
         <MapView
           users={[user]}
           properties={[]}
-          contentMode="users"
+          contentMode={CONTENT_MODES.USERS}
+          isDetailView={true}
         />
       </div>
     </div>

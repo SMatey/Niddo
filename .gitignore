@@ -39,6 +39,7 @@ next-env.d.ts
 .claude-flow
 .vscode
 .swarm
+.mcp.json 
 
 # Supabase
 supabase/.temp

@@ -40,4 +40,25 @@ export const FAVORITES_TABLE = {
   },
 } as const
 
+export const SUPABASE_ERROR_CODES = {
+  NOT_FOUND: 'PGRST116',
+} as const
+
+export const FAVORITES_CONSOLE_MESSAGES = {
+  error: {
+    checkingPropertyFavorite: 'Error checking property favorite status:',
+    checkingProfileFavorite: 'Error checking profile favorite status:',
+    togglingPropertyFavorite: 'Error toggling property favorite:',
+    togglingUserFavorite: 'Error toggling user favorite:',
+    fetchingFavorites: 'Error fetching favorites:',
+  },
+} as const
+
+export const FAVORITES_UI_MESSAGES = {
+  loading: 'Cargando favoritos...',
+  errorLoading: 'Error al cargar favoritos',
+  noProperties: 'No tienes propiedades favoritas',
+  noProfiles: 'No tienes perfiles favoritos',
+} as const
+
 export type FavoriteType = 'property' | 'user'

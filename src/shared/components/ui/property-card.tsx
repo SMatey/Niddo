@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { Tag } from './tag'
-import { FavoriteButton } from './favorite-button'
+//import { FavoriteButton } from './favorite-button'
+import { FavoritePropertyButton } from '@/features/favorites/components/favorite-button-container'
 import { PropertyBadge } from './property-badge'
 import { CARD_LABELS } from '@/features/search/constants/search.constants'
 import type { PropertyCardProps } from './types'
@@ -18,35 +19,11 @@ export function PropertyCard({
   bathrooms,
   squareMeters,
   amenities = [],
-  petFriendly,
-  smoker,
   isFavorite = false,
   onFavoriteToggle,
   className,
 }: PropertyCardProps) {
   const badges: BadgeItem[] = []
-
-  if (petFriendly) {
-    badges.push({
-      type: 'pet-friendly',
-      label: CARD_LABELS.petAllowed,
-      variant: 'success',
-    })
-  }
-
-  if (smoker) {
-    badges.push({
-      type: 'smoking-allowed',
-      label: CARD_LABELS.smoker,
-      variant: 'warning',
-    })
-  } else {
-    badges.push({
-      type: 'no-smoking',
-      label: CARD_LABELS.noSmokers,
-      variant: 'info',
-    })
-  }
 
   return (
     <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
@@ -60,15 +37,13 @@ export function PropertyCard({
             </div>
           )}
         </Link>
-        {onFavoriteToggle && (
+        {id && (
           <div
             className="absolute top-3 right-3 z-10"
             onClick={(e) => e.stopPropagation()}
           >
-            <FavoriteButton
-              isFavorite={isFavorite}
-              onToggle={onFavoriteToggle}
-              inactiveClassName="bg-white/80 text-text-muted border-white/80 hover:border-red-400 hover:text-red-500"
+            <FavoritePropertyButton
+              propertyId={id}
             />
           </div>
         )}

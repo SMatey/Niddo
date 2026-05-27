@@ -2,7 +2,7 @@
 
 import { SlidersHorizontal } from 'lucide-react'
 import { FILTER_LABELS, PAGE_LABELS } from '../constants/search.constants'
-import type { ExplorarHeaderProps } from '../types/search.types'
+import type { ExplorarHeaderProps } from '../types/ui.types'
 
 export function ExplorarHeader({ onOpenFilters }: ExplorarHeaderProps) {
     return (

@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react'
 import { FILTER_LABELS } from '../constants/search.constants'
-import type { MobileFiltersDrawerProps } from '../types/search.types'
+import type { MobileFiltersDrawerProps } from '../types/ui.types'
 
 export function MobileFiltersDrawer({ isOpen, onClose, children }: MobileFiltersDrawerProps) {
     if (!isOpen) return null

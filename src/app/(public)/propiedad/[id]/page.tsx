@@ -1,7 +1,10 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { MapProvider } from '@/features/search/providers/map-provider'
 import { MapView } from '@/features/search/components/map-view'
+
+
 import { useProperty } from '@/features/properties/hooks/use-property'
 import { PROPERTY_DETAIL_LABELS } from '@/features/properties/constants/property-detail.constants'
 import { PropertyInfoCard } from '@/features/properties/components/property-info-card'
@@ -13,9 +16,12 @@ import { PropertyGallery } from '@/features/properties/components/property-galle
 import { PropertyTitle } from '@/features/properties/components/property-title'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
+import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { FavoritePropertyButton } from '@/features/favorites/components/favorite-button-container'
+import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 
 function PropertyDetailLoadingState() {
   return (
@@ -73,9 +79,13 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
       <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
         <DetailHeader
           isFavorite={property.isFavorite ?? false}
-          onFavoriteToggle={() => {}}
+          favoriteButton={<FavoritePropertyButton propertyId={id} />}
           onBack={onBack}
         />
+
+        <div className="flex justify-end">
+          <ReviewEntryButton className="w-full sm:w-auto" targetId={id} targetType="property" />
+        </div>
 
         <PropertyGallery images={property.images} title={property.title} />
         <PropertyTitle title={property.title} location={property.location} />
@@ -98,7 +108,12 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
           <div className="bg-surface rounded-lg border border-border p-4 space-y-3 md:col-span-2 lg:col-span-3">
             <h3 className="font-semibold text-text-primary">{PROPERTY_DETAIL_LABELS.location}</h3>
             <div className="h-48 rounded-lg overflow-hidden">
-              <MapView properties={[property]} users={[]} contentMode="properties" />
+              <MapView
+                properties={[property]}
+                users={[]}
+                contentMode={CONTENT_MODES.PROPERTIES}
+                isDetailView={true}
+              />
             </div>
           </div>
           <PropertyAmenitiesCard amenities={property.amenities ?? []} />
@@ -133,5 +148,9 @@ export default function PropertyDetailPage() {
     )
   }
 
-  return <PropertyDetailContent id={id} onBack={() => router.back()} />
+  return (
+    <MapProvider>
+      <PropertyDetailContent id={id} onBack={() => router.back()} />
+    </MapProvider>
+  )
 }
