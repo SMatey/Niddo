@@ -32,3 +32,19 @@ export interface Conversation {
   participants: ConversationParticipant[];
   lastMessage?: Message;
 }
+
+// Interfaces para los Custom Hooks (Data Fetching & Mutations)
+export interface UseConversationsResult {
+  data: Conversation[];
+  isLoading: boolean;
+  error: Error | null;
+  refresh: () => Promise<void>;
+}
+
+export interface UseMessagesResult {
+  data: Message[];
+  isLoading: boolean;
+  error: Error | null;
+  sendMessage: (content: string, type?: MessageType) => Promise<void>;
+  markAsRead: () => Promise<void>;
+}
