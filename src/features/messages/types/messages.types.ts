@@ -5,6 +5,7 @@ export interface ProfileSnippet {
   name: string;
   avatar: string | null;
   isVerified: boolean;
+  status?: 'online' | 'offline';
 }
 
 export interface Message {
@@ -33,7 +34,6 @@ export interface Conversation {
   lastMessage?: Message;
 }
 
-// Interfaces para los Custom Hooks (Data Fetching & Mutations)
 export interface UseConversationsResult {
   data: Conversation[];
   isLoading: boolean;
