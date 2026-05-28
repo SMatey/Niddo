@@ -21,23 +21,29 @@ export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSend
       {/* Header Info */}
       <div className="h-16 px-6 bg-white border-b border-gray-200 flex items-center justify-between shadow-sm z-10 flex-shrink-0">
         <div className="flex items-center gap-3">
-          {profile?.avatar ? (
-            <img 
-              src={profile.avatar} 
-              alt={profile.name} 
-              className="w-10 h-10 rounded-full object-cover border border-gray-200" 
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold border border-gray-200">
-              {profile?.name?.charAt(0) || '?'}
-            </div>
-          )}
+          <div className="relative">
+            {profile?.avatar ? (
+              <img 
+                src={profile.avatar} 
+                alt={profile.name} 
+                className="w-10 h-10 rounded-full object-cover border border-gray-200" 
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold border border-gray-200">
+                {profile?.name?.charAt(0) || '?'}
+              </div>
+            )}
+            {profile?.status === 'online' && (
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+            )}
+          </div>
           <div>
             <h2 className="font-semibold text-gray-900 leading-tight">
               {profile?.name || MESSAGES_UI_TEXT.chat.unknownUser}
             </h2>
-            {/* Si quisieras agregar un estado 'en línea', iría aquí. Hardcodeamos un texto simple por ahora */}
-            <span className="text-xs text-green-600 font-medium">Disponible</span>
+            <span className={`text-xs font-medium ${profile?.status === 'online' ? 'text-green-600' : 'text-gray-400'}`}>
+              {profile?.status === 'online' ? 'Disponible' : 'Desconectado'}
+            </span>
           </div>
         </div>
 

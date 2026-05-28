@@ -16,12 +16,22 @@ interface ChatSidebarProps {
 export const ChatSidebar = ({ currentUserId, conversations, activeConversationId, onSelectConversation }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filtro de conversaciones basado en el nombre del otro usuario
+  // 1. Filtrar las conversaciones basado en la búsqueda
   const filteredConversations = conversations.filter((conv) => {
     const otherParticipant = conv.participants.find(p => p.profileId !== currentUserId);
     if (!otherParticipant?.profile?.name) return false;
     
     return otherParticipant.profile.name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  // 2. Ordenar las conversaciones resultantes de más reciente a más antigua
+  const sortedConversations = [...filteredConversations].sort((a, b) => {
+    // Si ambas tienen un lastMessage, las comparamos por su fecha de creación
+    if (a.lastMessage && b.lastMessage) {
+      return new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime();
+    }
+    // Si no tienen un último mensaje, utilizamos la fecha de actualización de la conversación
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
   return (
@@ -38,8 +48,8 @@ export const ChatSidebar = ({ currentUserId, conversations, activeConversationId
 
       {/* Lista scrolleable de chats */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {filteredConversations.length > 0 ? (
-          filteredConversations.map((conv) => (
+        {sortedConversations.length > 0 ? (
+          sortedConversations.map((conv) => (
             <ChatListItem
               key={conv.id}
               conversation={conv}

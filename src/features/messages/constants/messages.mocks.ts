@@ -5,25 +5,36 @@ const MOCK_PROFILES: Record<string, ProfileSnippet> = {
     id: 'me',
     name: 'Mi Cuenta',
     avatar: 'https://i.pravatar.cc/150?u=me',
-    isVerified: true
+    isVerified: true,
+    status: 'online'
   },
   'user-1': {
     id: 'user-1',
     name: 'Ana Gómez',
     avatar: 'https://i.pravatar.cc/150?u=user1',
-    isVerified: true
+    isVerified: true,
+    status: 'online'
   },
   'user-2': {
     id: 'user-2',
     name: 'Carlos Ruiz',
     avatar: 'https://i.pravatar.cc/150?u=user2',
-    isVerified: false
+    isVerified: false,
+    status: 'offline'
   },
   'user-3': {
     id: 'user-3',
     name: 'Laura Martínez',
     avatar: 'https://i.pravatar.cc/150?u=user3',
-    isVerified: true
+    isVerified: true,
+    status: 'online'
+  },
+  'user-4': {
+    id: 'user-4',
+    name: 'Roberto Sánchez',
+    avatar: 'https://i.pravatar.cc/150?u=user4',
+    isVerified: true,
+    status: 'offline'
   },
 };
 
@@ -72,6 +83,25 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     lastMessage: MOCK_MESSAGES_CONV_1[2]
   },
   {
+    id: 'conv-3',
+    createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    participants: [
+      { conversationId: 'conv-3', profileId: 'me', unreadCount: 5, profile: MOCK_PROFILES['me'] },
+      { conversationId: 'conv-3', profileId: 'user-3', unreadCount: 0, profile: MOCK_PROFILES['user-3'] }
+    ],
+    lastMessage: {
+      id: 'msg-5',
+      conversationId: 'conv-3',
+      senderId: 'user-3',
+      receiverId: 'me',
+      content: '¡Hola! Te envié los documentos que me pediste anoche, confírmame si los pudiste revisar. Quedo atenta, muchísimas gracias por el tiempo.',
+      read: false,
+      type: 'text',
+      createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+    }
+  },
+  {
     id: 'conv-2',
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
@@ -91,22 +121,22 @@ export const MOCK_CONVERSATIONS: Conversation[] = [
     }
   },
   {
-    id: 'conv-3',
-    createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+    id: 'conv-4',
+    createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000 * 20).toISOString(),
     participants: [
-      { conversationId: 'conv-3', profileId: 'me', unreadCount: 0, profile: MOCK_PROFILES['me'] },
-      { conversationId: 'conv-3', profileId: 'user-3', unreadCount: 0, profile: MOCK_PROFILES['user-3'] }
+      { conversationId: 'conv-4', profileId: 'me', unreadCount: 0, profile: MOCK_PROFILES['me'] },
+      { conversationId: 'conv-4', profileId: 'user-4', unreadCount: 0, profile: MOCK_PROFILES['user-4'] }
     ],
     lastMessage: {
-      id: 'msg-5',
-      conversationId: 'conv-3',
-      senderId: 'user-3',
+      id: 'msg-6',
+      conversationId: 'conv-4',
+      senderId: 'user-4',
       receiverId: 'me',
-      content: 'Entendido, lo reviso y te comento.',
+      content: 'Lamentablemente ya alquilé el apartamento. Suerte en tu búsqueda.',
       read: true,
       type: 'text',
-      createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
+      createdAt: new Date(Date.now() - 86400000 * 20).toISOString(),
     }
   }
 ];
