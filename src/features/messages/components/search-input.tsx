@@ -9,7 +9,6 @@ export const SearchInput = ({ value, onChange }: SearchInputProps) => {
   return (
     <div className="p-4 border-b border-gray-100 bg-white">
       <div className="relative flex items-center w-full">
-        {/* Lupa simple (SVG inlined para no depender de librerías de iconos todavía) */}
         <div className="absolute left-3 text-gray-400">
           <svg
             xmlns="http://www.w3.org/2000/svg"
