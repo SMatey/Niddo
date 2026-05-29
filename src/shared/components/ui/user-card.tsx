@@ -32,9 +32,12 @@ export function UserCard({
         <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
             {id && (
                 <div
-                    className="px-4 pt-4 flex justify-end"
+                    className="px-4 pt-4 flex justify-between items-center"
                     onClick={(e) => e.stopPropagation()}
                 >
+                    {matchScore != null && (
+                        <MatchScoreBadge score={matchScore} />
+                    )}
                     <FavoriteProfileButton
                         profileId={id}
                     />
@@ -48,9 +51,6 @@ export function UserCard({
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                                 <UserInfo name={name} verified={verified} age={age} location={location} />
-                                {matchScore != null && (
-                                    <MatchScoreBadge score={matchScore} />
-                                )}
                             </div>
                         </div>
                     </div>
