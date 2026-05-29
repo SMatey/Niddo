@@ -39,6 +39,7 @@ export const RESULTS_TABS = {
     ],
 } as const
 
+// DEPRECATED: Use LIFESTYLE_TAGS instead. Kept for backward compatibility during migration.
 export const LIFESTYLES = [
     'Ordenado',
     'Madrugador',
@@ -53,6 +54,48 @@ export const LIFESTYLES = [
     'Pet friendly',
     'No fumador',
 ] as const
+
+// --- Lifestyle Tag Categories ---
+export const LIFESTYLE_CATEGORIES = {
+    HABITS: 'habits',
+    WORK: 'work',
+    SOCIAL: 'social',
+    PREFERENCES: 'preferences',
+} as const
+
+export type LifestyleCategory = typeof LIFESTYLE_CATEGORIES[keyof typeof LIFESTYLE_CATEGORIES]
+
+// --- Lifestyle Tags (from database) ---
+export const LIFESTYLE_TAGS = [
+    { id: 'early-bird', label: 'Madrugador', category: 'habits' },
+    { id: 'night-owl', label: 'Noctámbulo', category: 'habits' },
+    { id: 'clean-freak', label: 'Ordenado', category: 'habits' },
+    { id: 'gym-lover', label: 'Fitness', category: 'habits' },
+    { id: 'no-smoking', label: 'No fumador', category: 'habits' },
+    { id: 'remote-work', label: 'Trabajo Remoto', category: 'work' },
+    { id: 'student', label: 'Estudiante', category: 'work' },
+    { id: 'social', label: 'Social', category: 'social' },
+    { id: 'quiet', label: 'Tranquilo', category: 'social' },
+    { id: 'music-lover', label: 'Músico', category: 'social' },
+    { id: 'vegan', label: 'Vegano', category: 'preferences' },
+    { id: 'pet-friendly', label: 'Pet friendly', category: 'preferences' },
+] as const
+
+// --- Lifestyle Tags Grouped by Category ---
+export const LIFESTYLES_BY_CATEGORY: Record<LifestyleCategory, readonly typeof LIFESTYLE_TAGS[number][]> = {
+    habits: LIFESTYLE_TAGS.filter((t) => t.category === 'habits'),
+    work: LIFESTYLE_TAGS.filter((t) => t.category === 'work'),
+    social: LIFESTYLE_TAGS.filter((t) => t.category === 'social'),
+    preferences: LIFESTYLE_TAGS.filter((t) => t.category === 'preferences'),
+} as const
+
+// --- Category Labels (translated) ---
+export const CATEGORY_LABELS: Record<LifestyleCategory, string> = {
+    habits: 'Hábitos',
+    work: 'Trabajo',
+    social: 'Social',
+    preferences: 'Preferencias',
+} as const
 
 export const AMENITY_TAGS = [
     'WiFi',
