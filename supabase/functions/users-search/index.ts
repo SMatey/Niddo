@@ -182,9 +182,9 @@ Deno.serve(async (req) => {
           .lte('longitude', normalizedBounds.maxLng)
       }
 
-      const { data: profilesData, error: profilesError, count } = hasValidBounds
+      const { data: profilesData, error: profilesError } = hasValidBounds
         ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
-        : await profilesQuery.range(offset, offset + pageSize - 1)
+        : await profilesQuery
 
       if (profilesError) {
         throw profilesError
@@ -212,7 +212,7 @@ Deno.serve(async (req) => {
         tagIdsByProfile[t.profile_id].push(t.tag_id)
       })
 
-      const items = (profilesData ?? []).map((p: Record<string, unknown>) => {
+      const allItems = (profilesData ?? []).map((p: Record<string, unknown>) => {
         const tagLabels = tagsByProfile[p.id as string] ?? []
         const profileTagIds = tagIdsByProfile[p.id as string] ?? []
         const score = calculateMatchScore(profileTagIds)
@@ -220,12 +220,18 @@ Deno.serve(async (req) => {
       })
 
       // Sort by match score descending
-      items.sort((a, b) => b.matchScore - a.matchScore)
+      allItems.sort((a, b) => b.matchScore - a.matchScore)
 
-      const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+      // Paginate sorted results in memory
+      const paginatedItems = hasValidBounds
+        ? allItems
+        : allItems.slice(offset, offset + pageSize)
+
+      const totalCount = allItems.length
+      const hasMore = !hasValidBounds && totalCount > offset + pageSize
 
       return new Response(
-        JSON.stringify({ items, total: count ?? items.length, hasMore }),
+        JSON.stringify({ items: paginatedItems, total: totalCount, hasMore }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -255,9 +261,9 @@ Deno.serve(async (req) => {
         .lte('longitude', normalizedBounds.maxLng)
     }
 
-    const { data: profilesData, error: profilesError, count } = hasValidBounds
+    const { data: profilesData, error: profilesError } = hasValidBounds
       ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
-      : await profilesQuery.range(offset, offset + pageSize - 1)
+      : await profilesQuery
 
     if (profilesError) {
       throw profilesError
@@ -285,7 +291,7 @@ Deno.serve(async (req) => {
       tagIdsByProfile[t.profile_id].push(t.tag_id)
     })
 
-    const items = (profilesData ?? []).map((p: Record<string, unknown>) => {
+    const allItems = (profilesData ?? []).map((p: Record<string, unknown>) => {
       const tagLabels = tagsByProfile[p.id as string] ?? []
       const profileTagIds = tagIdsByProfile[p.id as string] ?? []
       const score = calculateMatchScore(profileTagIds)
@@ -293,12 +299,18 @@ Deno.serve(async (req) => {
     })
 
     // Sort by match score descending
-    items.sort((a, b) => b.matchScore - a.matchScore)
+    allItems.sort((a, b) => b.matchScore - a.matchScore)
 
-    const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+    // Paginate sorted results in memory
+    const paginatedItems = hasValidBounds
+      ? allItems
+      : allItems.slice(offset, offset + pageSize)
+
+    const totalCount = allItems.length
+    const hasMore = !hasValidBounds && totalCount > offset + pageSize
 
     return new Response(
-      JSON.stringify({ items, total: count ?? items.length, hasMore }),
+      JSON.stringify({ items: paginatedItems, total: totalCount, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {

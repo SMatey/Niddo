@@ -222,6 +222,9 @@ export const LAYOUT_CONFIG = {
 export const MAP_VIEW_CONFIG = {
     BOUNDS_DEBOUNCE_MS: 400,
     MAX_MARKERS: 100,
+    MAX_LIFESTYLES_IN_INFO_WINDOW: 2,
+    SINGLE_POINT_LAT_OFFSET: 0.0055,
+    DETAIL_VIEW_ZOOM: 15,
 } as const
 
 export const CONTENT_MODES = {
