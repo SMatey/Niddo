@@ -5,6 +5,7 @@ import type { ChangeEvent } from 'react'
 import { ShieldCheck, Upload } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { PROFILE_FORM } from '@/features/users/constants/profile-form.constants'
+import { VERIFICATION_LABELS } from '@/features/settings/constants/settings.constants'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { createClient } from '@/lib/supabase/client'
 
@@ -137,7 +138,7 @@ export function VerificationSection() {
       setStatus({ type: 'success', message: PROFILE_FORM.ID_DOCUMENT.UI.SUCCESS })
       setIsUploadOpen(false)
     } catch (err: any) {
-      setStatus({ type: 'error', message: err?.message ?? 'Error al subir documento' })
+      setStatus({ type: 'error', message: err?.message ?? VERIFICATION_LABELS.UPLOAD_ERROR })
     } finally {
       setUploading(false)
     }
@@ -146,8 +147,8 @@ export function VerificationSection() {
   return (
     <section className="mx-auto w-full max-w-3xl rounded-2xl border border-border bg-surface p-6 shadow-[0_10px_30px_rgba(15,23,42,0.08)] md:p-8">
       <header className="space-y-2">
-        <h2 className="text-2xl font-semibold text-text-primary">Verificacion de Identidad</h2>
-        <p className="text-sm text-text-secondary">Verifica tu identidad para aumentar tu nivel de confianza</p>
+        <h2 className="text-2xl font-semibold text-text-primary">{VERIFICATION_LABELS.SECTION_TITLE}</h2>
+        <p className="text-sm text-text-secondary">{VERIFICATION_LABELS.SECTION_SUBTITLE}</p>
       </header>
 
       <div className="mt-6 rounded-2xl border border-border bg-surface-muted/40 p-5">
@@ -156,26 +157,26 @@ export function VerificationSection() {
             <ShieldCheck className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-text-primary">Estado actual</h3>
-            <p className="mt-1 text-sm text-text-secondary">Tu identidad ha sido verificada</p>
+            <h3 className="text-base font-semibold text-text-primary">{VERIFICATION_LABELS.CURRENT_STATUS}</h3>
+            <p className="mt-1 text-sm text-text-secondary">{VERIFICATION_LABELS.STATUS_VERIFIED}</p>
           </div>
         </div>
       </div>
 
       <div className="mt-8 space-y-4">
-        <h3 className="text-lg font-semibold text-text-primary">Documentos aceptados</h3>
+        <h3 className="text-lg font-semibold text-text-primary">{VERIFICATION_LABELS.ACCEPTED_DOCS}</h3>
         <ul className="space-y-3 text-sm text-text-secondary">
           <li className="flex items-center gap-2">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-brand-600 text-brand-600">✓</span>
-            INE / IFE vigente
+            {VERIFICATION_LABELS.DOC_INE}
           </li>
           <li className="flex items-center gap-2">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-brand-600 text-brand-600">✓</span>
-            Pasaporte mexicano vigente
+            {VERIFICATION_LABELS.DOC_PASSPORT}
           </li>
           <li className="flex items-center gap-2">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-brand-600 text-brand-600">✓</span>
-            Licencia de conducir vigente
+            {VERIFICATION_LABELS.DOC_LICENSE}
           </li>
         </ul>
       </div>
@@ -194,7 +195,7 @@ export function VerificationSection() {
       </div>
 
       <p className="mt-6 text-sm text-text-secondary">
-        Tu documento sera revisado en un plazo de 24-48 horas. La informacion se maneja de forma segura y confidencial.
+        {VERIFICATION_LABELS.REVIEW_NOTICE}
       </p>
 
       {isUploadOpen ? (
@@ -214,7 +215,7 @@ export function VerificationSection() {
               <button
                 onClick={onCloseUpload}
                 className="text-sm font-medium text-text-muted transition-colors hover:text-text-primary"
-                aria-label="Cerrar modal"
+                aria-label={VERIFICATION_LABELS.CLOSE_MODAL}
               >
                 {PROFILE_FORM.ID_DOCUMENT.UI.CLOSE}
               </button>
@@ -222,7 +223,7 @@ export function VerificationSection() {
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-text-primary">Seleccionar archivo</label>
+                <label className="block text-sm font-medium text-text-primary">{VERIFICATION_LABELS.SELECT_FILE}</label>
                 <div className="rounded-md border border-border bg-surface px-3 py-2">
                   <input
                     type="file"
