@@ -39,22 +39,6 @@ export const RESULTS_TABS = {
     ],
 } as const
 
-// DEPRECATED: Use LIFESTYLE_TAGS instead. Kept for backward compatibility during migration.
-export const LIFESTYLES = [
-    'Ordenado',
-    'Madrugador',
-    'Fitness',
-    'Músico',
-    'Noctámbulo',
-    'Tranquilo',
-    'Trabajo Remoto',
-    'Social',
-    'Estudiante',
-    'Vegano',
-    'Pet friendly',
-    'No fumador',
-] as const
-
 // --- Lifestyle Tag Categories ---
 export const LIFESTYLE_CATEGORIES = {
     HABITS: 'habits',
