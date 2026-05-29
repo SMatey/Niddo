@@ -4,8 +4,7 @@ import { Pagination } from '@/shared/components/ui/pagination'
 import { Tabs } from '@/shared/components/ui/tabs'
 import { ListView } from './list-view'
 import { MapView } from './map-view'
-import { PropertyCard } from '@/shared/components/ui/property-card'
-import { UserCard } from '@/shared/components/ui/user-card'
+
 import { RESULTS_TABS, VIEW_MODES, CONTENT_MODES } from '../constants/search.constants'
 import type { ContentMode, ViewMode, PropertyItem, UserItem } from '../types/domain.types'
 import type { ResultsDisplayProps } from '../types/ui.types'
@@ -25,29 +24,7 @@ export function ResultsDisplay({
   onPageChange,
   onBoundsChange,
 }: ResultsDisplayProps) {
-  const items = contentMode === CONTENT_MODES.PROPERTIES ? properties : users
 
-  const renderItem = (item: any) => {
-    if (contentMode === CONTENT_MODES.PROPERTIES) {
-      const property = item as PropertyItem
-      return (
-        <PropertyCard
-          key={property.id}
-          {...property}
-          onFavoriteToggle={onPropertyFavoriteToggle ? () => onPropertyFavoriteToggle(property.id) : undefined}
-        />
-      )
-    }
-
-    const user = item as UserItem
-    return (
-      <UserCard
-        key={user.id}
-        {...user}
-        onFavoriteToggle={onUserFavoriteToggle ? () => onUserFavoriteToggle(user.id) : undefined}
-      />
-    )
-  }
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -71,8 +48,9 @@ export function ResultsDisplay({
       {viewMode === VIEW_MODES.LIST ? (
         <>
           <ListView
-            items={items}
-            renderItem={renderItem}
+            properties={properties}
+            users={users}
+            contentMode={contentMode}
             isLoading={isLoading}
           />
           {onPageChange && (
