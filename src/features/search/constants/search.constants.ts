@@ -65,6 +65,14 @@ export const LIFESTYLE_TAGS = [
     { id: 'pet-friendly', label: 'Pet friendly', category: 'preferences' },
 ] as const
 
+// --- Label to ID mapping (for converting API label-based lifestyles to IDs) ---
+export const LABEL_TO_TAG_ID: Readonly<Record<string, string>> = Object.freeze(
+    LIFESTYLE_TAGS.reduce((acc, tag) => {
+        acc[tag.label] = tag.id
+        return acc
+    }, {} as Record<string, string>)
+)
+
 // --- Lifestyle Tags Grouped by Category ---
 export const LIFESTYLES_BY_CATEGORY: Record<LifestyleCategory, readonly typeof LIFESTYLE_TAGS[number][]> = {
     habits: LIFESTYLE_TAGS.filter((t) => t.category === 'habits'),

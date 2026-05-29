@@ -1,13 +1,18 @@
 import { PropertyCard } from '@/shared/components/ui/property-card'
 import { UserCard } from '@/shared/components/ui/user-card'
 import { FavoritePropertyButton, FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
-import { CONTENT_MODES } from '../constants/search.constants'
+import { CONTENT_MODES, LABEL_TO_TAG_ID } from '../constants/search.constants'
 import { LIST_VIEW_CONSTANTS } from '../constants/list-view.constants'
 import type { PropertyItem, UserItem, ContentMode } from '../types/domain.types'
 import type { ListViewProps } from '../types/ui.types'
 import type { UserListItem } from './list-view.types'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useRoomiePreferences } from '@/features/users/hooks/use-roomie-preferences'
+
+// Helper to convert API label-based lifestyles to IDs for match score calculation
+function toTagIds(labels: string[]): string[] {
+    return labels.map((label) => LABEL_TO_TAG_ID[label]).filter(Boolean)
+}
 
 export type { ContentMode }
 
@@ -55,7 +60,7 @@ export function ListView(props: CombinedListViewProps) {
         if (contentMode === CONTENT_MODES.USERS && users) {
             const usersWithScore: UserListItem[] = users.map((user) => ({
                 ...user,
-                matchScore: getMatchScore(user.lifestyles ?? []),
+                matchScore: getMatchScore(toTagIds(user.lifestyles ?? [])),
             }))
             // Sort by match score descending, placing undefined scores at the end
             usersWithScore.sort((a, b) => (b.matchScore ?? 0) - (a.matchScore ?? 0))
