@@ -252,14 +252,14 @@ export const VIEW_MODES = {
 
 export const CONTENT_MODE_CONFIG = {
     [CONTENT_MODES.PROPERTIES]: {
-        tags: AMENITY_TAGS,
+        tags: AMENITY_TAGS.map((name) => ({ id: name, label: name })),
         tagLabel: FILTER_LABELS.amenities,
         priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
         minPrice: 'minPrice' as const,
         maxPrice: 'maxPrice' as const,
     },
     [CONTENT_MODES.USERS]: {
-        tags: LIFESTYLES,
+        tags: LIFESTYLE_TAGS,
         tagLabel: FILTER_LABELS.lifestyle,
         priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
         minPrice: 'minBudget' as const,
