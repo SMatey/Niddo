@@ -49,11 +49,10 @@ function ExplorarPageContent() {
 
   // Set profileId in filters when user is available
   useEffect(() => {
-    if (user?.id && contentMode === CONTENT_MODES.USERS) {
-      const updatedFilters = { ...filters, profileId: user.id }
-      setFiltersContext(updatedFilters)
+    if (user?.id && contentMode === CONTENT_MODES.USERS && filters.profileId !== user.id) {
+      setFiltersContext({ ...filters, profileId: user.id })
     }
-  }, [user?.id, contentMode, filters, setFiltersContext])
+  }, [user?.id, contentMode, filters.profileId, setFiltersContext])
 
   useEffect(() => {
     if (!searchParamsKey) {
