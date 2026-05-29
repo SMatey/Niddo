@@ -10,7 +10,7 @@ export const SETTINGS_MENU = [
     icon: 'check-circle',
   },
   {
-    id: 'algorithm',
+    id: 'preferences',
     label: 'Preferencias',
     icon: 'sliders',
   },

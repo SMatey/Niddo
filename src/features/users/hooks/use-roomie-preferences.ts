@@ -1,32 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getUserPreferences, saveUserPreferences, type UserLifestylePreference, type ImportanceLevel } from '../lib/preferences.service'
-
-// LIFESTYLE_TAGS - mirrored from search/constants/search.constants.ts (frontend)
-const LIFESTYLE_TAGS = [
-  { id: 'early-bird', label: 'Madrugador' },
-  { id: 'night-owl', label: 'Noctámbulo' },
-  { id: 'clean-freak', label: 'Ordenado' },
-  { id: 'gym-lover', label: 'Fitness' },
-  { id: 'no-smoking', label: 'No fumador' },
-  { id: 'remote-work', label: 'Trabajo Remoto' },
-  { id: 'student', label: 'Estudiante' },
-  { id: 'social', label: 'Social' },
-  { id: 'quiet', label: 'Tranquilo' },
-  { id: 'music-lover', label: 'Músico' },
-  { id: 'vegan', label: 'Vegano' },
-  { id: 'pet-friendly', label: 'Pet friendly' },
-] as const
-
-interface UseRoomiePreferencesResult {
-  preferences: UserLifestylePreference[]
-  setImportance: (tagId: string, importance: ImportanceLevel) => void
-  resetPreferences: () => void
-  isDirty: boolean
-  isLoading: boolean
-  error: string | null
-  getMatchScore: (roomieLifestyleIds: string[]) => number
-  save: () => Promise<void>
-}
+import type { UseRoomiePreferencesResult } from '../types/preference.types'
+import type {
+  UserLifestylePreference,
+  ImportanceLevel,
+} from '@/features/search/types/preference.types'
+import { LIFESTYLE_TAGS } from '@/features/search/constants/search.constants'
+import { calculateMatchScore } from '@/features/search/utils/match-score'
+import { getUserPreferences, saveUserPreferences } from '../lib/preferences.service'
 
 const DEFAULT_IMPORTANCE: ImportanceLevel = 'important'
 
@@ -35,39 +15,6 @@ function createDefaultPreferences(): UserLifestylePreference[] {
     tagId: tag.id,
     importance: DEFAULT_IMPORTANCE,
   }))
-}
-
-function calculateMatchScore(
-  preferences: UserLifestylePreference[],
-  roomieLifestyleIds: string[]
-): number {
-  const IMPORTANCE_WEIGHTS: Record<ImportanceLevel, number> = {
-    'must-have': 10,
-    'important': 5,
-    'nice-to-have': 2,
-    'indifferent': 0,
-  }
-
-  const weightedPrefs = preferences.filter((p) => p.importance !== 'indifferent')
-
-  if (weightedPrefs.length === 0) {
-    return 0
-  }
-
-  const totalWeight = weightedPrefs.reduce(
-    (sum, p) => sum + IMPORTANCE_WEIGHTS[p.importance],
-    0
-  )
-
-  if (totalWeight === 0) {
-    return 0
-  }
-
-  const matchedWeight = weightedPrefs
-    .filter((p) => roomieLifestyleIds.includes(p.tagId))
-    .reduce((sum, p) => sum + IMPORTANCE_WEIGHTS[p.importance], 0)
-
-  return Math.round((matchedWeight / totalWeight) * 100)
 }
 
 export function useRoomiePreferences(profileId: string): UseRoomiePreferencesResult {
