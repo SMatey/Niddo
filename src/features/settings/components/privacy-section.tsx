@@ -1,6 +1,6 @@
 'use client'
 
-import { SETTINGS_LABELS } from '../../constants/settings.constants'
+import { SETTINGS_LABELS } from '@/features/settings/constants/settings.constants'
 
 export function PrivacySection() {
   return (
