@@ -11,6 +11,8 @@ export interface FilterState {
     maxBudget: string
     /** Array of lifestyle tag IDs (e.g., 'early-bird', 'clean-freak') matching database IDs */
     lifestyles: string[]
+    /** Current user's profile ID for calculating match scores */
+    profileId?: string
 }
 
 export interface PropertyItem {
