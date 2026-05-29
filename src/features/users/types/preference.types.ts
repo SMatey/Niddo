@@ -8,6 +8,8 @@ export interface UseRoomiePreferencesResult {
   setImportance: (tagId: string, importance: ImportanceLevel) => void
   resetPreferences: () => void
   isDirty: boolean
+  isLoading: boolean
+  error: string | null
   getMatchScore: (roomieLifestyleIds: string[]) => number
   save: () => Promise<void>
 }

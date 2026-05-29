@@ -6,6 +6,7 @@ import { LIST_VIEW_CONSTANTS } from '../constants/list-view.constants'
 import type { PropertyItem, UserItem, ContentMode } from '../types/domain.types'
 import type { ListViewProps } from '../types/ui.types'
 import type { UserListItem } from './list-view.types'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useRoomiePreferences } from '@/features/users/hooks/use-roomie-preferences'
 
 export type { ContentMode }
@@ -23,6 +24,8 @@ type CombinedListViewProps = PropertyListViewProps | ListViewProps
 
 export function ListView(props: CombinedListViewProps) {
     const { isLoading } = props as any
+    const { user } = useAuth()
+    const { getMatchScore } = useRoomiePreferences(user?.id ?? '')
 
     if (isLoading) {
         return (
@@ -50,7 +53,6 @@ export function ListView(props: CombinedListViewProps) {
 
         // For users mode, calculate match scores and sort
         if (contentMode === CONTENT_MODES.USERS && users) {
-            const { getMatchScore } = useRoomiePreferences()
             const usersWithScore: UserListItem[] = users.map((user) => ({
                 ...user,
                 matchScore: getMatchScore(user.lifestyles ?? []),
