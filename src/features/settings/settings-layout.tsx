@@ -10,7 +10,7 @@ import { PrivacySection } from './components/privacy-section'
 import { SETTINGS_CONFIG } from './constants/settings.constants'
 
 export function SettingsLayout() {
-  const { activeSection, setActiveSection } = useSettingsNavigation()
+  const { activeSection, setActiveSection } = useSettingsNavigation('verification')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const renderSection = () => {
