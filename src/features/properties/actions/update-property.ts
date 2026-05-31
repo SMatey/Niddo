@@ -1,6 +1,4 @@
-'use server'
-
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
@@ -13,8 +11,7 @@ export interface UpdatePropertyPayload extends PublicationFormValues {
 
 export async function updateProperty(propertyId: string, payload: UpdatePropertyPayload) {
   try {
-    // For Deno edge functions update via token (or normal client)
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
@@ -22,7 +19,6 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
       return { success: false, error: PROPERTY_ACTIONS_MESSAGES.errors.unauthorized }
     }
 
-    // Prepare data
     const propertyData: any = {
       title: payload.title,
       description: payload.description || null,
@@ -38,7 +34,6 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
       available_from: payload.availableFrom || null,
     }
 
-    // Handle new images upload
     const newImageFiles = payload.images.filter((img): img is File => img instanceof File);
     let allImageUrls = payload.images.filter((img): img is string => typeof img === 'string');
 
@@ -55,7 +50,6 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
 
     propertyData.images = allImageUrls;
 
-    // Ensure amenities exist in the amenities catalogue before updating relations
     if (payload.amenities && payload.amenities.length > 0) {
       const supabaseAdmin = createSupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,7 +71,6 @@ export async function updateProperty(propertyId: string, payload: UpdateProperty
       }
     }
 
-    // Use Edge function OR direct backend update
     const { data, error } = await supabase.functions.invoke('property-manage', {
       method: 'PUT',
       body: {

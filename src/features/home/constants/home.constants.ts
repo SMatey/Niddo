@@ -1,4 +1,4 @@
-import type { FilterState } from '@/features/search/types/search.types'
+import type { FilterState } from '@/features/search/types/domain.types'
 
 export const EMPTY_FILTERS: FilterState = {
   location: '',

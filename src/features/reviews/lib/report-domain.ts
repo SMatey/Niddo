@@ -1,10 +1,10 @@
-import { REPORT_FORM } from '../constants/report-form.constants.ts'
+import { REPORT_FORM } from '../constants/report-form.constants'
 import type {
   CreateReviewReportInput,
   ReviewReportModerationStatus,
   ReviewReportSubject,
   ReviewReportTargetContext,
-} from '../types/report-form.types.ts'
+} from '../types/report-form.types'
 
 export interface ReviewReportInsertPayload {
   id: string

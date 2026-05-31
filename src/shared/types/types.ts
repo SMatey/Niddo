@@ -1,4 +1,20 @@
-import { ReactNode } from 'react'
+// Re-export all shared UI types from the central types location
+export type {
+    PropertyCardProps,
+    UserCardProps,
+    UserAvatarProps,
+    UserInfoProps,
+    FavoriteButtonProps,
+    ConfidenceBarProps,
+    BudgetBadgeProps,
+    DetailHeaderProps,
+    BadgeVariant,
+    BadgeItem,
+    PropertyBadgeProps,
+    PageButtonType,
+    PageButton,
+    PaginationProps,
+} from '@/shared/components/ui/types'
 
 // Additional shared types
 export interface TagProps {
@@ -15,7 +31,7 @@ export interface Tab {
 }
 
 export interface TabsProps {
-    tabs: Tab[]
+    tabs: readonly Tab[]
     value: string
     onChange: (value: string) => void
     className?: string
@@ -38,76 +54,4 @@ export interface PriceRangeProps {
     maxPlaceholder?: string
     currency?: string
     className?: string
-}
-
-export interface UserCardProps {
-    id: string
-    name: string
-    age?: number
-    bio?: string
-    location?: string
-    imageUrl?: string
-    verified?: boolean
-    isFavorite?: boolean
-    onFavoriteToggle?: () => void
-    minBudget?: string
-    maxBudget?: string
-    confidenceScore?: number
-    lifestyles?: string[]
-    className?: string
-}
-
-export interface PropertyCardProps {
-    id: string
-    title: string
-    location: string
-    price: string
-    imageUrl?: string
-    bedrooms?: number
-    bathrooms?: number
-    squareMeters?: number
-    amenities?: string[]
-    lifestyles?: string[]
-    isFavorite?: boolean
-    onFavoriteToggle?: () => void
-    className?: string
-}
-
-export interface UserAvatarProps {
-    name: string
-    imageUrl?: string
-    verified?: boolean
-    age?: number
-    size?: 'sm' | 'md' | 'xl'
-}
-
-export interface UserInfoProps {
-    name: string
-    verified?: boolean
-    age?: number
-    location?: string
-}
-
-export interface FavoriteButtonProps {
-    isFavorite: boolean
-    onToggle: () => void
-    className?: string
-    activeClassName?: string
-    inactiveClassName?: string
-}
-
-export interface ConfidenceBarProps {
-    score: number
-}
-
-export interface BudgetBadgeProps {
-    minBudget?: string
-    maxBudget?: string
-}
-
-export interface DetailHeaderProps {
-    isFavorite: boolean
-    onFavoriteToggle?: () => void
-    favoriteButton?: ReactNode
-    onBack?: () => void
 }

@@ -1,7 +1,11 @@
 'use client'
 
+import { Suspense, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { ExplorarProvider, useExplorarContext } from '@/features/search/context/explorar.context'
+import { ExplorarUIProvider, useExplorarUIContext } from '@/features/search/context/explorar-ui.context'
 import { SearchServiceProvider } from '@/features/search/context/search-service.context'
+import { MapProvider } from '@/features/search/providers/map-provider'
 import { FilterSidebar } from '@/features/search/components/filter-sidebar'
 import { ResultsDisplay } from '@/features/search/components/results-display'
 import { ExplorarHeader } from '@/features/search/components/explorar-header'
@@ -9,35 +13,66 @@ import { MobileFiltersDrawer } from '@/features/search/components/mobile-filters
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
 import { VIEW_MODES, CONTENT_MODES } from '@/features/search/constants/search.constants'
-import { useSearchServiceRepositories } from '@/features/search/context/search-service.context'
+import { SupabasePropertyRepository } from '@/features/properties/repositories/supabase-property.repository'
+import { SupabaseUserRepository } from '@/features/users/repositories/supabase-user.repository'
+
+// We instantiate these here or pass them from a higher composition root
+const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const apiKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+const propertyRepository = new SupabasePropertyRepository(baseUrl, apiKey)
+const userRepository = new SupabaseUserRepository(baseUrl, apiKey)
 
 function ExplorarPageContent() {
   const {
     filters,
+    handleFilterChange,
+    handleBoundsChange,
+    mapBounds,
+    setFilters
+  } = useExplorarContext()
+
+  const {
     contentMode,
     viewMode,
     isMobileFiltersOpen,
     setIsMobileFiltersOpen,
     setContentMode,
     handleViewModeChange,
-    handleFilterChange,
-    handleBoundsChange,
-    mapBounds,
-  } = useExplorarContext()
+  } = useExplorarUIContext()
 
-  const { propertyRepository, userRepository } = useSearchServiceRepositories()
+  const searchParams = useSearchParams()
+  const searchParamsKey = searchParams.toString()
+
+  useEffect(() => {
+    if (!searchParamsKey) {
+      return
+    }
+
+    const params = new URLSearchParams(searchParamsKey)
+    const tipo = params.get('tipo')
+    const ubicacion = params.get('ubicacion')
+
+    if (tipo === 'roomie') {
+      setContentMode('users')
+    } else if (tipo === 'vivienda') {
+      setContentMode('properties')
+    }
+
+    if (ubicacion && ubicacion.trim()) {
+      handleFilterChange({ ...filters, location: ubicacion })
+    }
+  }, [searchParamsKey, setContentMode, setFilters])
 
   const currentBounds = viewMode === VIEW_MODES.MAP ? mapBounds : null
 
   const propertiesResult = useProperties(
     contentMode === CONTENT_MODES.PROPERTIES ? filters : null,
-    currentBounds,
-    { repository: propertyRepository }
+    currentBounds
   )
   const usersResult = useUsers(
     contentMode === CONTENT_MODES.USERS ? filters : null,
-    currentBounds,
-    { repository: userRepository }
+    currentBounds
   )
 
   const resultConfig = {
@@ -80,7 +115,7 @@ function ExplorarPageContent() {
           </MobileFiltersDrawer>
 
           <div className="flex-1 min-h-0">
-            <div className="sticky top-0 z-10 bg-surface-subtle pb-3 -mx-4 px-4">
+            <div className="lg:sticky lg:top-0 lg:z-10 lg:bg-surface-subtle lg:pb-3 -mx-4 px-4">
               <ResultsDisplay
                 contentMode={contentMode}
                 viewMode={viewMode}
@@ -101,11 +136,21 @@ function ExplorarPageContent() {
     </main>
   )
 }
+
 export default function ExplorarPage() {
   return (
-    <SearchServiceProvider>
+    <SearchServiceProvider
+      propertyRepository={propertyRepository}
+      userRepository={userRepository}
+    >
       <ExplorarProvider>
-        <ExplorarPageContent />
+        <ExplorarUIProvider>
+          <MapProvider>
+            <Suspense fallback={<div className="min-h-screen bg-surface-subtle" />}>
+              <ExplorarPageContent />
+            </Suspense>
+          </MapProvider>
+        </ExplorarUIProvider>
       </ExplorarProvider>
     </SearchServiceProvider>
   )

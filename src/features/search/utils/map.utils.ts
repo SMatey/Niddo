@@ -1,4 +1,4 @@
-import type { PropertyItem, UserItem, ContentMode, Point } from '../types/search.types'
+import type { PropertyItem, UserItem, ContentMode, Point } from '../types/domain.types'
 import { CONTENT_MODES } from '../constants/search.constants'
 
 export function toPoints(items: (PropertyItem | UserItem)[], contentMode: ContentMode): Point[] {

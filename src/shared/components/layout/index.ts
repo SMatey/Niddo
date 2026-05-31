@@ -1,2 +1,1 @@
-export { Navbar } from './navbar'
-export { Sidebar } from './sidebar'
+export { PublicNavbar } from './navbar'

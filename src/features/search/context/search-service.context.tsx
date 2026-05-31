@@ -1,24 +1,37 @@
 'use client'
 
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
-import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
-import type { UserRepository } from '@/features/users/types/user-repository.types'
+import { PropertiesService } from '@/features/properties/lib/supabase-properties'
+import { UsersService } from '@/features/users/lib/supabase-users'
 import { SupabasePropertyRepository } from '@/features/properties/repositories/supabase-property.repository'
 import { SupabaseUserRepository } from '@/features/users/repositories/supabase-user.repository'
+import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
+import type { UserRepository } from '@/features/users/types/user-repository.types'
+import type { SearchServiceProviderProps } from '../types/context.types'
 
-
-export interface SearchServiceContextValue {
-    propertyRepository: PropertyRepository
-    userRepository: UserRepository
+function createDefaultPropertyRepository(): PropertyRepository {
+    return new SupabasePropertyRepository(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
 }
 
-const SearchServiceContext = createContext<SearchServiceContextValue | null>(null)
+function createDefaultUserRepository(): UserRepository {
+    return new SupabaseUserRepository(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+}
 
-export interface SearchServiceProviderProps {
-    children: ReactNode
+export interface SearchServiceContextValue {
+    propertiesService: PropertiesService
+    usersService: UsersService
+    // Expose repositories for consumers that need them directly (e.g. detail pages)
     propertyRepository?: PropertyRepository
     userRepository?: UserRepository
 }
+
+const SearchServiceContext = createContext<SearchServiceContextValue | null>(null)
 
 export function SearchServiceProvider({
     children,
@@ -26,12 +39,13 @@ export function SearchServiceProvider({
     userRepository,
 }: SearchServiceProviderProps) {
     const value = useMemo<SearchServiceContextValue>(() => {
-        const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const apiKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
+        const resolvedPropertyRepo = propertyRepository ?? createDefaultPropertyRepository()
+        const resolvedUserRepo = userRepository ?? createDefaultUserRepository()
         return {
-            propertyRepository: propertyRepository ?? new SupabasePropertyRepository(baseUrl, apiKey),
-            userRepository: userRepository ?? new SupabaseUserRepository(baseUrl, apiKey),
+            propertyRepository: resolvedPropertyRepo,
+            userRepository: resolvedUserRepo,
+            propertiesService: new PropertiesService(resolvedPropertyRepo),
+            usersService: new UsersService(resolvedUserRepo),
         }
     }, [propertyRepository, userRepository])
 
@@ -42,7 +56,6 @@ export function SearchServiceProvider({
     )
 }
 
-
 export function useSearchServiceRepositories(): SearchServiceContextValue {
     const context = useContext(SearchServiceContext)
     if (!context) {
@@ -51,5 +64,15 @@ export function useSearchServiceRepositories(): SearchServiceContextValue {
     return context
 }
 
+export function useSearchServices(): Pick<SearchServiceContextValue, 'propertiesService' | 'usersService'> {
+    const context = useContext(SearchServiceContext)
+    if (!context) {
+        throw new Error('useSearchServices must be used within SearchServiceProvider')
+    }
+    return {
+        propertiesService: context.propertiesService,
+        usersService: context.usersService,
+    }
+}
 
 export { SearchServiceContext }
