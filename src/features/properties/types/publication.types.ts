@@ -18,7 +18,6 @@ export interface PublicationFormValues {
   bathrooms: number | null
   squareMeters: number | null
   availableFrom: string
-  availableTo: string
   latitude: number | null
   longitude: number | null
   amenities: string[]
