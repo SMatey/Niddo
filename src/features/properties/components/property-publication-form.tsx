@@ -83,7 +83,6 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
       bathrooms: initialData?.bathrooms || null,
       squareMeters: initialData?.area || null,
       availableFrom: initialData?.available_from || '',
-      availableTo: '',
       latitude: initialData?.latitude || null,
       longitude: initialData?.longitude || null,
       amenities: initialData?.amenities || [],
@@ -96,11 +95,9 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
   const [isSavingDraft, setIsSavingDraft] = useState(false)
 
   const availableFrom = watch('availableFrom')
-  const availableTo = watch('availableTo')
   const priceValue = watch('price')
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
-  const isExpired = Boolean(availableTo && availableTo < today)
 
   // Format price input
   const formatPrice = (value: string) => {
@@ -132,14 +129,6 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
 
     if (selectedImages.length === 0) {
       setFormError(PROPERTY_ACTIONS_MESSAGES.errors.noImages)
-      return
-    }
-
-    if (isExpired) {
-      setError('availableTo', {
-        type: 'manual',
-        message: PROPERTY_PUBLICATION_LABELS.helpers.expiredAvailability,
-      })
       return
     }
 
@@ -221,7 +210,6 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
           bathrooms: watch('bathrooms'),
           squareMeters: watch('squareMeters'),
           availableFrom: watch('availableFrom'),
-          availableTo: watch('availableTo'),
           latitude: location?.lat,
           longitude: location?.lng,
           amenities,
@@ -394,7 +382,7 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
               <h2 className="text-lg font-semibold text-text-primary">{PROPERTY_PUBLICATION_LABELS.sectionTitles.availability}</h2>
               <p className="text-sm text-text-secondary">{PROPERTY_PUBLICATION_LABELS.helpers.dateHint}</p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="max-w-xs">
               <div className="space-y-2">
                 <label htmlFor="availableFrom" className="text-sm font-medium text-text-primary">
                   {PROPERTY_PUBLICATION_LABELS.labels.availableFrom}
@@ -408,23 +396,6 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
                 />
                 {errors.availableFrom ? (
                   <p className="text-sm text-state-error">{errors.availableFrom.message}</p>
-                ) : null}
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="availableTo" className="text-sm font-medium text-text-primary">
-                  {PROPERTY_PUBLICATION_LABELS.labels.availableTo}
-                </label>
-                <Input
-                  id="availableTo"
-                  type="date"
-                  min={availableFrom || today}
-                  error={Boolean(errors.availableTo) || isExpired}
-                  {...register('availableTo')}
-                />
-                {errors.availableTo ? (
-                  <p className="text-sm text-state-error">{errors.availableTo.message}</p>
-                ) : isExpired ? (
-                  <p className="text-sm text-state-error">{PROPERTY_PUBLICATION_LABELS.helpers.expiredAvailability}</p>
                 ) : null}
               </div>
             </div>
@@ -517,11 +488,11 @@ export function PropertyPublicationForm({ initialData, propertyId }: PropertyPub
                 <p>{watch('location') || PROPERTY_PUBLICATION_LABELS.placeholders.location}</p>
               </div>
               <div className="rounded-3xl border border-border bg-background p-4 text-sm text-text-secondary">
-                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.availabilityDates}</p>
+                <p className="text-sm text-text-primary font-medium">{PROPERTY_PUBLICATION_LABELS.previewLabels.availabilityDate}</p>
                 <p>
-                  {availableFrom && availableTo && !isExpired
-                    ? `${availableFrom} hasta ${availableTo}`
-                    : PROPERTY_PUBLICATION_LABELS.previewLabels.selectValidRange}
+                  {availableFrom
+                    ? availableFrom
+                    : PROPERTY_PUBLICATION_LABELS.placeholders.location}
                 </p>
               </div>
             </div>
