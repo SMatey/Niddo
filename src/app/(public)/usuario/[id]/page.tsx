@@ -3,9 +3,6 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/features/users/hooks/use-user'
 import { UserProfileHeader } from '@/features/users/components/user-profile-header'
-import { UserStatsCard } from '@/features/users/components/user-stats-card'
-import { UserBudgetCard } from '@/features/users/components/user-budget-card'
-import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-card'
 import { UserLocationCard } from '@/features/users/components/user-location-card'
 import { MapProvider } from '@/features/search/providers/map-provider'
 
@@ -75,18 +72,12 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           onBack={onBack}
         />
 
-        <div className="flex justify-end">
-          <ReviewEntryButton className="w-full sm:w-auto" targetId={id} targetType="profile" />
-        </div>
+        <UserProfileHeader
+          user={user}
+          reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
+        />
 
-        <UserProfileHeader user={user} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UserStatsCard user={user} />
-          <UserBudgetCard user={user} />
-          <UserLifestylesCard user={user} />
-          <UserLocationCard user={user} />
-        </div>
+        <UserLocationCard user={user} />
       </div>
     </main>
   )
