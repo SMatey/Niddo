@@ -1,19 +1,14 @@
 'use client'
 
-import Link from 'next/link'
 import { Star } from 'lucide-react'
-import {
-  buildReviewFormPath,
-  REVIEW_FORM,
-} from '@/features/reviews/constants/review-form.constants'
-import type { ReviewTargetType } from '@/features/reviews/types/review-form.types'
-import { Button } from '@/shared/components/ui/button'
+import Link from 'next/link'
 
-interface ReviewEntryButtonProps {
-  targetType: ReviewTargetType
-  targetId: string
-  className?: string
-}
+import {
+  REVIEW_FORM,
+  buildReviewFormPath,
+} from '@/features/reviews/constants/review-form.constants'
+import type { ReviewEntryButtonProps } from '@/features/reviews/types/review-component.types'
+import { Button } from '@/shared/components/ui/button'
 
 export function ReviewEntryButton({ targetType, targetId, className }: ReviewEntryButtonProps) {
   return (
