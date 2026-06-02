@@ -12,6 +12,7 @@ import { MapProvider } from '@/features/search/providers/map-provider'
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
+import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
@@ -73,6 +74,10 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           favoriteButton={<FavoriteProfileButton profileId={id} />}
           onBack={onBack}
         />
+
+        <div className="flex justify-end">
+          <ReviewEntryButton className="w-full sm:w-auto" targetId={id} targetType="profile" />
+        </div>
 
         <UserProfileHeader user={user} />
 

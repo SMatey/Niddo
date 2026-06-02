@@ -1,17 +1,13 @@
 'use client'
 
 import { ShieldAlert } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
-import {
-  getModeratedContentLabel,
-  REPORT_FORM,
-} from '@/features/reviews/constants/report-form.constants'
-import type { ReviewReportTargetType } from '@/features/reviews/types/report-form.types'
 
-interface ModeratedContentStateProps {
-  targetType: ReviewReportTargetType
-  onBack: () => void
-}
+import {
+  REPORT_FORM,
+  getModeratedContentLabel,
+} from '@/features/reviews/constants/report-form.constants'
+import type { ModeratedContentStateProps } from '@/features/reviews/types/review-component.types'
+import { Button } from '@/shared/components/ui/button'
 
 export function ModeratedContentState({
   targetType,

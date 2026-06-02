@@ -1,14 +1,10 @@
 'use client'
 
 import { Star } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { REVIEW_FORM } from '@/features/reviews/constants/review-form.constants'
 
-interface ReviewRatingFieldProps {
-  value: number
-  onChange: (value: number) => void
-  error?: string
-}
+import { REVIEW_FORM } from '@/features/reviews/constants/review-form.constants'
+import type { ReviewRatingFieldProps } from '@/features/reviews/types/review-component.types'
+import { cn } from '@/lib/utils'
 
 export function ReviewRatingField({ value, onChange, error }: ReviewRatingFieldProps) {
   const selectedLabel = value >= REVIEW_FORM.RATING.MIN ? REVIEW_FORM.RATING.LABELS[value - 1] : null
