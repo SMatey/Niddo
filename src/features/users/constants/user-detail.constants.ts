@@ -8,6 +8,13 @@ export const USER_DETAIL_LABELS = {
     budget: 'Presupuesto',
     budgetRangeHint: 'Rango mensual que está dispuesto a pagar',
     lifestylePreferences: 'Preferencias de estilo de vida',
+    lifeStyles: 'Estilo de vida',
     locationOfInterest: 'Ubicación de interés',
     seeProfile: 'Ver perfil del anfitrión',
+    trustLevel: 'Nivel de confianza',
+    monthlyBudget: 'Presupuesto mensual',
+    sendMessage: 'Enviar mensaje',
+    reviews: 'Reseñas',
+    email: 'Correo',
+    phone: 'Teléfono',
 } as const

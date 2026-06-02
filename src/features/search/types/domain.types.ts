@@ -61,6 +61,7 @@ export interface PropertyDetail extends PropertyItem {
 export interface UserDetail extends UserItem {
     description?: string
     memberSince: string
+    email?: string
 }
 
 export interface Point {

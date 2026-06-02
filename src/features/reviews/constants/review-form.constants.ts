@@ -68,7 +68,7 @@ export const REVIEW_FORM = {
     GO_TO_LOGIN: 'Ir a login',
     GO_TO_PROFILE: 'Completar mi perfil',
     GO_TO_TARGET: 'Volver al detalle',
-    OPEN_FORM: 'Escribir resena',
+    OPEN_FORM: 'Escribir reseña',
     UNKNOWN_LOCATION: 'Ubicacion no especificada',
     PROFILE_SELF_REVIEW: 'No puedes publicar una resena sobre tu propio perfil.',
     PROPERTY_SELF_REVIEW: 'No puedes publicar una resena sobre tu propia propiedad.',

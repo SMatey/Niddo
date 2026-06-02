@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const tagIdToLabel: Record<string, string> = {}
     ;(tagData ?? []).forEach(t => { tagIdToLabel[t.id] = t.label })
 
-    // Fetch profile
+    // Fetch profile with email from auth.users
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -79,6 +79,7 @@ Deno.serve(async (req) => {
       lifestyles: tagLabels,
       description: profileData.bio ?? undefined,
       memberSince: profileData.joined_date,
+      email: profileData.email ?? undefined,
     }
 
     return new Response(JSON.stringify(detail), {

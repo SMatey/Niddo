@@ -134,6 +134,13 @@ export function MyProfileForm() {
   }
 
 
+  const onOpenUpload = () => setIsUploadOpen(true)
+  const onCloseUpload = () => {
+    setIsUploadOpen(false)
+    setSelectedFile(null)
+    setPreviewUrl(null)
+  }
+
   const onSubmit = async (values: ProfileFormSchemaValues) => {
     const didSave = await saveProfile(values)
 
