@@ -3,6 +3,8 @@ import {
   type UserLifestylePreference,
 } from '../types/preference.types'
 
+const PERCENTAGE_MULTIPLIER = 100
+
 /**
  * Calculate match score between user's preferences and a roomie's lifestyles.
  * Returns a percentage (0-100).
@@ -35,5 +37,5 @@ export function calculateMatchScore(
     .filter((p) => roomieLifestyleIds.includes(p.tagId))
     .reduce((sum, p) => sum + IMPORTANCE_WEIGHTS[p.importance], 0)
 
-  return Math.round((matchedWeight / totalWeight) * 100)
+  return Math.round((matchedWeight / totalWeight) * PERCENTAGE_MULTIPLIER)
 }

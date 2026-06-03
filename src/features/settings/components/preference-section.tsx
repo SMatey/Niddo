@@ -13,15 +13,15 @@ export function PreferenceSection() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <h2 className="text-2xl font-bold text-text-primary mb-2">
         {PRIORITY_SELECTOR_LABELS.SECTION_TITLE}
       </h2>
-      <p className="text-gray-600 mb-6">
+      <p className="text-text-secondary mb-6">
         {PRIORITY_SELECTOR_LABELS.SECTION_SUBTITLE}
       </p>
 
       {isLoading && <p>{PRIORITY_SELECTOR_LABELS.LOADING}</p>}
-      {error && <p className="text-red-500">{PRIORITY_SELECTOR_LABELS.ERROR_PREFIX}{error}</p>}
+      {error && <p className="text-state-error">{PRIORITY_SELECTOR_LABELS.ERROR_PREFIX}{error}</p>}
 
       {!isLoading && !error && (
         <>

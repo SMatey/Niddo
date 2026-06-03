@@ -1,10 +1,6 @@
 import { getMatchScoreLevel, type MatchScoreLevel } from '../types/preference.types'
 import { MATCH_SCORE_CLASSES, MATCH_SCORE_LABELS } from '../constants/match-score.constants'
-
-interface MatchScoreBadgeProps {
-  score: number
-  level?: MatchScoreLevel
-}
+import type { MatchScoreBadgeProps } from '../types/ui.types'
 
 export function MatchScoreBadge({ score, level }: MatchScoreBadgeProps) {
   const actualLevel = level ?? getMatchScoreLevel(score)

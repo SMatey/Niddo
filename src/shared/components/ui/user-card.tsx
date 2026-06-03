@@ -35,10 +35,8 @@ export function UserCard({
                     className="px-4 pt-4 flex justify-between items-center"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {matchScore != null ? (
+                    {matchScore != null && (
                         <MatchScoreBadge score={matchScore} />
-                    ) : (
-                        <div />
                     )}
                     <FavoriteProfileButton
                         profileId={id}

@@ -8,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
 }
 
-function formatUser(row: Record<string, unknown>, tagLabels: string[]) {
+function formatUser(row: Record<string, unknown>, tagLabels: string[], matchScore: number) {
   return {
     id: row.id,
     name: row.name,
@@ -26,6 +26,7 @@ function formatUser(row: Record<string, unknown>, tagLabels: string[]) {
     lat: row.latitude ?? undefined,
     lng: row.longitude ?? undefined,
     lifestyles: tagLabels,
+    matchScore,
   }
 }
 
@@ -41,6 +42,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const url = new URL(req.url)
+    const profileId = url.searchParams.get('profileId') ?? ''
     const location = url.searchParams.get('location') ?? ''
     const lifestyles = url.searchParams.get('lifestyles')?.split(',').filter(Boolean) ?? []
     const minBudget = url.searchParams.get('minBudget') ?? ''
@@ -49,6 +51,41 @@ Deno.serve(async (req) => {
     const pageSize = Math.min(100, Math.max(1, Number(url.searchParams.get('pageSize') ?? 20)))
     const offset = (page - 1) * pageSize
     const MAX_BOUND_RESULTS = 200
+
+    // Importance weights for match score calculation
+    const IMPORTANCE_WEIGHTS: Record<string, number> = {
+      'must-have': 10,
+      'important': 5,
+      'nice-to-have': 2,
+      'indifferent': 0,
+    }
+
+    // Fetch user's preferences if profileId provided
+    let userPreferences: Array<{ tag_id: string; importance: string }> = []
+    if (profileId) {
+      const { data: prefs } = await supabase
+        .from('profile_lifestyle_tags')
+        .select('tag_id, importance')
+        .eq('profile_id', profileId)
+      userPreferences = prefs ?? []
+    }
+
+    // Calculate match score for a profile's lifestyle tags
+    const calculateMatchScore = (profileTagIds: string[]): number => {
+      if (userPreferences.length === 0) return 0
+
+      const weightedPrefs = userPreferences.filter(p => p.importance !== 'indifferent')
+      if (weightedPrefs.length === 0) return 0
+
+      const totalWeight = weightedPrefs.reduce((sum, p) => sum + (IMPORTANCE_WEIGHTS[p.importance] ?? 0), 0)
+      if (totalWeight === 0) return 0
+
+      const matchedWeight = weightedPrefs
+        .filter(p => profileTagIds.includes(p.tag_id))
+        .reduce((sum, p) => sum + (IMPORTANCE_WEIGHTS[p.importance] ?? 0), 0)
+
+      return Math.round((matchedWeight / totalWeight) * 100)
+    }
 
     // Bounds parameters for map view progressive loading
     const neLatParam = url.searchParams.get('neLat')
@@ -145,9 +182,9 @@ Deno.serve(async (req) => {
           .lte('longitude', normalizedBounds.maxLng)
       }
 
-      const { data: profilesData, error: profilesError, count } = hasValidBounds
+      const { data: profilesData, error: profilesError } = hasValidBounds
         ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
-        : await profilesQuery.range(offset, offset + pageSize - 1)
+        : await profilesQuery
 
       if (profilesError) {
         throw profilesError
@@ -166,21 +203,35 @@ Deno.serve(async (req) => {
       }
 
       const tagsByProfile: Record<string, string[]> = {}
+      const tagIdsByProfile: Record<string, string[]> = {}
       allProfileTags.forEach(t => {
         if (!tagsByProfile[t.profile_id]) tagsByProfile[t.profile_id] = []
+        if (!tagIdsByProfile[t.profile_id]) tagIdsByProfile[t.profile_id] = []
         const label = tagIdToLabel[t.tag_id]
         if (label) tagsByProfile[t.profile_id].push(label)
+        tagIdsByProfile[t.profile_id].push(t.tag_id)
       })
 
-      const items = (profilesData ?? []).map((p: Record<string, unknown>) => {
+      const allItems = (profilesData ?? []).map((p: Record<string, unknown>) => {
         const tagLabels = tagsByProfile[p.id as string] ?? []
-        return formatUser(p, tagLabels)
+        const profileTagIds = tagIdsByProfile[p.id as string] ?? []
+        const score = calculateMatchScore(profileTagIds)
+        return formatUser(p, tagLabels, score)
       })
 
-      const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+      // Sort by match score descending
+      allItems.sort((a, b) => b.matchScore - a.matchScore)
+
+      // Paginate sorted results in memory
+      const paginatedItems = hasValidBounds
+        ? allItems
+        : allItems.slice(offset, offset + pageSize)
+
+      const totalCount = allItems.length
+      const hasMore = !hasValidBounds && totalCount > offset + pageSize
 
       return new Response(
-        JSON.stringify({ items, total: count ?? items.length, hasMore }),
+        JSON.stringify({ items: paginatedItems, total: totalCount, hasMore }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -210,9 +261,9 @@ Deno.serve(async (req) => {
         .lte('longitude', normalizedBounds.maxLng)
     }
 
-    const { data: profilesData, error: profilesError, count } = hasValidBounds
+    const { data: profilesData, error: profilesError } = hasValidBounds
       ? await profilesQuery.range(0, MAX_BOUND_RESULTS - 1)
-      : await profilesQuery.range(offset, offset + pageSize - 1)
+      : await profilesQuery
 
     if (profilesError) {
       throw profilesError
@@ -231,21 +282,35 @@ Deno.serve(async (req) => {
     }
 
     const tagsByProfile: Record<string, string[]> = {}
+    const tagIdsByProfile: Record<string, string[]> = {}
     allProfileTags.forEach(t => {
       if (!tagsByProfile[t.profile_id]) tagsByProfile[t.profile_id] = []
+      if (!tagIdsByProfile[t.profile_id]) tagIdsByProfile[t.profile_id] = []
       const label = tagIdToLabel[t.tag_id]
       if (label) tagsByProfile[t.profile_id].push(label)
+      tagIdsByProfile[t.profile_id].push(t.tag_id)
     })
 
-    const items = (profilesData ?? []).map((p: Record<string, unknown>) => {
+    const allItems = (profilesData ?? []).map((p: Record<string, unknown>) => {
       const tagLabels = tagsByProfile[p.id as string] ?? []
-      return formatUser(p, tagLabels)
+      const profileTagIds = tagIdsByProfile[p.id as string] ?? []
+      const score = calculateMatchScore(profileTagIds)
+      return formatUser(p, tagLabels, score)
     })
 
-    const hasMore = !hasValidBounds && (count ?? 0) > offset + pageSize
+    // Sort by match score descending
+    allItems.sort((a, b) => b.matchScore - a.matchScore)
+
+    // Paginate sorted results in memory
+    const paginatedItems = hasValidBounds
+      ? allItems
+      : allItems.slice(offset, offset + pageSize)
+
+    const totalCount = allItems.length
+    const hasMore = !hasValidBounds && totalCount > offset + pageSize
 
     return new Response(
-      JSON.stringify({ items, total: count ?? items.length, hasMore }),
+      JSON.stringify({ items: paginatedItems, total: totalCount, hasMore }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {
