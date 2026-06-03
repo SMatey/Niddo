@@ -1,9 +1,5 @@
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
-
-interface SearchInputProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+import { SearchInputProps } from '../types/components.types';
 
 export const SearchInput = ({ value, onChange }: SearchInputProps) => {
   return (

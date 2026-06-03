@@ -1,9 +1,5 @@
 import { Message } from '../types/messages.types';
-
-interface ChatMessageBubbleProps {
-  message: Message;
-  currentUserId: string;
-}
+import { ChatMessageBubbleProps } from '../types/components.types';
 
 export const ChatMessageBubble = ({ message, currentUserId }: ChatMessageBubbleProps) => {
   const isSentByMe = message.senderId === currentUserId;

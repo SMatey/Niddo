@@ -1,16 +1,10 @@
 'use client';
 
 import { Conversation, Message } from '../types/messages.types';
+import { ActiveChatWindowProps } from '../types/components.types';
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
 import { ChatMessageBubble } from './chat-message-bubble';
 import { ChatInputFooter } from './chat-input-footer';
-
-interface ActiveChatWindowProps {
-  conversation: Conversation;
-  messages: Message[];
-  currentUserId: string;
-  onSendMessage: (content: string) => void;
-}
 
 export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSendMessage }: ActiveChatWindowProps) => {
   const otherParticipant = conversation.participants.find(p => p.profileId !== currentUserId);
@@ -42,7 +36,7 @@ export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSend
               {profile?.name || MESSAGES_UI_TEXT.chat.unknownUser}
             </h2>
             <span className={`text-xs font-medium ${profile?.status === 'online' ? 'text-green-600' : 'text-gray-400'}`}>
-              {profile?.status === 'online' ? 'Disponible' : 'Desconectado'}
+              {profile?.status === 'online' ? MESSAGES_UI_TEXT.chat.online : MESSAGES_UI_TEXT.chat.offline}
             </span>
           </div>
         </div>
@@ -60,7 +54,7 @@ export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSend
         {messages.length === 0 ? (
            <div className="m-auto text-center p-4">
               <span className="bg-gray-100 text-gray-500 px-4 py-2 rounded-full text-xs font-medium">
-                Inicia la conversación
+                {MESSAGES_UI_TEXT.emptyState.startConversation}
               </span>
            </div>
         ) : (

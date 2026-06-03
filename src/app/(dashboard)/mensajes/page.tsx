@@ -13,7 +13,6 @@ export default function Page() {
   const activeMessages = activeConversationId === 'conv-1' ? MOCK_MESSAGES_CONV_1 : [];
 
   const handleSendMessage = (content: string) => {
-    // Al estar en la fase de UI, solo haremos un console.log.
     // Posteriormente aquí se integrará la llamada a supabase para guardar el mensaje.
     console.log('Enviando mensaje:', content, 'a la conversación', activeConversationId);
   };

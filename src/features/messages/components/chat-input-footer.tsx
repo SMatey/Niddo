@@ -2,11 +2,7 @@
 
 import { useState, FormEvent, KeyboardEvent } from 'react';
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
-
-interface ChatInputFooterProps {
-  onSendMessage: (content: string) => void;
-  disabled?: boolean;
-}
+import { ChatInputFooterProps } from '../types/components.types';
 
 export const ChatInputFooter = ({ onSendMessage, disabled = false }: ChatInputFooterProps) => {
   const [message, setMessage] = useState('');
