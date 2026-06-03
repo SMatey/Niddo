@@ -5,7 +5,7 @@ import { useSettingsNavigation } from './hooks'
 import { SettingsSidebar } from './components/settings-sidebar'
 import { EditProfileSection } from './components/edit-profile-section'
 import { VerificationSection } from './components/verification-section'
-import { AlgorithmSection } from './components/preference-section'
+import { PreferenceSection } from './components/preference-section'
 import { PrivacySection } from './components/privacy-section'
 import { SETTINGS_CONFIG } from './constants/settings.constants'
 
@@ -19,8 +19,8 @@ export function SettingsLayout() {
         return <EditProfileSection />
       case 'verification':
         return <VerificationSection />
-      case 'algorithm':
-        return <AlgorithmSection />
+      case 'preferences':
+        return <PreferenceSection />
       case 'privacy':
         return <PrivacySection />
       default:
