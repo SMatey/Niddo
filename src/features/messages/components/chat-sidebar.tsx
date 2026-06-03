@@ -3,15 +3,9 @@
 import { useState } from 'react';
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
 import { Conversation } from '../types/messages.types';
+import { ChatSidebarProps } from '../types/components.types';
 import { SearchInput } from './search-input';
 import { ChatListItem } from './chat-list-item';
-
-interface ChatSidebarProps {
-  currentUserId: string;
-  conversations: Conversation[];
-  activeConversationId?: string;
-  onSelectConversation: (id: string) => void;
-}
 
 export const ChatSidebar = ({ currentUserId, conversations, activeConversationId, onSelectConversation }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +64,7 @@ export const ChatSidebar = ({ currentUserId, conversations, activeConversationId
             </h3>
             <p className="text-xs text-gray-500 max-w-[250px]">
               {searchQuery 
-                ? 'Intenta buscar con otro nombre.' 
+                ? MESSAGES_UI_TEXT.emptyState.tryAnotherName 
                 : MESSAGES_UI_TEXT.emptyState.noChatsDescription}
             </p>
           </div>

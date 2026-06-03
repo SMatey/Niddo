@@ -1,15 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
-export interface Message {
-  id: string
-  content: string
-  senderId: string
-  receiverId: string
-  createdAt: string
-  read: boolean
-}
+import { Message } from '../types/messages.types'
 
 export function useMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([])

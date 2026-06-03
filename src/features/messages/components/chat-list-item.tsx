@@ -1,12 +1,6 @@
 import { Conversation } from '../types/messages.types';
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
-
-interface ChatListItemProps {
-  conversation: Conversation;
-  currentUserId: string;
-  isActive: boolean;
-  onClick: () => void;
-}
+import { ChatListItemProps } from '../types/components.types';
 
 export const ChatListItem = ({ conversation, currentUserId, isActive, onClick }: ChatListItemProps) => {
   // Encontrar al otro participante del chat
@@ -23,12 +17,12 @@ export const ChatListItem = ({ conversation, currentUserId, isActive, onClick }:
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Eliminar chat', conversation.id);
+    console.log(MESSAGES_UI_TEXT.actions.deleteChat, conversation.id);
   };
 
   const handleBlock = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Bloquear usuario', profile?.id);
+    console.log(MESSAGES_UI_TEXT.actions.block, profile?.id);
   };
 
   return (

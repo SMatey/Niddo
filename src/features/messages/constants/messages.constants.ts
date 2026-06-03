@@ -4,7 +4,9 @@ export const MESSAGES_UI_TEXT = {
     description: 'Selecciona una conversación o inicia un nuevo chat para conectarte con posibles roomies o dueños.',
     noChats: 'Aún no tienes mensajes',
     noChatsDescription: 'Cuando contactes a un roomie o dueño de apartamento, tus conversaciones aparecerán aquí.',
-    noResults: 'No se encontraron conversaciones'
+    noResults: 'No se encontraron conversaciones',
+    startConversation: 'Inicia la conversación',
+    tryAnotherName: 'Intenta buscar con otro nombre.'
   },
   chat: {
     placeholder: 'Escribe un mensaje...',
@@ -15,7 +17,9 @@ export const MESSAGES_UI_TEXT = {
     yesterday: 'Ayer',
     read: 'Leído',
     unread: 'No leído',
-    unknownUser: 'Usuario desconocido'
+    unknownUser: 'Usuario desconocido',
+    online: 'Disponible',
+    offline: 'Desconectado'
   },
   errors: {
     loadFailed: 'No pudimos cargar tus mensajes. Por favor, intenta de nuevo.',

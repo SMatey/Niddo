@@ -1,6 +1,7 @@
 export { useMessages } from './hooks/use-messages'
 export * from './lib/supabase-messages'
 export * from './types/messages.types'
+export * from './types/components.types'
 export * from './constants/messages.constants'
 export * from './constants/messages.mocks'
 
