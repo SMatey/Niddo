@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { FilterState, ContentMode, ViewMode, PropertyItem, UserItem, Point, MapBounds } from './domain.types'
+import type { MatchScoreLevel } from './preference.types'
 
 export type {
     BadgeItem,
@@ -79,4 +80,9 @@ export interface MapProviderProps {
 
 export interface GoogleMapsProviderProps extends MapProviderProps {
     onBoundsChange?: (bounds: MapBounds) => void
+}
+
+export interface MatchScoreBadgeProps {
+    score: number
+    level?: MatchScoreLevel
 }
