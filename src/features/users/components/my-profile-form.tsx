@@ -9,6 +9,7 @@ import { Input } from '@/shared/components/ui/input'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { PROFILE_FORM } from '@/features/users/constants/profile-form.constants'
 import { useMyProfile } from '@/features/users/hooks/use-my-profile'
+import { createClient } from '@/lib/supabase/client'
 import {
   profileFormSchema,
   toProfileFormDefaults,
@@ -100,6 +101,11 @@ export function MyProfileForm() {
   const avatarValue = watch('avatar')
   const nameValue = watch('name')
 
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+
   const onSelectAvatarFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
 
@@ -137,6 +143,37 @@ export function MyProfileForm() {
     }
 
     setStatus({ type: 'success', message: PROFILE_FORM.UI.SAVE_SUCCESS })
+  }
+
+  const handleUploadSubmit = async () => {
+    if (!user?.id) return setStatus({ type: 'error', message: PROFILE_FORM.ID_DOCUMENT.VALIDATION.AUTH_REQUIRED })
+    if (!selectedFile) return setStatus({ type: 'error', message: PROFILE_FORM.ID_DOCUMENT.VALIDATION.NO_FILE })
+
+    try {
+      setUploading(true)
+      setStatus(null)
+
+      const result = await encryptFileAndUpload(selectedFile, user.id)
+
+      const resp = await fetch('/api/id-doc/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ profileId: user.id, idDocumentPath: result.path, keyB64: result.key_b64, fileIvB64: result.file_iv_b64 }),
+      })
+
+      if (!resp.ok) {
+        const text = await resp.text()
+        throw new Error(text || 'Error saving metadata')
+      }
+
+      setStatus({ type: 'success', message: PROFILE_FORM.ID_DOCUMENT.UI.SUCCESS })
+      setIsUploadOpen(false)
+    } catch (err: any) {
+      setStatus({ type: 'error', message: err?.message ?? 'Error al subir documento' })
+    } finally {
+      setUploading(false)
+    }
   }
 
   if (!isInitialized || isLoading) {
@@ -309,11 +346,88 @@ export function MyProfileForm() {
         ) : null}
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? PROFILE_FORM.UI.SAVING : PROFILE_FORM.UI.SUBMIT}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button type="button" variant="secondary" onClick={onOpenUpload} disabled={isSaving}>
+              {PROFILE_FORM.ID_DOCUMENT.UI.OPEN_BUTTON}
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? PROFILE_FORM.UI.SAVING : PROFILE_FORM.UI.SUBMIT}
+            </Button>
+          </div>
         </div>
       </form>
+      {isUploadOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={onCloseUpload}
+        >
+          <div
+            className="w-full max-w-2xl rounded-4xl bg-surface border border-border shadow-2xl p-6 md:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 2v4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M6 8v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M9 12h6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-text-primary">{PROFILE_FORM.ID_DOCUMENT.UI.MODAL_TITLE}</h3>
+                  <p className="text-sm text-text-secondary">{PROFILE_FORM.ID_DOCUMENT.UI.PREVIEW_HINT}</p>
+                </div>
+              </div>
+              <button
+                onClick={onCloseUpload}
+                className="text-sm font-medium text-text-muted hover:text-text-primary"
+                aria-label="Cerrar modal"
+              >
+                {PROFILE_FORM.ID_DOCUMENT.UI.CLOSE}
+              </button>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:items-start">
+              <div className="col-span-1 md:col-span-1">
+                <label className="block text-sm font-medium text-text-primary mb-2">Seleccionar archivo</label>
+                <div className="rounded-md border border-border bg-surface px-3 py-2">
+                  <input
+                    type="file"
+                    accept={PROFILE_FORM.ID_DOCUMENT.ACCEPTED_TYPES.join(',')}
+                    onChange={onSelectDocumentFile}
+                    className="w-full text-sm text-text-primary"
+                  />
+                </div>
+
+                <div className="mt-3 text-sm text-text-secondary">
+                  {selectedFile ? selectedFile.name : <span className="text-text-muted">{PROFILE_FORM.ID_DOCUMENT.UI.PREVIEW_HINT}</span>}
+                </div>
+              </div>
+
+              <div className="col-span-1 flex items-center justify-center">
+                <div className="w-full max-w-md rounded-lg border border-border bg-white p-4 flex items-center justify-center">
+                  {previewUrl ? (
+                    <img src={previewUrl} alt="preview" className="max-h-64 object-contain" />
+                  ) : selectedFile ? (
+                    <div className="text-sm text-text-primary">{selectedFile.name}</div>
+                  ) : (
+                    <div className="text-sm text-text-muted">{PROFILE_FORM.ID_DOCUMENT.UI.PREVIEW_HINT}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <Button type="button" variant="ghost" onClick={onCloseUpload} disabled={uploading}>{PROFILE_FORM.ID_DOCUMENT.UI.CANCEL}</Button>
+              <Button type="button" onClick={handleUploadSubmit} disabled={uploading || !selectedFile}>
+                {uploading ? PROFILE_FORM.ID_DOCUMENT.UI.UPLOADING : PROFILE_FORM.ID_DOCUMENT.UI.UPLOAD_BUTTON}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
     </section>
   )
 }

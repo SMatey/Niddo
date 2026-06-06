@@ -3,7 +3,7 @@
 import { Input } from '@/shared/components/ui/input'
 import { Tag } from '@/shared/components/ui/tag'
 import { PriceRange } from '@/shared/components/ui/price-range'
-import { LIFESTYLES, AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS, CONTENT_MODE_CONFIG } from '../constants/search.constants'
+import { AMENITY_TAGS, FILTER_LABELS, CONTENT_MODES, FILTER_KEYS, CONTENT_MODE_CONFIG } from '../constants/search.constants'
 import type { FilterState, ContentMode } from '../types/domain.types'
 import type { FilterSidebarProps, FilterSidebarWithModeProps } from '../types/ui.types'
 import { useFilterState } from '../hooks/use-filter-state'
@@ -48,15 +48,15 @@ export function FilterSidebar({ filters, onFilterChange, contentMode = CONTENT_M
                 <div className="flex flex-wrap gap-2">
                     {config.tags.map((tag) => (
                         <Tag
-                            key={tag}
-                            selected={filters.lifestyles.includes(tag)}
+                            key={tag.id}
+                            selected={filters.lifestyles.includes(tag.id)}
                             onClick={(e) => {
                                 e.stopPropagation()
-                                toggleTag(tag)
+                                toggleTag(tag.id)
                             }}
                             variant="outline"
                         >
-                            {tag}
+                            {tag.label}
                         </Tag>
                     ))}
                 </div>
