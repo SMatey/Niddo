@@ -15,5 +15,5 @@ export function useMessages(conversationId: string | null) {
     setIsLoading(false)
   }, [conversationId])
 
-  return { messages, isLoading }
+  return { messages, isLoading } // limpiar
 }
