@@ -3,15 +3,15 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/features/userprofile/hooks/use-user'
 import { UserProfileHeader } from '@/features/userprofile/components/user-profile-header'
-
 import { USER_DETAIL_LABELS } from '@/features/userprofile/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
-import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
 import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
+import { ProfileReviewsSection } from '@/features/reviews/profile-reviews/components/profile-reviews-section'
+import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 
 function UserDetailLoadingState() {
   return (
@@ -46,6 +46,7 @@ function UserModerationErrorState({ onBack }: { onBack: () => void }) {
 
 function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
   const { data: user, isLoading } = useUser(id)
+  console.log("Datos del usuario:", user)
 
   if (isLoading) {
     return <UserDetailLoadingState />
@@ -74,6 +75,8 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           user={user}
           reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
         />
+
+        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )

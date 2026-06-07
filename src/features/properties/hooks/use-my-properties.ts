@@ -1,5 +1,5 @@
 'use client';
-s
+
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Property } from '@/features/properties/types'

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { getReviewReportModerationStatus } from '@/features/reviews/lib/supabase-review-reports'
-import type { ReviewReportTargetType } from '@/features/reviews/types/report-form.types'
+import type { ReviewReportTargetType, ReviewReportModerationStatus } from '@/features/reviews/types/report-form.types'
 import type { UseReviewReportModerationResult } from '@/features/reviews/types/review-hook.types'
 
 export function useReviewReportModeration(
