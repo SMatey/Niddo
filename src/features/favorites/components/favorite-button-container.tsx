@@ -4,12 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { FavoriteButton } from '@/shared/components/ui/favorite-button'
 import { isPropertyFavorited, isProfileFavorited } from '../lib/supabase-favorites'
 import { useFavorites } from '..'
-import type { FavoriteButtonProps } from '@/shared/types/types'
-
-interface FavoritePropertyButtonProps extends Omit<FavoriteButtonProps, 'isFavorite' | 'onToggle'> {
-  propertyId: string
-  onToggleComplete?: (isFavorited: boolean) => void
-}
+import type { FavoritePropertyButtonProps, FavoriteProfileButtonProps } from '../types/favorites.types'
 
 export function FavoritePropertyButton({
   propertyId,
@@ -53,11 +48,6 @@ export function FavoritePropertyButton({
       className="cursor-pointer"
     />
   )
-}
-
-interface FavoriteProfileButtonProps extends Omit<FavoriteButtonProps, 'isFavorite' | 'onToggle'> {
-  profileId: string
-  onToggleComplete?: (isFavorited: boolean) => void
 }
 
 export function FavoriteProfileButton({

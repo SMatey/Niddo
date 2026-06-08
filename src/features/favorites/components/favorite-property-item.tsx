@@ -3,10 +3,7 @@
 import { PropertyCard } from '@/shared/components/ui/property-card'
 import { useProperty } from '@/features/properties/hooks/use-property'
 import { FAVORITES_UI_MESSAGES } from '../constants/favorites.constants'
-
-interface FavoritePropertyItemProps {
-  id: string
-}
+import type { FavoritePropertyItemProps } from '../types/favorites.types'
 
 export function FavoritePropertyItem({ id }: FavoritePropertyItemProps) {
   const { data, isLoading } = useProperty(id)
