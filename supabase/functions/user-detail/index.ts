@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const tagIdToLabel: Record<string, string> = {}
     ;(tagData ?? []).forEach(t => { tagIdToLabel[t.id] = t.label })
 
-    // Fetch profile with email from auth.users
+    // Fetch profile from public.profiles
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -52,6 +52,19 @@ Deno.serve(async (req) => {
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    let userEmail = undefined;
+    try {
+      const { data: authData, error: authError } = await supabase.auth.admin.getUserById(id);
+      if (!authError && authData?.user) {
+        userEmail = authData.user.email;
+      } else {
+        console.warn("No se encontró en auth.users o el ID no es UUID:", authError?.message);
+      }
+    } catch (e) {
+      console.warn("Error al consultar auth.users:", e);
+    }
+
 
     // Fetch profile lifestyle tags
     const { data: profileTags } = await supabase
@@ -79,7 +92,8 @@ Deno.serve(async (req) => {
       lifestyles: tagLabels,
       description: profileData.bio ?? undefined,
       memberSince: profileData.joined_date,
-      email: profileData.email ?? undefined,
+      // Se prioriza el email extraído de auth.users, si no existe usa el de profiles
+      email: userEmail ?? profileData.email ?? undefined,
     }
 
     return new Response(JSON.stringify(detail), {
