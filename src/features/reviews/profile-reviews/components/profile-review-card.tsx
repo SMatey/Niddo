@@ -2,7 +2,8 @@
 
 import { Star, ShieldCheck } from 'lucide-react'
 
-import { PROFILE_REVIEWS_COPY, PROFILE_REVIEWS_DATE_FORMAT, PROFILE_REVIEWS_LIMITS } from '../constants/profile-reviews.constants'
+import { PROFILE_REVIEWS_COPY, PROFILE_REVIEWS_LIMITS } from '../constants/profile-reviews.constants'
+import { formatProfileReviewDate } from '../lib/profile-review-card.utils'
 import type { ProfileReviewItem } from '@/features/reviews/types/review-form.types'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/shared/components/ui/badge'
@@ -15,18 +16,8 @@ interface ProfileReviewCardProps {
 
 const ratingStarStates = Array.from({ length: PROFILE_REVIEWS_LIMITS.MAX_STARS }, (_, index) => index)
 
-function formatReviewDate(createdAt: string) {
-  const date = new Date(createdAt)
-
-  if (Number.isNaN(date.getTime())) {
-    return PROFILE_REVIEWS_COPY.REVIEW.DATE_FALLBACK
-  }
-
-  return new Intl.DateTimeFormat(PROFILE_REVIEWS_DATE_FORMAT.LOCALE, PROFILE_REVIEWS_DATE_FORMAT.OPTIONS).format(date)
-}
-
 export function ProfileReviewCard({ review }: ProfileReviewCardProps) {
-  const formattedDate = formatReviewDate(review.createdAt)
+  const formattedDate = formatProfileReviewDate(review.createdAt)
   const ratingLabel = `${PROFILE_REVIEWS_COPY.REVIEW.RATING_LABEL} ${review.rating}/5`
 
   return (

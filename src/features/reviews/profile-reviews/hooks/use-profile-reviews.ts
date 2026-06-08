@@ -2,19 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import type { ProfileReviewItem } from '@/features/reviews/types/review-form.types'
+import type { UseProfileReviewsResult } from '@/features/reviews/types/review-hook.types'
 
 import { loadProfileReviews } from '../services/profile-reviews.service'
 
-export interface UseProfileReviewsResult {
-  reviews: ProfileReviewItem[]
-  isLoading: boolean
-  error: string | null
-  refresh: () => Promise<void>
-}
-
 export function useProfileReviews(profileId: string): UseProfileReviewsResult {
-  const [reviews, setReviews] = useState<ProfileReviewItem[]>([])
+  const [reviews, setReviews] = useState<UseProfileReviewsResult['reviews']>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
