@@ -3,8 +3,6 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/features/users/hooks/use-user'
 import { UserProfileHeader } from '@/features/users/components/user-profile-header'
-import { UserLocationCard } from '@/features/users/components/user-location-card'
-import { MapProvider } from '@/features/search/providers/map-provider'
 
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
@@ -76,8 +74,6 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           user={user}
           reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
         />
-
-        <UserLocationCard user={user} />
       </div>
     </main>
   )
@@ -107,9 +103,5 @@ export default function UserDetailPage() {
     )
   }
 
-  return (
-    <MapProvider>
-      <UserDetailContent id={id} onBack={() => router.back()} />
-    </MapProvider>
-  )
+  return <UserDetailContent id={id} onBack={() => router.back()} />
 }
