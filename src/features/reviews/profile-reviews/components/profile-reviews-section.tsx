@@ -8,11 +8,9 @@ import { ProfileReviewCard } from './profile-review-card'
 import { ProfileReviewsEmptyState } from './profile-reviews-empty-state'
 import { ProfileReviewsErrorState } from './profile-reviews-error-state'
 import { ProfileReviewsLoadingState } from './profile-reviews-loading-state'
+import {ProfileReviewsSectionProps} from "@/features/reviews/types/report-form.types";
 
-interface ProfileReviewsSectionProps {
-  profileId: string
-  className?: string
-}
+
 
 export function ProfileReviewsSection({ profileId, className }: ProfileReviewsSectionProps) {
   const { reviews, isLoading, error, refresh } = useProfileReviews(profileId)

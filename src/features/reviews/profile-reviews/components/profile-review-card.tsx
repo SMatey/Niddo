@@ -33,7 +33,7 @@ export function ProfileReviewCard({ review }: ProfileReviewCardProps) {
     <Card className="border-border/80 bg-surface shadow-sm">
       <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
         <div className="flex items-start gap-3">
-          <UserAvatar name={review.author.name} imageUrl={review.author.imageUrl} verified={review.author.verified} size="sm" />
+          <UserAvatar name={review.author.name} imageUrl={review.author.imageUrl ?? undefined} verified={review.author.verified} size="sm" />
 
           <div className="min-w-0 space-y-1">
             <div className="flex flex-wrap items-center gap-2">

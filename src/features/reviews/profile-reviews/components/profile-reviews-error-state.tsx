@@ -4,10 +4,8 @@ import { AlertTriangle } from 'lucide-react'
 
 import { PROFILE_REVIEWS_COPY } from '../constants/profile-reviews.constants'
 import { Button } from '@/shared/components/ui/button'
+import {ProfileReviewsErrorStateProps} from "@/features/reviews/types/report-form.types";
 
-interface ProfileReviewsErrorStateProps {
-  onRetry: () => void
-}
 
 export function ProfileReviewsErrorState({ onRetry }: ProfileReviewsErrorStateProps) {
   return (
