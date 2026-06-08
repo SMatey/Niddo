@@ -2,10 +2,7 @@
 
 import { UserCard } from '@/shared/components/ui/user-card'
 import { useUser } from '@/features/userprofile/hooks/use-user'
-
-interface FavoriteUserItemProps {
-  id: string
-}
+import type { FavoriteUserItemProps } from '../types/favorites.types'
 
 export function FavoriteUserItem({ id }: FavoriteUserItemProps) {
   const { data, isLoading } = useUser(id)

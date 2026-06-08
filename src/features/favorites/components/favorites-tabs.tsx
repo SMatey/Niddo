@@ -2,13 +2,7 @@
 
 import { Tabs } from '@/shared/components/ui/tabs'
 import { FAVORITES_LABELS } from '../constants/favorites.constants'
-
-export type FavoritesTabValue = 'all' | 'properties' | 'users'
-
-interface FavoritesTabsProps {
-  activeTab: FavoritesTabValue
-  onTabChange: (tab: FavoritesTabValue) => void
-}
+import type { FavoritesTabValue, FavoritesTabsProps } from '../types/favorites.types'
 
 const tabs = [
   { label: FAVORITES_LABELS.tabs.all, value: 'all' },

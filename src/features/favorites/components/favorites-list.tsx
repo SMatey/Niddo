@@ -4,16 +4,13 @@ import { useEffect, useState } from 'react'
 import { getUserFavorites } from '../lib/supabase-favorites'
 import { FavoritePropertyItem } from './favorite-property-item'
 import { FavoriteUserItem } from './favorite-user-item'
-import { FavoritesTabs, FavoritesTabValue } from './favorites-tabs'
+import { FavoritesTabs } from './favorites-tabs'
 import {
   FAVORITES_LABELS,
   FAVORITES_UI_MESSAGES,
   FAVORITES_CONSOLE_MESSAGES,
 } from '../constants/favorites.constants'
-
-interface FavoritesListProps {
-  className?: string
-}
+import type { FavoritesListProps, FavoritesTabValue } from '../types/favorites.types'
 
 export function FavoritesList({ className }: FavoritesListProps) {
   const [favorites, setFavorites] = useState<{ properties: string[]; profiles: string[] }>({
