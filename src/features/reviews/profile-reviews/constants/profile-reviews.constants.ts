@@ -20,6 +20,7 @@ export const PROFILE_REVIEWS_COPY = {
     RATING_LABEL: 'Calificacion',
     DATE_FALLBACK: 'Fecha no disponible',
     CONTENT_FALLBACK: 'Sin comentario adicional.',
+    VERIFIED_BADGE: 'Verificado',
   },
 } as const
 

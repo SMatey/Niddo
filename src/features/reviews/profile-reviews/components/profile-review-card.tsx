@@ -32,7 +32,7 @@ export function ProfileReviewCard({ review }: ProfileReviewCardProps) {
               {review.author.verified ? (
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-700">
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  Verificado
+                  {PROFILE_REVIEWS_COPY.REVIEW.VERIFIED_BADGE}
                 </span>
               ) : null}
             </div>
