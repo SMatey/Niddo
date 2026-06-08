@@ -4,10 +4,8 @@ import { MessageSquareText } from 'lucide-react'
 
 import { PROFILE_REVIEWS_COPY } from '../constants/profile-reviews.constants'
 import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
+import {ProfileReviewsEmptyStateProps} from "@/features/reviews/types/report-form.types";
 
-interface ProfileReviewsEmptyStateProps {
-  profileId: string
-}
 
 export function ProfileReviewsEmptyState({ profileId }: ProfileReviewsEmptyStateProps) {
   return (
