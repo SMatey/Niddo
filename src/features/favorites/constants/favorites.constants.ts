@@ -60,5 +60,3 @@ export const FAVORITES_UI_MESSAGES = {
   noProperties: 'No tienes propiedades favoritas',
   noProfiles: 'No tienes perfiles favoritos',
 } as const
-
-export type FavoriteType = 'property' | 'user'
