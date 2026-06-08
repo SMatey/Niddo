@@ -9,6 +9,20 @@ export interface ReportFormValues {
   description: string
 }
 
+export interface ProfileReviewsEmptyStateProps {
+  profileId: string
+}
+
+export interface ProfileReviewsErrorStateProps {
+  onRetry: () => void
+}
+
+export interface ProfileReviewsSectionProps {
+  profileId: string
+  className?: string
+}
+
+
 export interface ReviewReportSubject {
   targetType: ReviewReportTargetType
   targetId: string
