@@ -8,8 +8,8 @@ export function SettingsOption({ label, icon, isActive, onClick }: SettingsOptio
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
         isActive
-          ? 'bg-surface-muted text-text-primary'
-          : 'text-text-secondary hover:bg-surface-muted'
+          ? 'bg-gray-200 text-gray-900'
+          : 'text-gray-700 hover:bg-gray-100'
       }`}
     >
       {icon}

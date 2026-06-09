@@ -14,7 +14,7 @@ const iconMap = {
 
 export function SettingsSidebar({ activeSection, onSelectSection }: SettingsSidebarProps) {
   return (
-    <aside className="w-full lg:w-64 bg-surface-subtle rounded-lg p-6">
+    <aside className="w-full lg:w-64 bg-gray-50 rounded-lg p-6">
       <nav className="space-y-2">
         {SETTINGS_MENU.map((option: SettingsOptionType) => {
           const Icon = iconMap[option.icon as keyof typeof iconMap]

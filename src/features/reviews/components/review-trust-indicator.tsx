@@ -1,11 +1,13 @@
 'use client'
 
 import { ShieldCheck } from 'lucide-react'
-
+import { cn } from '@/lib/utils'
 import { REVIEW_FORM } from '@/features/reviews/constants/review-form.constants'
 import { createTrustIndicator } from '@/features/reviews/lib/review-domain'
-import type { ReviewTrustIndicatorProps } from '@/features/reviews/types/review-component.types'
-import { cn } from '@/lib/utils'
+
+interface ReviewTrustIndicatorProps {
+  score: number
+}
 
 export function ReviewTrustIndicator({ score }: ReviewTrustIndicatorProps) {
   const trustIndicator = createTrustIndicator(score)

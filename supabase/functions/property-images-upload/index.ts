@@ -7,10 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
 }
 
-const MAX_IMAGE_WIDTH = 1200
-const IMAGE_RESIZE_WIDTH = 1200
-const JPEG_QUALITY = 80
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -66,12 +62,12 @@ Deno.serve(async (req) => {
         const arrayBuffer = await file.arrayBuffer()
         const image = await Image.decode(new Uint8Array(arrayBuffer))
         
-        // Dieta estricta: Si la imagen es más ancha de MAX_IMAGE_WIDTH, la encoge sin deformarla
-        if (image.width > MAX_IMAGE_WIDTH) {
-            image.resize(IMAGE_RESIZE_WIDTH, Image.RESIZE_AUTO)
+        // Dieta estricta: Si la imagen es más ancha de 1200px, la encoge sin deformarla
+        if (image.width > 1200) {
+            image.resize(1200, Image.RESIZE_AUTO)
         }
-        // Compresión: La convierte a JPEG bajándole la calidad al JPEG_QUALITY%
-        const jpegBuffer = await image.encodeJPEG(JPEG_QUALITY) 
+        // Compresión: La convierte a JPEG bajándole la calidad al 80% 
+        const jpegBuffer = await image.encodeJPEG(80) 
         
         // Le asigna un nombre único basado en la fecha y el índice
         const timestamp = Date.now()

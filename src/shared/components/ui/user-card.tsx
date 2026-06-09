@@ -7,7 +7,6 @@ import { ConfidenceBar } from './confidence-bar'
 import { BudgetBadge } from './budget-badge'
 //import { FavoriteButton } from './favorite-button'
 import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
-import { MatchScoreBadge } from '@/features/search/components/match-score-badge'
 import type { UserCardProps } from './types'
 
 export function UserCard({
@@ -25,19 +24,15 @@ export function UserCard({
     maxBudget,
     confidenceScore,
     lifestyles = [],
-    matchScore,
     className,
 }: UserCardProps) {
     return (
         <div className={`bg-surface rounded-lg border border-border overflow-hidden ${className}`}>
             {id && (
                 <div
-                    className="px-4 pt-4 flex justify-between items-center"
+                    className="px-4 pt-4 flex justify-end"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {matchScore != null && (
-                        <MatchScoreBadge score={matchScore} />
-                    )}
                     <FavoriteProfileButton
                         profileId={id}
                     />
@@ -48,11 +43,7 @@ export function UserCard({
                     {/* Header: Avatar + Info */}
                     <div className="flex items-start gap-3">
                         <UserAvatar name={name} imageUrl={imageUrl} verified={verified} age={age} />
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <UserInfo name={name} verified={verified} age={age} location={location} />
-                            </div>
-                        </div>
+                        <UserInfo name={name} verified={verified} age={age} location={location} />
                     </div>
 
                     {confidenceScore != null && (

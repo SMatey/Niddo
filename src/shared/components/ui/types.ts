@@ -31,7 +31,6 @@ export interface UserCardProps {
     maxBudget?: string
     confidenceScore?: number
     lifestyles?: string[]
-    matchScore?: number
     className?: string
 }
 

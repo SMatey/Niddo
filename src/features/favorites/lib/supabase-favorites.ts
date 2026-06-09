@@ -15,14 +15,14 @@ export async function isPropertyFavorited(propertyId: string): Promise<boolean> 
     .select(FAVORITES_TABLE.columns.id)
     .eq(FAVORITES_TABLE.columns.profileId, user.id)
     .eq(FAVORITES_TABLE.columns.propertyId, propertyId)
-    .limit(1)
+    .single()
 
-  if (error) {
+  if (error && error.code !== SUPABASE_ERROR_CODES.NOT_FOUND) { // PGRST116 is "not found"
     console.error(FAVORITES_CONSOLE_MESSAGES.error.checkingPropertyFavorite, error)
     return false
   }
 
-  return Array.isArray(data) ? data.length > 0 : false
+  return !!data
 }
 
 /**
@@ -38,14 +38,14 @@ export async function isProfileFavorited(profileId: string): Promise<boolean> {
     .select(FAVORITES_TABLE.columns.id)
     .eq(FAVORITES_TABLE.columns.profileId, user.id)
     .eq(FAVORITES_TABLE.columns.favoritedProfileId, profileId)
-    .limit(1)
+    .single()
 
-  if (error) {
+  if (error && error.code !== SUPABASE_ERROR_CODES.NOT_FOUND) {
     console.error(FAVORITES_CONSOLE_MESSAGES.error.checkingProfileFavorite, error)
     return false
   }
 
-  return Array.isArray(data) ? data.length > 0 : false
+  return !!data
 }
 
 /**

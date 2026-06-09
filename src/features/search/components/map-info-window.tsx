@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { PropertyItem, UserItem } from '../types/domain.types'
 import type { MapInfoWindowProps } from '../types/ui.types'
-import { ROUTING_PATHS, CONTENT_MODES, MAP_LABELS, MAP_VIEW_CONFIG } from '../constants/search.constants'
+import { ROUTING_PATHS, CONTENT_MODES, MAP_LABELS } from '../constants/search.constants'
 
 import { formatPriceLabel } from '../utils/formatters.utils'
 
@@ -24,7 +24,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
 
     const user = item as UserItem
     const isVerified = !isProperty && user.verified
-    const lifestyles = !isProperty ? (user.lifestyles ?? []).slice(0, MAP_VIEW_CONFIG.MAX_LIFESTYLES_IN_INFO_WINDOW) : []
+    const lifestyles = !isProperty ? (user.lifestyles ?? []).slice(0, 2) : []
 
     const handleClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault()

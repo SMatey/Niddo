@@ -1,15 +1,19 @@
 'use client'
 
 import { CheckCircle2, Home, MapPin } from 'lucide-react'
-
-import { ReportIssueModal } from '@/features/reviews/components/report-issue-modal'
 import {
   REVIEW_FORM,
   getReviewTargetCopy,
 } from '@/features/reviews/constants/review-form.constants'
+import { ReportIssueModal } from '@/features/reviews/components/report-issue-modal'
 import { ReviewTrustIndicator } from '@/features/reviews/components/review-trust-indicator'
-import type { ReviewTargetCardProps } from '@/features/reviews/types/review-component.types'
 import { UserAvatar } from '@/shared/components/ui/user-avatar'
+import type { ReviewTargetSummary } from '@/features/reviews/types/review-form.types'
+
+interface ReviewTargetCardProps {
+  target: ReviewTargetSummary
+  reporterId: string
+}
 
 export function ReviewTargetCard({ target, reporterId }: ReviewTargetCardProps) {
   const copy = getReviewTargetCopy(target.type)

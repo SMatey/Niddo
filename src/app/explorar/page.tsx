@@ -12,7 +12,6 @@ import { ExplorarHeader } from '@/features/search/components/explorar-header'
 import { MobileFiltersDrawer } from '@/features/search/components/mobile-filters-drawer'
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
-import { useAuth } from '@/features/auth/hooks/use-auth'
 import { VIEW_MODES, CONTENT_MODES } from '@/features/search/constants/search.constants'
 import { SupabasePropertyRepository } from '@/features/properties/repositories/supabase-property.repository'
 import { SupabaseUserRepository } from '@/features/users/repositories/supabase-user.repository'
@@ -25,14 +24,12 @@ const propertyRepository = new SupabasePropertyRepository(baseUrl, apiKey)
 const userRepository = new SupabaseUserRepository(baseUrl, apiKey)
 
 function ExplorarPageContent() {
-  const { user } = useAuth()
   const {
     filters,
-    setFilters,
     handleFilterChange,
     handleBoundsChange,
     mapBounds,
-    setFilters: setFiltersContext
+    setFilters
   } = useExplorarContext()
 
   const {
@@ -46,13 +43,6 @@ function ExplorarPageContent() {
 
   const searchParams = useSearchParams()
   const searchParamsKey = searchParams.toString()
-
-  // Set profileId in filters when user is available
-  useEffect(() => {
-    if (user?.id && contentMode === CONTENT_MODES.USERS && filters.profileId !== user.id) {
-      setFiltersContext({ ...filters, profileId: user.id })
-    }
-  }, [user?.id, contentMode, filters.profileId, setFiltersContext])
 
   useEffect(() => {
     if (!searchParamsKey) {

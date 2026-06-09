@@ -1,10 +1,13 @@
-'use client'
-
 import { useEffect, useState } from 'react'
-
 import { getReviewTargetSummary, getReviewerProfileStatus } from '@/features/reviews/lib/supabase-reviews'
-import type { UseReviewTargetResult } from '@/features/reviews/types/review-hook.types'
 import type { ReviewTargetSummary, ReviewTargetType } from '@/features/reviews/types/review-form.types'
+
+interface UseReviewTargetResult {
+  target: ReviewTargetSummary | null
+  isLoading: boolean
+  error: string | null
+  viewerHasProfile: boolean
+}
 
 export function useReviewTarget(
   targetType: ReviewTargetType,

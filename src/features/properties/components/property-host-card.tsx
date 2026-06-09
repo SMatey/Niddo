@@ -39,7 +39,7 @@ export function PropertyHostCard({
             <ConfidenceBar score={hostConfidence} />
             <button
                 onClick={handleViewProfile}
-                className="w-full py-2.5 bg-brand-600 text-white rounded-lg font-medium text-sm cursor-pointer hover:bg-brand-700 transition"
+                className="w-full py-2.5 bg-brand-600 text-white rounded-lg font-medium text-sm"
             >
                 {PROPERTY_DETAIL_LABELS.seeHostProfile}
             </button>
