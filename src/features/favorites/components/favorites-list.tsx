@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react'
 import { getUserFavorites } from '../lib/supabase-favorites'
 import { FavoritePropertyItem } from './favorite-property-item'
 import { FavoriteUserItem } from './favorite-user-item'
-import { FAVORITES_LABELS, FAVORITES_UI_MESSAGES, FAVORITES_CONSOLE_MESSAGES } from '../constants/favorites.constants'
-
-interface FavoritesListProps {
-  className?: string
-}
+import { FavoritesTabs } from './favorites-tabs'
+import {
+  FAVORITES_LABELS,
+  FAVORITES_UI_MESSAGES,
+  FAVORITES_CONSOLE_MESSAGES,
+} from '../constants/favorites.constants'
+import type { FavoritesListProps, FavoritesTabValue } from '../types/favorites.types'
 
 export function FavoritesList({ className }: FavoritesListProps) {
   const [favorites, setFavorites] = useState<{ properties: string[]; profiles: string[] }>({
@@ -17,6 +19,7 @@ export function FavoritesList({ className }: FavoritesListProps) {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<FavoritesTabValue>('all')
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -58,44 +61,65 @@ export function FavoritesList({ className }: FavoritesListProps) {
 
   const hasProperties = favorites.properties.length > 0
   const hasProfiles = favorites.profiles.length > 0
+  const showPropertiesSection = activeTab === 'all' || activeTab === 'properties'
+  const showProfilesSection = activeTab === 'all' || activeTab === 'users'
+  const shouldShowEmptyMessage =
+    activeTab === 'properties' ? !hasProperties : activeTab === 'users' ? !hasProfiles : !hasProperties && !hasProfiles
 
-  if (!hasProperties && !hasProfiles) {
-    return (
-      <div className={`space-y-6 ${className}`}>
-        <div className="text-center py-12">
-          <p className="text-text-muted">{FAVORITES_LABELS.emptyState}</p>
-          <p className="text-sm text-text-secondary mt-2">{FAVORITES_LABELS.emptyStateDescription}</p>
-        </div>
-      </div>
-    )
-  }
+  const emptyMessage =
+    activeTab === 'properties'
+      ? FAVORITES_UI_MESSAGES.noProperties
+      : activeTab === 'users'
+      ? FAVORITES_UI_MESSAGES.noProfiles
+      : FAVORITES_LABELS.emptyState
 
   return (
     <div className={`space-y-6 ${className}`}>
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">{FAVORITES_LABELS.pageTitle}</h1>
-        <p className="text-text-secondary">{FAVORITES_LABELS.pageDescription}</p>
+      <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-text-primary">{FAVORITES_LABELS.pageTitle}</h1>
+          <p className="text-text-secondary mt-2">{FAVORITES_LABELS.pageDescription}</p>
+        </div>
+
+        <FavoritesTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      {hasProperties && (
-        <div>
-          <h2 className="text-lg font-semibold mb-4">{FAVORITES_LABELS.properties}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {favorites.properties.map((propertyId) => (
-              <FavoritePropertyItem key={propertyId} id={propertyId} />
-            ))}
+      {shouldShowEmptyMessage ? (
+        <div className={`space-y-6 ${className}`}>
+          <div className="text-center py-12">
+            <p className="text-text-muted">{emptyMessage}</p>
+            {activeTab === 'all' && (
+              <p className="text-sm text-text-secondary mt-2">{FAVORITES_LABELS.emptyStateDescription}</p>
+            )}
           </div>
         </div>
-      )}
+      ) : (
+        <div className={`space-y-6 ${className}`}>
+          {showPropertiesSection && hasProperties && (
+            <section>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="text-lg font-semibold text-text-primary">{FAVORITES_LABELS.properties}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {favorites.properties.map((propertyId) => (
+                  <FavoritePropertyItem key={propertyId} id={propertyId} />
+                ))}
+              </div>
+            </section>
+          )}
 
-      {hasProfiles && (
-        <div>
-          <h2 className="text-lg font-semibold mb-4">{FAVORITES_LABELS.users}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {favorites.profiles.map((profileId) => (
-              <FavoriteUserItem key={profileId} id={profileId} />
-            ))}
-          </div>
+          {showProfilesSection && hasProfiles && (
+            <section>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h2 className="text-lg font-semibold text-text-primary">{FAVORITES_LABELS.users}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {favorites.profiles.map((profileId) => (
+                  <FavoriteUserItem key={profileId} id={profileId} />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </div>

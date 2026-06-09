@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { FAVORITES_TABLE, SUPABASE_ERROR_CODES, FAVORITES_CONSOLE_MESSAGES } from '../constants/favorites.constants'
-import type { FavoriteType } from '../constants/favorites.constants'
+import type { FavoriteType, ToggleFavoriteResponse, UserFavorites } from '../types/favorites.types'
 
 /**
  * Check if a property is favorited by the current user
@@ -51,7 +51,7 @@ export async function isProfileFavorited(profileId: string): Promise<boolean> {
 /**
  * Add or remove a property from favorites
  */
-export async function togglePropertyFavorite(propertyId: string): Promise<{ success: boolean; isFavorited: boolean }> {
+export async function togglePropertyFavorite(propertyId: string): Promise<ToggleFavoriteResponse> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -95,7 +95,7 @@ export async function togglePropertyFavorite(propertyId: string): Promise<{ succ
 /**
  * Add or remove a profile from favorites
  */
-export async function toggleProfileFavorite(profileId: string): Promise<{ success: boolean; isFavorited: boolean }> {
+export async function toggleProfileFavorite(profileId: string): Promise<ToggleFavoriteResponse> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
@@ -139,10 +139,7 @@ export async function toggleProfileFavorite(profileId: string): Promise<{ succes
 /**
  * Get all favorites for the current user
  */
-export async function getUserFavorites(): Promise<{
-  properties: string[]
-  profiles: string[]
-}> {
+export async function getUserFavorites(): Promise<UserFavorites> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {

@@ -7,6 +7,7 @@ import { UserStatsCard } from '@/features/users/components/user-stats-card'
 import { UserBudgetCard } from '@/features/users/components/user-budget-card'
 import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-card'
 import { UserLocationCard } from '@/features/users/components/user-location-card'
+import { ProfileReviewsSection } from '@/features/reviews'
 import { MapProvider } from '@/features/search/providers/map-provider'
 
 import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
@@ -82,6 +83,8 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           <UserLifestylesCard user={user} />
           <UserLocationCard user={user} />
         </div>
+
+        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { UserDetail } from '@/features/search/types/domain.types'
+import { getUserDetail } from '@/features/users/lib/supabase-users'
 
 export interface UseUserResult {
     data: UserDetail | null
@@ -19,30 +20,25 @@ export function useUser(id: string) {
             return
         }
 
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const functionUrl = `${supabaseUrl}/functions/v1/user-detail`
-
         async function fetchUser() {
             setIsLoading(true)
             setError(null)
 
-            const response = await fetch(`${functionUrl}?id=${id}`, {
-                headers: {
-                    apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
-                },
-            })
+            try {
+                const result = await getUserDetail(id)
 
-            if (!response.ok) {
-                setError(new Error(`HTTP ${response.status}`))
+                if (!result) {
+                    setError(new Error('Usuario no encontrado'))
+                    setData(null)
+                } else {
+                    setData(result)
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Error al cargar el usuario'))
                 setData(null)
+            } finally {
                 setIsLoading(false)
-                return
             }
-
-            const result = await response.json()
-            setData(result)
-            setIsLoading(false)
         }
 
         fetchUser()
