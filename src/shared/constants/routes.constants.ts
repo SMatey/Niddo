@@ -10,6 +10,7 @@ export const ROUTES = {
   FAVORITES: '/favoritos',
   MY_PUBLICATIONS: '/mis-publicaciones',
   MESSAGES: '/mensajes',
+  NOTIFICATIONS: '/notificaciones',
   SETTINGS: '/configuracion',
   PROFILE: '/perfil',
 } as const

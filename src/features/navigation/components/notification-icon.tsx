@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
+import { ROUTES } from '@/shared/constants/routes.constants'
 import type { NotificationIconProps } from '../interface/navbar.types'
 
-export function NotificationIcon({ unreadCount, href = '/notificaciones' }: NotificationIconProps) {
+export function NotificationIcon({ unreadCount, href = ROUTES.NOTIFICATIONS }: NotificationIconProps) {
   return (
     <Link href={href} className="relative text-gray-700 hover:text-gray-900 transition-colors">
       <Bell className="w-6 h-6" />
