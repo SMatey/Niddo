@@ -24,6 +24,7 @@ export function UserCard({
     minBudget,
     maxBudget,
     confidenceScore,
+    matchScore,
     lifestyles = [],
     matchScore,
     className,
