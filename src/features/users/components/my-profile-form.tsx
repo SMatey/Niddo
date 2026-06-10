@@ -133,6 +133,75 @@ export function MyProfileForm() {
     }
   }
 
+  const onOpenUpload = () => {
+    setSelectedFile(null)
+    setPreviewUrl(null)
+    setIsUploadOpen(true)
+  }
+
+  const onCloseUpload = () => {
+    setIsUploadOpen(false)
+  }
+
+  const onSelectDocumentFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      setSelectedFile(null)
+      setPreviewUrl(null)
+      return
+    }
+
+    if (!PROFILE_FORM.ID_DOCUMENT.ACCEPTED_TYPES.includes(file.type as (typeof PROFILE_FORM.ID_DOCUMENT.ACCEPTED_TYPES)[number])) {
+      setStatus({ type: 'error', message: PROFILE_FORM.ID_DOCUMENT.VALIDATION.FILE_TYPE })
+      return
+    }
+
+    const maxSize = 5 * 1024 * 1024
+    if (file.size > PROFILE_FORM.ID_DOCUMENT.MAX_SIZE_BYTES) {
+      setStatus({ type: 'error', message: PROFILE_FORM.ID_DOCUMENT.VALIDATION.FILE_SIZE })
+      return
+    }
+
+    setSelectedFile(file)
+
+    if (file.type.startsWith('image/')) {
+      try {
+        const dataUrl = await fileToDataUrl(file)
+        setPreviewUrl(dataUrl)
+      } catch {
+        setPreviewUrl(null)
+      }
+    } else {
+      setPreviewUrl(null)
+    }
+  }
+
+  async function encryptFileAndUpload(file: File, userId: string) {
+    const subtle = window.crypto.subtle
+    const key = await subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt'])
+    const rawKey = await subtle.exportKey('raw', key)
+    const rawKeyB64 = btoa(String.fromCharCode(...new Uint8Array(rawKey)))
+
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const fileArrayBuffer = await file.arrayBuffer()
+    const encryptedBuffer = await subtle.encrypt({ name: 'AES-GCM', iv }, key, fileArrayBuffer)
+
+    const encryptedBlob = new Blob([encryptedBuffer], { type: file.type })
+
+    const fileExt = 'enc'
+    const fileName = `${userId}/${crypto.randomUUID()}.${fileExt}`
+
+    const supabase = createClient()
+    const { error: uploadError } = await supabase.storage.from('identity_documents').upload(fileName, encryptedBlob, { upsert: true })
+    if (uploadError) throw uploadError
+
+    return {
+      path: fileName,
+      key_b64: rawKeyB64,
+      file_iv_b64: btoa(String.fromCharCode(...iv)),
+    }
+  }
 
   const onOpenUpload = () => setIsUploadOpen(true)
   const onCloseUpload = () => {

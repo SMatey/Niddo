@@ -1,10 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
 import { getReviewReportModerationStatus } from '@/features/reviews/lib/supabase-review-reports'
-import type { ReviewReportTargetType } from '@/features/reviews/types/report-form.types'
-import type { UseReviewReportModerationResult } from '@/features/reviews/types/review-hook.types'
+import type {
+  ReviewReportModerationStatus,
+  ReviewReportTargetType,
+} from '@/features/reviews/types/report-form.types'
+
+interface UseReviewReportModerationResult {
+  moderationStatus: ReviewReportModerationStatus | null
+  isLoading: boolean
+  error: string | null
+}
 
 export function useReviewReportModeration(
   targetType: ReviewReportTargetType,

@@ -5,17 +5,9 @@ export const REVIEW_TARGET_TYPES = {
   PROPERTY: 'property',
 } as const
 
-const REVIEW_FORM_PATH_SEGMENT = 'resena'
-
 export const buildProfileDetailPath = (profileId: string) => `/usuario/${profileId}`
 
 export const buildPropertyDetailPath = (propertyId: string) => `/propiedad/${propertyId}`
-
-export const buildProfileReviewPath = (profileId: string) =>
-  `${buildProfileDetailPath(profileId)}/${REVIEW_FORM_PATH_SEGMENT}`
-
-export const buildPropertyReviewPath = (propertyId: string) =>
-  `${buildPropertyDetailPath(propertyId)}/${REVIEW_FORM_PATH_SEGMENT}`
 
 export const REVIEW_FORM = {
   IDENTIFIERS: {
@@ -109,11 +101,3 @@ export const REVIEW_FORM = {
 } as const
 
 export const getReviewTargetCopy = (targetType: ReviewTargetType) => REVIEW_FORM.TARGET_COPY[targetType]
-
-const REVIEW_FORM_PATH_BUILDERS: Record<ReviewTargetType, (targetId: string) => string> = {
-  profile: buildProfileReviewPath,
-  property: buildPropertyReviewPath,
-}
-
-export const buildReviewFormPath = (targetType: ReviewTargetType, targetId: string) =>
-  REVIEW_FORM_PATH_BUILDERS[targetType](targetId)

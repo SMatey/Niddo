@@ -3,15 +3,18 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useUser } from '@/features/userprofile/hooks/use-user'
 import { UserProfileHeader } from '@/features/userprofile/components/user-profile-header'
-
 import { USER_DETAIL_LABELS } from '@/features/userprofile/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
-import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
 import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
+import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
+import { UserLifestylesCard } from '@/features/userprofile/components/user-lifestyles-card'
+import { UserStatsCard } from '@/features/userprofile/components/user-stats-card'
+import { UserBudgetCard } from '@/features/userprofile/components/user-budget-card'
+import { ProfileReviewsSection } from '@/features/reviews/profile-reviews/components/profile-reviews-section'
 
 function UserDetailLoadingState() {
   return (
@@ -74,6 +77,14 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           user={user}
           reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
         />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UserStatsCard user={user} />
+          <UserBudgetCard user={user} />
+          <UserLifestylesCard user={user} />
+        </div>
+
+        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )

@@ -16,7 +16,6 @@ import { PropertyGallery } from '@/features/properties/components/property-galle
 import { PropertyTitle } from '@/features/properties/components/property-title'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
-import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
@@ -82,10 +81,6 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
           favoriteButton={<FavoritePropertyButton propertyId={id} />}
           onBack={onBack}
         />
-
-        <div className="flex justify-end">
-          <ReviewEntryButton className="w-full sm:w-auto" targetId={id} targetType="property" />
-        </div>
 
         <PropertyGallery images={property.images} title={property.title} />
         <PropertyTitle title={property.title} location={property.location} />
