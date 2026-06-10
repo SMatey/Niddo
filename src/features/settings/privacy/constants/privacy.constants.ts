@@ -2,11 +2,6 @@ import type { PrivacyOption } from '../types/privacy.types'
 
 export const PRIVACY_OPTIONS: PrivacyOption[] = [
   {
-    id: 'showPhone',
-    label: 'Mostrar teléfono',
-    description: 'Permite que otros usuarios vean tu numero',
-  },
-  {
     id: 'showEmail',
     label: 'Mostrar email',
     description: 'Permite que otros usuarios vean tu correo',

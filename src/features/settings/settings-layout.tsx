@@ -7,7 +7,6 @@ import { EditProfileSection } from './components/edit-profile-section'
 import { VerificationSection } from './components/verification-section'
 import { PrivacySection } from './privacy'
 import { PreferenceSection } from './components/preference-section'
-import { PrivacySection } from './components/privacy-section'
 import { SETTINGS_CONFIG } from './constants/settings.constants'
 
 export function SettingsLayout() {
