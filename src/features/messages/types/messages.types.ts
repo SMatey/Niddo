@@ -1,3 +1,5 @@
+import { MESSAGE_TYPES } from '../constants/messages.constants';
+
 export type MessageType = 'text' | 'image';
 
 export interface ProfileSnippet {
@@ -47,4 +49,11 @@ export interface UseMessagesResult {
   error: Error | null;
   sendMessage: (content: string, type?: MessageType) => Promise<void>;
   markAsRead: () => Promise<void>;
+}
+
+export interface SendMessagePayload {
+  conversationId: string;
+  receiverId: string;
+  content: string;
+  type?: typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
 }
