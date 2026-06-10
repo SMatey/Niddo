@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { ExplorarProvider, useExplorarContext } from '@/features/search/context/explorar.context'
 import { ExplorarUIProvider, useExplorarUIContext } from '@/features/search/context/explorar-ui.context'
@@ -13,7 +13,10 @@ import { MobileFiltersDrawer } from '@/features/search/components/mobile-filters
 import { useProperties } from '@/features/properties/hooks/use-properties'
 import { useUsers } from '@/features/users/hooks/use-users'
 import { useAuth } from '@/features/auth/hooks/use-auth'
+import { useRoomiePreferences } from '@/features/users/hooks/use-roomie-preferences'
 import { VIEW_MODES, CONTENT_MODES } from '@/features/search/constants/search.constants'
+import { toTagIds, sortByMatchScoreDesc } from '@/features/search/utils/match-score'
+import type { UserListItem } from '@/features/search/components/list-view.types'
 import { SupabasePropertyRepository } from '@/features/properties/repositories/supabase-property.repository'
 import { SupabaseUserRepository } from '@/features/users/repositories/supabase-user.repository'
 
@@ -25,7 +28,7 @@ const propertyRepository = new SupabasePropertyRepository(baseUrl, apiKey)
 const userRepository = new SupabaseUserRepository(baseUrl, apiKey)
 
 function ExplorarPageContent() {
-  const { user } = useAuth()
+  const { user, isInitialized: isAuthInitialized } = useAuth()
   const {
     filters,
     setFilters,
@@ -43,6 +46,8 @@ function ExplorarPageContent() {
     setContentMode,
     handleViewModeChange,
   } = useExplorarUIContext()
+
+  const { getMatchScore, isLoading: isPreferencesLoading, preferences } = useRoomiePreferences(user?.id ?? '')
 
   const searchParams = useSearchParams()
   const searchParamsKey = searchParams.toString()
@@ -90,11 +95,26 @@ function ExplorarPageContent() {
     [CONTENT_MODES.USERS]: usersResult,
   }
   const currentResult = resultConfig[contentMode]
-  const isLoading = currentResult.isLoading
+
+  const sortedUsers = useMemo<UserListItem[]>(() => {
+    if (contentMode !== CONTENT_MODES.USERS) return []
+    if (preferences === null) return []
+    const items = (usersResult.data ?? []).map((item) => ({
+      ...item,
+      matchScore: getMatchScore(toTagIds(item.lifestyles ?? [])),
+    }))
+    return items.sort(sortByMatchScoreDesc)
+  }, [contentMode, usersResult.data, getMatchScore, preferences])
+
+  const preferencesNotReady =
+    contentMode === CONTENT_MODES.USERS && (preferences === null || isPreferencesLoading)
+
+  const isLoading =
+    !isAuthInitialized || currentResult.isLoading || preferencesNotReady
 
   const dataByMode = {
     [CONTENT_MODES.PROPERTIES]: propertiesResult.data,
-    [CONTENT_MODES.USERS]: usersResult.data,
+    [CONTENT_MODES.USERS]: sortedUsers,
   }
   const properties = dataByMode[CONTENT_MODES.PROPERTIES] ?? []
   const users = dataByMode[CONTENT_MODES.USERS] ?? []
@@ -154,13 +174,13 @@ export default function ExplorarPage() {
       userRepository={userRepository}
     >
       <ExplorarProvider>
-        <ExplorarUIProvider>
-          <MapProvider>
-            <Suspense fallback={<div className="min-h-screen bg-surface-subtle" />}>
+        <Suspense fallback={<div className="min-h-screen bg-surface-subtle" />}>
+          <ExplorarUIProvider>
+            <MapProvider>
               <ExplorarPageContent />
-            </Suspense>
-          </MapProvider>
-        </ExplorarUIProvider>
+            </MapProvider>
+          </ExplorarUIProvider>
+        </Suspense>
       </ExplorarProvider>
     </SearchServiceProvider>
   )

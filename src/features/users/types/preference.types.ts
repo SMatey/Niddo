@@ -4,7 +4,7 @@ import type {
 } from '@/features/search/types/preference.types'
 
 export interface UseRoomiePreferencesResult {
-  preferences: UserLifestylePreference[]
+  preferences: UserLifestylePreference[] | null
   setImportance: (tagId: string, importance: ImportanceLevel) => void
   resetPreferences: () => void
   isDirty: boolean

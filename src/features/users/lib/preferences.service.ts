@@ -1,27 +1,16 @@
 import { createClient } from '@/lib/supabase/client'
-
-// --- Types (mirrored from frontend for backend independence) ---
-
-export const IMPORTANCE_LEVELS = {
-  MUST_HAVE: 'must-have',
-  IMPORTANT: 'important',
-  NICE_TO_HAVE: 'nice-to-have',
-  INDIFFERENT: 'indifferent',
-} as const
-
-export type ImportanceLevel =
-  typeof IMPORTANCE_LEVELS[keyof typeof IMPORTANCE_LEVELS]
-
-export interface UserLifestylePreference {
-  tagId: string
-  importance: ImportanceLevel
-}
+import {
+  type UserLifestylePreference,
+  type ImportanceLevel,
+  IMPORTANCE_LEVELS,
+} from '@/features/search/types/preference.types'
 
 // --- Service ---
 
 interface UserPreferencesResponse {
-  data: UserLifestylePreference[]
+  data: UserLifestylePreference[] | null
   error: string | null
+  isEmpty: boolean
 }
 
 interface SavePreferencesResult {
@@ -39,15 +28,20 @@ export async function getUserPreferences(
     .eq('profile_id', profileId)
 
   if (error) {
-    return { data: [], error: error.message }
+    return { data: null, error: error.message, isEmpty: false }
   }
 
-  const preferences: UserLifestylePreference[] = (data ?? []).map((row) => ({
+  const rows = data ?? []
+  if (rows.length === 0) {
+    return { data: null, error: null, isEmpty: true }
+  }
+
+  const preferences: UserLifestylePreference[] = rows.map((row) => ({
     tagId: row.tag_id,
-    importance: (row.importance as ImportanceLevel) ?? 'important',
+    importance: (row.importance as ImportanceLevel) ?? IMPORTANCE_LEVELS.IMPORTANT,
   }))
 
-  return { data: preferences, error: null }
+  return { data: preferences, error: null, isEmpty: false }
 }
 
 export async function saveUserPreferences(
@@ -56,28 +50,39 @@ export async function saveUserPreferences(
 ): Promise<SavePreferencesResult> {
   const supabase = createClient()
 
+  if (preferences.length === 0) {
+    // Si no hay preferencias, eliminar todas las del usuario
+    const { error: deleteError } = await supabase
+      .from('profile_lifestyle_tags')
+      .delete()
+      .eq('profile_id', profileId)
+
+    return { error: deleteError?.message ?? null }
+  }
+
+  const currentTagIds = preferences.map((p) => p.tagId)
+
+  // 1. Eliminar preferencias que ya no están seleccionadas (huérfanas)
   const { error: deleteError } = await supabase
     .from('profile_lifestyle_tags')
     .delete()
     .eq('profile_id', profileId)
+    .not('tag_id', 'in', `(${currentTagIds.join(',')})`)
 
   if (deleteError) {
     return { error: deleteError.message }
   }
 
-  if (preferences.length === 0) {
-    return { error: null }
-  }
-
+  // 2. Realizar upsert de las preferencias actuales (nuevas o actualizadas)
   const payload = preferences.map((p) => ({
     profile_id: profileId,
     tag_id: p.tagId,
     importance: p.importance,
   }))
 
-  const { error: insertError } = await supabase
+  const { error: upsertError } = await supabase
     .from('profile_lifestyle_tags')
-    .insert(payload)
+    .upsert(payload, { onConflict: 'profile_id,tag_id' })
 
-  return { error: insertError?.message ?? null }
+  return { error: upsertError?.message ?? null }
 }

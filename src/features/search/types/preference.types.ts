@@ -1,4 +1,5 @@
 import type { LifestyleCategory } from '../constants/search.constants'
+import { MATCH_SCORE_THRESHOLDS } from '../constants/match-score.constants'
 
 // --- Importance Levels ---
 export const IMPORTANCE_LEVELS = {
@@ -35,14 +36,6 @@ export interface UserLifestylePreference {
 export interface UserWithMatchScore {
   matchScore: number
 }
-
-// --- Match Score Ranges (for UI colors) ---
-export const MATCH_SCORE_THRESHOLDS = {
-  EXCELLENT: { min: 80, max: 100 },
-  GOOD: { min: 60, max: 79 },
-  FAIR: { min: 40, max: 59 },
-  POOR: { min: 0, max: 39 },
-} as const
 
 export type MatchScoreLevel = 'excellent' | 'good' | 'fair' | 'poor'
 

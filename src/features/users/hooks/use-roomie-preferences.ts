@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { UseRoomiePreferencesResult } from '../types/preference.types'
-import type {
-  UserLifestylePreference,
-  ImportanceLevel,
+import {
+  IMPORTANCE_LEVELS,
+  type UserLifestylePreference,
+  type ImportanceLevel,
 } from '@/features/search/types/preference.types'
 import { LIFESTYLE_TAGS } from '@/features/search/constants/search.constants'
 import { calculateMatchScore } from '@/features/search/utils/match-score'
 import { getUserPreferences, saveUserPreferences } from '../lib/preferences.service'
 
-const DEFAULT_IMPORTANCE: ImportanceLevel = 'important'
+const DEFAULT_IMPORTANCE: ImportanceLevel = IMPORTANCE_LEVELS.IMPORTANT
 
 function createDefaultPreferences(): UserLifestylePreference[] {
   return LIFESTYLE_TAGS.map((tag) => ({
@@ -18,9 +19,7 @@ function createDefaultPreferences(): UserLifestylePreference[] {
 }
 
 export function useRoomiePreferences(profileId: string): UseRoomiePreferencesResult {
-  const [preferences, setPreferences] = useState<UserLifestylePreference[]>(
-    createDefaultPreferences
-  )
+  const [preferences, setPreferences] = useState<UserLifestylePreference[] | null>(null)
   const [isDirty, setIsDirty] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,36 +27,49 @@ export function useRoomiePreferences(profileId: string): UseRoomiePreferencesRes
   useEffect(() => {
     if (!profileId) {
       setIsLoading(false)
+      setPreferences(null)
       return
     }
 
+    let cancelled = false
+    setIsLoading(true)
+
     async function loadPreferences() {
       try {
-        const { data, error: fetchError } = await getUserPreferences(profileId)
+        const { data, error: fetchError, isEmpty } = await getUserPreferences(profileId)
+        if (cancelled) return
 
         if (fetchError) {
           console.error('[useRoomiePreferences] Failed to load preferences:', fetchError)
           setError(fetchError)
           setPreferences(createDefaultPreferences())
-        } else if (data && data.length > 0) {
-          setPreferences(data)
+        } else if (isEmpty) {
+          setPreferences(null)
+        } else {
+          setPreferences(data as UserLifestylePreference[])
         }
       } catch (err) {
+        if (cancelled) return
         console.error('[useRoomiePreferences] Unexpected error:', err)
         setError('Error loading preferences')
         setPreferences(createDefaultPreferences())
       } finally {
-        setIsLoading(false)
+        if (!cancelled) setIsLoading(false)
       }
     }
 
     loadPreferences()
+
+    return () => {
+      cancelled = true
+    }
   }, [profileId])
 
   const setImportance = useCallback(
     (tagId: string, importance: ImportanceLevel) => {
       setPreferences((prev) => {
-        const updated = prev.map((p) =>
+        const base = prev ?? createDefaultPreferences()
+        const updated = base.map((p) =>
           p.tagId === tagId ? { ...p, importance } : p
         )
         return updated
@@ -75,6 +87,7 @@ export function useRoomiePreferences(profileId: string): UseRoomiePreferencesRes
 
   const getMatchScore = useCallback(
     (roomieLifestyleIds: string[]): number => {
+      if (preferences === null) return 0
       return calculateMatchScore(preferences, roomieLifestyleIds)
     },
     [preferences]
@@ -83,6 +96,11 @@ export function useRoomiePreferences(profileId: string): UseRoomiePreferencesRes
   const save = useCallback(async (): Promise<void> => {
     if (!profileId) {
       console.error('[useRoomiePreferences] Cannot save: no profileId')
+      return
+    }
+
+    if (preferences === null) {
+      console.error('[useRoomiePreferences] Cannot save: preferences not loaded')
       return
     }
 

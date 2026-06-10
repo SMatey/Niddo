@@ -162,6 +162,10 @@ Deno.serve(async (req) => {
         .select('*', { count: 'exact' })
         .in('id', matchedProfileIds)
 
+      if (profileId) {
+        profilesQuery = profilesQuery.neq('id', profileId)
+      }
+
       if (location) {
         profilesQuery = profilesQuery.ilike('location', `%${location}%`)
       }
@@ -240,6 +244,10 @@ Deno.serve(async (req) => {
     let profilesQuery = supabase
       .from('profiles')
       .select('*', { count: 'exact' })
+
+    if (profileId) {
+      profilesQuery = profilesQuery.neq('id', profileId)
+    }
 
     if (location) {
       profilesQuery = profilesQuery.ilike('location', `%${location}%`)

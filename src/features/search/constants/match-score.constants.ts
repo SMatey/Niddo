@@ -3,6 +3,15 @@ export const MATCH_SCORE_LABELS = {
   COMPATIBLE: 'Match',
 } as const
 
+export const MATCH_SCORE_THRESHOLDS = {
+  EXCELLENT: { min: 80, max: 100 },
+  GOOD: { min: 60, max: 79 },
+  FAIR: { min: 40, max: 59 },
+  POOR: { min: 0, max: 39 },
+} as const
+
+export const MATCH_SCORE_FALLBACK = 0
+
 export const MATCH_SCORE_CLASSES = {
   excellent: {
     bg: 'bg-state-success/10',
