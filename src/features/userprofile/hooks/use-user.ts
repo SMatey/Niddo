@@ -2,12 +2,6 @@ import { useState, useEffect } from 'react'
 import type { UserDetail } from '@/features/search/types/domain.types'
 import { getUserDetail } from '@/features/users/lib/supabase-users'
 
-export interface UseUserResult {
-    data: UserDetail | null
-    isLoading: boolean
-    error: Error | null
-}
-
 export function useUser(id: string) {
     const [data, setData] = useState<UserDetail | null>(null)
     const [isLoading, setIsLoading] = useState(true)
