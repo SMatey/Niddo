@@ -25,7 +25,7 @@ export function PreferenceSection() {
 
       {!isLoading && !error && (
         <>
-          <LifestylePrioritySelector values={preferences ?? []} onChange={setImportance} />
+          <LifestylePrioritySelector values={preferences} onChange={setImportance} />
 
           <div className="flex gap-3 mt-6 pt-6 border-t border-border">
             <Button onClick={save} disabled={!isDirty}>
