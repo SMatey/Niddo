@@ -10,6 +10,7 @@ export interface ProfileSnippet {
   status?: 'online' | 'offline';
 }
 
+// Interfaz original en camelCase (así tus otros componentes no se rompen)
 export interface Message {
   id: string;
   conversationId: string;
@@ -55,5 +56,5 @@ export interface SendMessagePayload {
   conversationId: string;
   receiverId: string;
   content: string;
-  type?: typeof MESSAGE_TYPES[keyof typeof MESSAGE_TYPES];
+  type?: MessageType;
 }

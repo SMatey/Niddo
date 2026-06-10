@@ -1,11 +1,21 @@
 import { createClient } from '@/lib/supabase/client';
 import { MESSAGES_DB, MESSAGES_ERRORS, MESSAGE_TYPES } from '../constants/messages.constants';
-import { SendMessagePayload } from '../types/messages.types'
+import type { SendMessagePayload, Message } from '../types/messages.types';
 
-export async function sendMessage(payload: SendMessagePayload) {
+const mapSupabaseMessage = (row: any): Message => ({
+  id: row.id,
+  conversationId: row.conversation_id,
+  senderId: row.sender_id,
+  receiverId: row.receiver_id,
+  content: row.content,
+  read: row.read,
+  type: row.type,
+  createdAt: row.created_at,
+});
+
+export async function sendMessage(payload: SendMessagePayload): Promise<Message> {
   const supabase = createClient();
 
-  // 1. Verificación de seguridad local
   const { data: { session }, error: authError } = await supabase.auth.getSession();
 
   if (authError || !session) {
@@ -16,7 +26,6 @@ export async function sendMessage(payload: SendMessagePayload) {
     throw new Error(MESSAGES_ERRORS.MISSING_FIELDS);
   }
 
-  // 2. Inserción directa en la base de datos
   const { data, error } = await supabase
     .from(MESSAGES_DB.TABLE)
     .insert({
@@ -34,5 +43,5 @@ export async function sendMessage(payload: SendMessagePayload) {
     throw new Error(MESSAGES_ERRORS.SEND_FAILED);
   }
 
-  return data;
+  return mapSupabaseMessage(data);
 }
