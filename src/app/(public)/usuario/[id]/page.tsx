@@ -1,10 +1,10 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useUser } from '@/features/users/hooks/use-user'
-import { UserProfileHeader } from '@/features/users/components/user-profile-header'
+import { useUser } from '@/features/userprofile/hooks/use-user'
+import { UserProfileHeader } from '@/features/userprofile/components/user-profile-header'
 
-import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
+import { USER_DETAIL_LABELS } from '@/features/userprofile/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
 import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'

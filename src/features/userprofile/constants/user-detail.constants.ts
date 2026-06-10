@@ -17,4 +17,5 @@ export const USER_DETAIL_LABELS = {
     reviews: 'Reseñas',
     email: 'Correo',
     phone: 'Teléfono',
+    emptyReviews: 'Este usuario aún no tiene reseñas',
 } as const

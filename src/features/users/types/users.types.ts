@@ -19,6 +19,4 @@ export interface UseUsersResult {
     error: Error | null
 }
 
-export interface UserLocationCardProps {
-    user: UserDetail
-}
+

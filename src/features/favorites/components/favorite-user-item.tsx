@@ -1,7 +1,7 @@
 'use client'
 
 import { UserCard } from '@/shared/components/ui/user-card'
-import { useUser } from '@/features/users/hooks/use-user'
+import { useUser } from '@/features/userprofile/hooks/use-user'
 
 interface FavoriteUserItemProps {
   id: string
