@@ -10,10 +10,6 @@ import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-r
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
 import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
-import { ReviewEntryButton } from '@/features/reviews/components/review-entry-button'
-import { UserLifestylesCard } from '@/features/userprofile/components/user-lifestyles-card'
-import { UserStatsCard } from '@/features/userprofile/components/user-stats-card'
-import { UserBudgetCard } from '@/features/userprofile/components/user-budget-card'
 import { ProfileReviewsSection } from '@/features/reviews/profile-reviews/components/profile-reviews-section'
 
 function UserDetailLoadingState() {
@@ -49,6 +45,7 @@ function UserModerationErrorState({ onBack }: { onBack: () => void }) {
 
 function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
   const { data: user, isLoading } = useUser(id)
+  console.log("Datos del usuario:", user)
 
   if (isLoading) {
     return <UserDetailLoadingState />
@@ -73,18 +70,12 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           onBack={onBack}
         />
 
-        <UserProfileHeader
-          user={user}
-          reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
+        {/* Le inyectamos el componente de reseñas directamente al Header */}
+        <UserProfileHeader 
+          user={user} 
+          reviewsSection={<ProfileReviewsSection profileId={id} />}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UserStatsCard user={user} />
-          <UserBudgetCard user={user} />
-          <UserLifestylesCard user={user} />
-        </div>
-
-        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )

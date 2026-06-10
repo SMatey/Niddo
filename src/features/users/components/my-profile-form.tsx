@@ -141,6 +141,8 @@ export function MyProfileForm() {
 
   const onCloseUpload = () => {
     setIsUploadOpen(false)
+    setSelectedFile(null)
+    setPreviewUrl(null)
   }
 
   const onSelectDocumentFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -201,13 +203,6 @@ export function MyProfileForm() {
       key_b64: rawKeyB64,
       file_iv_b64: btoa(String.fromCharCode(...iv)),
     }
-  }
-
-  const onOpenUpload = () => setIsUploadOpen(true)
-  const onCloseUpload = () => {
-    setIsUploadOpen(false)
-    setSelectedFile(null)
-    setPreviewUrl(null)
   }
 
   const onSubmit = async (values: ProfileFormSchemaValues) => {
