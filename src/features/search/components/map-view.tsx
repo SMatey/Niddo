@@ -5,7 +5,7 @@ import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api'
 import type { PropertyItem, UserItem, ContentMode, Point, MapBounds } from '../types/domain.types'
 import type { MapViewProps } from '../types/ui.types'
 import { MapInfoWindow } from './map-info-window'
-import { MAP_CONFIG, MAP_LABELS, CONTENT_MODES } from '../constants/search.constants'
+import { MAP_CONFIG, MAP_LABELS, CONTENT_MODES, MAP_VIEW_CONFIG } from '../constants/search.constants'
 import { toPoints } from '../utils/map.utils'
 import { MapLoadingState, useMap } from '@/features/search/providers/map-provider'
 
@@ -35,14 +35,14 @@ export function MapView({
 
     const center = useMemo(() => {
         if (isDetailView && points.length === 1) {
-            return { lat: points[0].lat - 0.0055, lng: points[0].lng }
+            return { lat: points[0].lat - MAP_VIEW_CONFIG.SINGLE_POINT_LAT_OFFSET, lng: points[0].lng }
         }
         return MAP_CONFIG.defaultCenter
     }, [points, isDetailView])
 
     const zoom = useMemo(() => {
         if (isDetailView && points.length === 1) {
-            return 15
+            return MAP_VIEW_CONFIG.DETAIL_VIEW_ZOOM
         }
         return MAP_CONFIG.defaultZoom
     }, [points, isDetailView])
