@@ -50,7 +50,6 @@ export const publicationSchema = z
     bathrooms: parseNullableNumber,
     squareMeters: parseNullableNumber,
     availableFrom: z.string().min(1, PROPERTY_PUBLICATION_LABELS.validation.availableFromRequired),
-    availableTo: z.string().min(1, PROPERTY_PUBLICATION_LABELS.validation.availableToRequired),
     latitude: z
       .preprocess((value) => {
         if (typeof value === 'string') {
@@ -79,10 +78,6 @@ export const publicationSchema = z
       }, z.number().min(-180).max(180).nullable()),
     amenities: z.array(z.string().min(1)).max(15),
     rules: z.array(z.string().min(1)).max(15),
-  })
-  .refine((values) => values.availableTo >= values.availableFrom, {
-    path: ['availableTo'],
-    message: PUBLICATION_VALIDATION_MESSAGES.dateRange,
   })
   .refine((values) => values.latitude !== null && values.longitude !== null, {
     path: ['location'],

@@ -94,7 +94,7 @@ export function PropertyImageUploader({
                 </span>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/10"
+                  className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/10 cursor-pointer"
                   onClick={(event) => {
                     event.preventDefault()
                     onRemoveImage(index)
