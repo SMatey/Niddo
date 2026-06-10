@@ -2,13 +2,12 @@
 
 import { UserBasicInfoCard } from './user-basic-info-card'
 import { UserBioCard } from './user-bio-card'
-import { UserReviewsCard } from './user-reviews-card'
 import { UserStatsCard } from './user-stats-card'
 import { UserBudgetCard } from './user-budget-card'
 import { UserLifestylesCard } from './user-lifestyles-card'
 import type { UserProfileHeaderProps } from '../types/user-profile.types'
 
-export function UserProfileHeader({ user, reviewButton }: UserProfileHeaderProps) {
+export function UserProfileHeader({ user, reviewsSection }: UserProfileHeaderProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       
@@ -30,8 +29,7 @@ export function UserProfileHeader({ user, reviewButton }: UserProfileHeaderProps
         )}
 
         <UserStatsCard user={user} />
-
-        <UserReviewsCard reviewButton={reviewButton} />
+        {reviewsSection}
       </div>
       
     </div>

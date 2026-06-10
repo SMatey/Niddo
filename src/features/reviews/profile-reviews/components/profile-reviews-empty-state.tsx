@@ -19,7 +19,6 @@ export function ProfileReviewsEmptyState({ profileId }: ProfileReviewsEmptyState
         <p className="text-sm leading-6 text-text-secondary">{PROFILE_REVIEWS_COPY.STATES.EMPTY_DESCRIPTION}</p>
       </div>
 
-      <ReviewEntryButton targetType="profile" targetId={profileId} />
     </div>
   )
 }

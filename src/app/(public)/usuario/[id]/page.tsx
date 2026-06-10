@@ -71,12 +71,12 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           onBack={onBack}
         />
 
-        <UserProfileHeader
-          user={user}
-          reviewButton={<ReviewEntryButton className="w-full" targetId={id} targetType="profile" />}
+        {/* Le inyectamos el componente de reseñas directamente al Header */}
+        <UserProfileHeader 
+          user={user} 
+          reviewsSection={<ProfileReviewsSection profileId={id} />}
         />
 
-        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )

@@ -27,5 +27,5 @@ export interface UserLifestylesCardProps {
 
 export interface UserProfileHeaderProps {
   user: UserDetail
-  reviewButton?: ReactNode
+  reviewsSection?: ReactNode
 }

@@ -103,7 +103,7 @@ export async function getUserDetail(profileId: string): Promise<UserDetail | nul
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select(
-      'id, name, age, bio, location, avatar, is_verified, budget_min, budget_max, trust_score, latitude, longitude, joined_date'
+      'id, name, age, bio, location, avatar, is_verified, budget_min, budget_max, trust_score, latitude, longitude, joined_date, email'
     )
     .eq('id', profileId)
     .single()
@@ -159,5 +159,6 @@ export async function getUserDetail(profileId: string): Promise<UserDetail | nul
     lifestyles,
     description: profile.bio ?? undefined,
     memberSince: profile.joined_date,
+    email: profile.email ?? undefined,
   }
 }
