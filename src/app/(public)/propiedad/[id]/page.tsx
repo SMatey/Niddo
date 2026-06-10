@@ -1,7 +1,10 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { MapProvider } from '@/features/search/providers/map-provider'
 import { MapView } from '@/features/search/components/map-view'
+
+
 import { useProperty } from '@/features/properties/hooks/use-property'
 import { PROPERTY_DETAIL_LABELS } from '@/features/properties/constants/property-detail.constants'
 import { PropertyInfoCard } from '@/features/properties/components/property-info-card'
@@ -16,6 +19,7 @@ import { ModeratedContentState } from '@/features/reviews/components/moderated-c
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
+import { FavoritePropertyButton } from '@/features/favorites/components/favorite-button-container'
 import { CONTENT_MODES } from '@/features/search/constants/search.constants'
 
 function PropertyDetailLoadingState() {
@@ -74,7 +78,7 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
       <div className="container mx-auto px-4 py-6 max-w-5xl space-y-6">
         <DetailHeader
           isFavorite={property.isFavorite ?? false}
-          onFavoriteToggle={() => {}}
+          favoriteButton={<FavoritePropertyButton propertyId={id} />}
           onBack={onBack}
         />
 
@@ -103,6 +107,7 @@ function PropertyDetailContent({ id, onBack }: { id: string; onBack: () => void 
                 properties={[property]}
                 users={[]}
                 contentMode={CONTENT_MODES.PROPERTIES}
+                isDetailView={true}
               />
             </div>
           </div>
@@ -138,5 +143,9 @@ export default function PropertyDetailPage() {
     )
   }
 
-  return <PropertyDetailContent id={id} onBack={() => router.back()} />
+  return (
+    <MapProvider>
+      <PropertyDetailContent id={id} onBack={() => router.back()} />
+    </MapProvider>
+  )
 }

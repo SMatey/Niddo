@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Property } from '@/features/properties/types'
@@ -39,8 +41,6 @@ export function useMyProperties(pageSize = 10): UseMyPropertiesResult {
             
             try {
                 const supabase = createClient()
-                
-                // Get fresh session
                 const { data: { session } } = await supabase.auth.getSession()
                 
                 if (!session) {
@@ -49,7 +49,6 @@ export function useMyProperties(pageSize = 10): UseMyPropertiesResult {
                     return
                 }
 
-                // Edge functions using GET need query params in the URL string
                 const params = new URLSearchParams({
                     page: String(page),
                     pageSize: String(pageSize)

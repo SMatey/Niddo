@@ -1,4 +1,4 @@
-import type { FilterState } from '../types/search.types'
+import type { FilterState } from '../types/domain.types'
 
 export const CARD_LABELS = {
     noImage: 'Sin imagen',
@@ -39,20 +39,47 @@ export const RESULTS_TABS = {
     ],
 } as const
 
-export const LIFESTYLES = [
-    'Ordenado',
-    'Madrugador',
-    'Fitness',
-    'Músico',
-    'Noctámbulo',
-    'Tranquilo',
-    'Trabajo Remoto',
-    'Social',
-    'Estudiante',
-    'Vegano',
-    'Pet friendly',
-    'No fumador',
+// --- Lifestyle Tag Categories ---
+export const LIFESTYLE_CATEGORIES = {
+    HABITS: 'habits',
+    WORK: 'work',
+    SOCIAL: 'social',
+    PREFERENCES: 'preferences',
+} as const
+
+export type LifestyleCategory = typeof LIFESTYLE_CATEGORIES[keyof typeof LIFESTYLE_CATEGORIES]
+
+// --- Lifestyle Tags (from database) ---
+export const LIFESTYLE_TAGS = [
+    { id: 'early-bird', label: 'Madrugador', category: 'habits' },
+    { id: 'night-owl', label: 'Noctámbulo', category: 'habits' },
+    { id: 'clean-freak', label: 'Ordenado', category: 'habits' },
+    { id: 'gym-lover', label: 'Fitness', category: 'habits' },
+    { id: 'no-smoking', label: 'No fumador', category: 'habits' },
+    { id: 'remote-work', label: 'Trabajo Remoto', category: 'work' },
+    { id: 'student', label: 'Estudiante', category: 'work' },
+    { id: 'social', label: 'Social', category: 'social' },
+    { id: 'quiet', label: 'Tranquilo', category: 'social' },
+    { id: 'music-lover', label: 'Músico', category: 'social' },
+    { id: 'vegan', label: 'Vegano', category: 'preferences' },
+    { id: 'pet-friendly', label: 'Pet friendly', category: 'preferences' },
 ] as const
+
+// --- Lifestyle Tags Grouped by Category ---
+export const LIFESTYLES_BY_CATEGORY: Record<LifestyleCategory, readonly typeof LIFESTYLE_TAGS[number][]> = {
+    habits: LIFESTYLE_TAGS.filter((t) => t.category === 'habits'),
+    work: LIFESTYLE_TAGS.filter((t) => t.category === 'work'),
+    social: LIFESTYLE_TAGS.filter((t) => t.category === 'social'),
+    preferences: LIFESTYLE_TAGS.filter((t) => t.category === 'preferences'),
+} as const
+
+// --- Category Labels (translated) ---
+export const CATEGORY_LABELS: Record<LifestyleCategory, string> = {
+    habits: 'Hábitos',
+    work: 'Trabajo',
+    social: 'Social',
+    preferences: 'Preferencias',
+} as const
 
 export const AMENITY_TAGS = [
     'WiFi',
@@ -85,6 +112,9 @@ export const MAP_LABELS = {
     apiKeyMissing: 'Google Maps API key no configurada',
     loading: 'Cargando mapa...',
     loadError: 'Error al cargar el mapa',
+    budgetPrefix: 'Presupuesto:',
+    close: 'Cerrar',
+    viewDetails: 'Ver detalles',
     selectedUbication: 'Ubicación seleccionada: ',
 } as const
 
@@ -98,7 +128,7 @@ export const MAP_COORDINATES = {
 export const MAP_CONFIG = {
     containerStyle: {
         width: '100%',
-        height: '100%',
+        height: '500px', // Set a default fixed height to avoid 0px height issues
     },
     defaultCenter: MAP_COORDINATES.SAN_JOSE,
     defaultZoom: 12,
@@ -192,6 +222,9 @@ export const LAYOUT_CONFIG = {
 export const MAP_VIEW_CONFIG = {
     BOUNDS_DEBOUNCE_MS: 400,
     MAX_MARKERS: 100,
+    MAX_LIFESTYLES_IN_INFO_WINDOW: 2,
+    SINGLE_POINT_LAT_OFFSET: 0.0055,
+    DETAIL_VIEW_ZOOM: 15,
 } as const
 
 export const CONTENT_MODES = {
@@ -202,4 +235,21 @@ export const CONTENT_MODES = {
 export const VIEW_MODES = {
     LIST: 'list',
     MAP: 'map',
+} as const
+
+export const CONTENT_MODE_CONFIG = {
+    [CONTENT_MODES.PROPERTIES]: {
+        tags: AMENITY_TAGS.map((name) => ({ id: name, label: name })),
+        tagLabel: FILTER_LABELS.amenities,
+        priceFilter: { min: FILTER_KEYS.MIN_PRICE, max: FILTER_KEYS.MAX_PRICE },
+        minPrice: 'minPrice' as const,
+        maxPrice: 'maxPrice' as const,
+    },
+    [CONTENT_MODES.USERS]: {
+        tags: LIFESTYLE_TAGS,
+        tagLabel: FILTER_LABELS.lifestyle,
+        priceFilter: { min: FILTER_KEYS.MIN_BUDGET, max: FILTER_KEYS.MAX_BUDGET },
+        minPrice: 'minBudget' as const,
+        maxPrice: 'maxBudget' as const,
+    },
 } as const

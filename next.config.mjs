@@ -1,8 +1,10 @@
 
-import path from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const nextConfig = {
   experimental: {
@@ -14,7 +16,7 @@ const nextConfig = {
     bodySizeLimit: '10mb',
   },
   turbopack: {
-    root: __dirname,
+    root: resolve(__dirname),
   },
   images: {
     remotePatterns: [
@@ -26,14 +28,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-        pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+      },
     ],
-  },
-  experimental: {
-    turbopack: {
-      root: '.',
-    },
   },
 }
 

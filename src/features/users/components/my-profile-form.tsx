@@ -141,6 +141,8 @@ export function MyProfileForm() {
 
   const onCloseUpload = () => {
     setIsUploadOpen(false)
+    setSelectedFile(null)
+    setPreviewUrl(null)
   }
 
   const onSelectDocumentFile = async (event: ChangeEvent<HTMLInputElement>) => {

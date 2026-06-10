@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api'
+import { GoogleMap, Marker } from '@react-google-maps/api'
 import { Button } from '@/shared/components/ui/button'
-import { MAP_CONFIG, MAP_LABELS } from '@/features/search/constants/search.constants'
-import { PROPERTY_PUBLICATION_LABELS } from '@/features/properties/constants/publication.constants'
+import { MAP_CONFIG } from '@/features/search/constants/search.constants'
+import { MapLoadingState, useMap } from '@/features/search/providers/map-provider'
+import { PROPERTY_PUBLICATION_LABELS }   from '@/features/properties/constants/publication.constants'
 import type { PublicationLocation } from '@/features/properties/types/publication.types'
 
 interface PropertyLocationPickerProps {
@@ -16,9 +17,7 @@ interface PropertyLocationPickerProps {
 export function PropertyLocationPicker({ lat, lng, onLocationChange }: PropertyLocationPickerProps) {
   const [isClient, setIsClient] = useState(false)
   const [center, setCenter] = useState<google.maps.LatLngLiteral>(MAP_CONFIG.defaultCenter)
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
-
-  const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: apiKey })
+  const { isLoaded, loadError } = useMap()
 
   useEffect(() => {
     setIsClient(true)
@@ -92,17 +91,11 @@ export function PropertyLocationPicker({ lat, lng, onLocationChange }: PropertyL
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-border bg-surface-muted h-96">
-          {!apiKey ? (
-            <div className="flex h-96 items-center justify-center p-6 text-center text-sm text-text-muted">
-              {MAP_LABELS.apiKeyMissing}
-            </div>
-          ) : !isClient || !isLoaded ? (
-            <div className="flex h-96 items-center justify-center p-6 text-sm text-text-muted">
-              {loadError ? MAP_LABELS.loadError : MAP_LABELS.loading}
-            </div>
+          {!isClient || !isLoaded || loadError ? (
+            <MapLoadingState />
           ) : (
             <GoogleMap
-              mapContainerStyle={MAP_CONFIG.containerStyle}
+              mapContainerStyle={{ width: '100%', height: '100%', minHeight: '384px' }}
               center={center}
               zoom={13}
               options={MAP_CONFIG.options}

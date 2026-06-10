@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts'
+import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts' 
 
+// Configuración CORS para no bloquear la petición del navegador
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
@@ -12,6 +13,7 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Control de identidad: Extrae el token para saber quién llama a la puerta
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) throw new Error('No authorization header')
 
@@ -23,11 +25,10 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } }
     })
     
-    // Auth Check
     const { data: { user }, error: userError } = await supabase.auth.getUser()
     if (userError || !user) throw new Error('Unauthorized')
 
-    // Parse form data
+    // Extracción del "Paquete": Saca las fotos y los IDs del FormData que envió el cliente
     const formData = await req.formData()
     const propertyId = formData.get('propertyId') as string
     const files = formData.getAll('file') as File[]
@@ -37,7 +38,7 @@ Deno.serve(async (req) => {
       throw new Error('No files provided')
     }
 
-    // Optional: verification that property belongs to user before attempting up to Deno limit
+    // Doble Seguridad: Si hay un ID de propiedad, confirma en la BD que este usuario es el dueño legítimo
     if (propertyId) {
       const { data: prop, error: propErr } = await supabase
         .from('properties')
@@ -48,30 +49,31 @@ Deno.serve(async (req) => {
       if (propErr || !prop) throw new Error('Property not found or unauthorized')
     }
 
-    // Elevated client to bypass RLS for direct storage insert if configured that way, 
-    // or standard auth client if Storage RLS is correctly tracking auth.uid()
+    // Creamos un cliente con poder absoluto para guardar los archivos sin restricciones
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
-
     const uploadedUrls = []
 
+    // La "Lavadora" de Imágenes: Procesamos cada foto una por una
     for (let i = 0; i < files.length; i++) {
         const file = files[i]
         const idx = fileIndexes[i] || i.toString()
 
+        // Convertimos el archivo en datos puros para que 'imagescript' lo pueda leer
         const arrayBuffer = await file.arrayBuffer()
         const image = await Image.decode(new Uint8Array(arrayBuffer))
         
-        // Resize while maintaining aspect ratio, max width 1200px
+        // Dieta estricta: Si la imagen es más ancha de 1200px, la encoge sin deformarla
         if (image.width > 1200) {
             image.resize(1200, Image.RESIZE_AUTO)
         }
-
-        // Compress to JPEG
-        const jpegBuffer = await image.encodeJPEG(80) // 80% quality
+        // Compresión: La convierte a JPEG bajándole la calidad al 80% 
+        const jpegBuffer = await image.encodeJPEG(80) 
         
+        // Le asigna un nombre único basado en la fecha y el índice
         const timestamp = Date.now()
         const storagePath = `properties/${user.id}/${propertyId || 'temp'}/${timestamp}_${idx}.jpg`
 
+        // Sube la versión ya optimizada al Storage de Supabase
         const { data, error } = await supabaseAdmin.storage
           .from('property-media') 
           .upload(storagePath, jpegBuffer.buffer, {
@@ -81,17 +83,18 @@ Deno.serve(async (req) => {
 
         if (error) {
             console.error('Upload Error:', error)
-            continue
+            continue // Si una foto falla, no detiene el resto, simplemente se la salta
         }
 
+        // Obtiene el enlace público que usaremos en el <img src="...">
         const { data: { publicUrl } } = supabaseAdmin.storage
           .from('property-media')
           .getPublicUrl(storagePath)
 
         uploadedUrls.push({ index: parseInt(idx), url: publicUrl })
     }
-
-    // Optional ordering update logic could be handled here or returned to client
+    
+    // Entrega final: Ordena las URLs para que coincidan con cómo las ordenó el usuario en pantalla
     return new Response(JSON.stringify({ urls: uploadedUrls.sort((a,b)=>a.index-b.index) }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })

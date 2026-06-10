@@ -3,13 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { FavoriteButton } from '@/shared/components/ui/favorite-button'
 import { isPropertyFavorited, isProfileFavorited } from '../lib/supabase-favorites'
-import { useFavorites } from '../hooks/use-favorites'
-import type { FavoriteButtonProps } from '@/shared/types/types'
-
-interface FavoritePropertyButtonProps extends Omit<FavoriteButtonProps, 'isFavorite' | 'onToggle'> {
-  propertyId: string
-  onToggleComplete?: (isFavorited: boolean) => void
-}
+import { useFavorites } from '..'
+import type { FavoritePropertyButtonProps, FavoriteProfileButtonProps } from '../types/favorites.types'
 
 export function FavoritePropertyButton({
   propertyId,
@@ -50,13 +45,9 @@ export function FavoritePropertyButton({
       isFavorite={isFavorite}
       onToggle={handleToggle}
       {...props}
+      className="cursor-pointer"
     />
   )
-}
-
-interface FavoriteProfileButtonProps extends Omit<FavoriteButtonProps, 'isFavorite' | 'onToggle'> {
-  profileId: string
-  onToggleComplete?: (isFavorited: boolean) => void
 }
 
 export function FavoriteProfileButton({
@@ -98,6 +89,7 @@ export function FavoriteProfileButton({
       isFavorite={isFavorite}
       onToggle={handleToggle}
       {...props}
+      className="cursor-pointer"
     />
   )
 }

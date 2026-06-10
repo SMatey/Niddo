@@ -1,32 +1,22 @@
-
-
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/search.types'
+import type { PropertyItem, FilterState, MapBounds } from '@/features/search/types/domain.types'
 import { PAGINATION_CONFIG } from '@/features/search/constants/search.constants'
+import { PropertiesService } from '../lib/supabase-properties'
 import { SupabasePropertyRepository } from '../repositories/supabase-property.repository'
-import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
-import { usePropertyRepository } from '../context/property-repository.context'
-
-export interface UsePropertiesOptions {
-    initialPageSize?: number
-    repository?: PropertyRepository
-}
-
-export interface UsePropertiesResult {
-    data: PropertyItem[]
-    total: number
-    page: number
-    pageSize: number
-    setPage: (page: number) => void
-    totalPages: number
-    hasMore: boolean
-    isLoading: boolean
-    error: Error | null
-}
+import { useSearchServices } from '@/features/search/context/search-service.context'
+import type { UsePropertiesOptions } from '../types/properties.types'
 
 function boundsKey(bounds: MapBounds | null): string {
     if (!bounds) return ''
     return `${bounds.neLat},${bounds.neLng},${bounds.swLat},${bounds.swLng}`
+}
+
+function createDefaultService(): PropertiesService {
+    const repository = new SupabasePropertyRepository(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    return new PropertiesService(repository)
 }
 
 export function useProperties(
@@ -42,25 +32,30 @@ export function useProperties(
     const [error, setError] = useState<Error | null>(null)
     const [total, setTotal] = useState(0)
 
-    let repository: PropertyRepository
+    // Resolve service: explicit injection > context > default (no context)
+    let contextServices: { propertiesService: PropertiesService } | null = null
     try {
-        repository = usePropertyRepository()
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        contextServices = useSearchServices()
     } catch {
-        repository = options.repository ?? new SupabasePropertyRepository(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
+        // Not wrapped in SearchServiceProvider — use fallback
     }
+
+    const service = useMemo(
+        () => options.service ?? contextServices?.propertiesService ?? createDefaultService(),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [options.service, contextServices?.propertiesService]
+    )
 
     const stableBoundsKey = boundsKey(bounds)
     const stableBounds = useMemo(() => bounds, [stableBoundsKey])
-
     const prevBoundsKeyRef = useRef(stableBoundsKey)
 
     const handleSetPage = useCallback((newPage: number) => {
         setPage(newPage)
     }, [])
 
+    // Reset page when filters change (not on bounds)
     useEffect(() => {
         setPage(1)
     }, [filters])
@@ -85,12 +80,7 @@ export function useProperties(
             setError(null)
 
             try {
-                const result = await repository.search({
-                    filters,
-                    bounds: stableBounds,
-                    page,
-                    pageSize,
-                })
+                const result = await service.search({ filters, bounds: stableBounds, page, pageSize })
                 setData(result.items)
                 setTotal(result.total)
                 setIsLoading(false)
@@ -106,7 +96,7 @@ export function useProperties(
         fetchProperties()
 
         return () => controller.abort()
-    }, [filters, page, pageSize, stableBoundsKey, repository])
+    }, [filters, page, pageSize, stableBoundsKey, service])
 
     return {
         data,

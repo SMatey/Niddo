@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
-import type { PropertyItem, UserItem, ContentMode, MapViewProps, Point, MapBounds } from '../types/search.types'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api'
+import type { PropertyItem, UserItem, ContentMode, Point, MapBounds } from '../types/domain.types'
+import type { MapViewProps } from '../types/ui.types'
 import { MapInfoWindow } from './map-info-window'
-import { MAP_LABELS, MAP_CONFIG, CONTENT_MODES } from '../constants/search.constants'
+import { MAP_CONFIG, MAP_LABELS, CONTENT_MODES, MAP_VIEW_CONFIG } from '../constants/search.constants'
 import { toPoints } from '../utils/map.utils'
+import { MapLoadingState, useMap } from '@/features/search/providers/map-provider'
 
 export function MapView({
     properties = [],
@@ -13,10 +15,12 @@ export function MapView({
     contentMode,
     isLoading,
     onBoundsChange,
+    isDetailView = false,
 }: MapViewProps) {
     const [isClient, setIsClient] = useState(false)
     const [selectedPoint, setSelectedPoint] = useState<Point | null>(null)
     const mapRef = useRef<google.maps.Map | null>(null)
+    const { isLoaded, loadError } = useMap()
 
     useEffect(() => {
         setIsClient(true)
@@ -26,13 +30,22 @@ export function MapView({
         setSelectedPoint(null)
     }, [contentMode])
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
-    const { isLoaded, loadError } = useJsApiLoader({
-        googleMapsApiKey: apiKey,
-    })
-
     const allItems: (PropertyItem | UserItem)[] = contentMode === CONTENT_MODES.PROPERTIES ? properties : users
     const points = toPoints(allItems, contentMode)
+
+    const center = useMemo(() => {
+        if (isDetailView && points.length === 1) {
+            return { lat: points[0].lat - MAP_VIEW_CONFIG.SINGLE_POINT_LAT_OFFSET, lng: points[0].lng }
+        }
+        return MAP_CONFIG.defaultCenter
+    }, [points, isDetailView])
+
+    const zoom = useMemo(() => {
+        if (isDetailView && points.length === 1) {
+            return MAP_VIEW_CONFIG.DETAIL_VIEW_ZOOM
+        }
+        return MAP_CONFIG.defaultZoom
+    }, [points, isDetailView])
 
     const onMarkerClick = useCallback((point: Point) => {
         setSelectedPoint(point)
@@ -68,25 +81,15 @@ export function MapView({
         }
     }, [onBoundsChange])
 
-    if (!apiKey) {
-        return (
-            <div className="flex items-center justify-center w-full h-full bg-surface-muted rounded-lg border border-border text-text-muted">
-                {MAP_LABELS.apiKeyMissing}
-            </div>
-        )
-    }
-
     if (!isClient) {
         return (
-            <div className="flex items-center justify-center w-full h-full bg-surface-muted rounded-lg border border-border text-text-muted">
-                {MAP_LABELS.loading}
-            </div>
+            <div className="w-full h-[500px] bg-surface-muted animate-pulse rounded-lg border border-border" />
         )
     }
 
     if (loadError) {
         return (
-            <div className="flex items-center justify-center w-full h-full bg-surface-muted rounded-lg border border-border text-text-muted">
+            <div className="w-full h-[500px] flex items-center justify-center bg-surface-muted rounded-lg border border-border text-error">
                 {MAP_LABELS.loadError}
             </div>
         )
@@ -94,14 +97,14 @@ export function MapView({
 
     if (!isLoaded) {
         return (
-            <div className="flex items-center justify-center w-full h-full bg-surface-muted rounded-lg border border-border text-text-muted">
+            <div className="w-full h-[500px] flex items-center justify-center bg-surface-muted rounded-lg border border-border text-text-muted">
                 {MAP_LABELS.loading}
             </div>
         )
     }
 
     return (
-        <div className="w-full h-full rounded-lg border border-border overflow-hidden">
+        <div className="w-full h-full min-h-full rounded-lg border border-border overflow-hidden">
             <style>{`
                 .gm-style-iw button[aria-label="Close"] {
                     display: none !important;
@@ -109,8 +112,8 @@ export function MapView({
             `}</style>
             <GoogleMap
                 mapContainerStyle={MAP_CONFIG.containerStyle}
-                center={MAP_CONFIG.defaultCenter}
-                zoom={MAP_CONFIG.defaultZoom}
+                center={center}
+                zoom={zoom}
                 options={MAP_CONFIG.options}
                 onLoad={onLoad}
                 onUnmount={onUnmount}

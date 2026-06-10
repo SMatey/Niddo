@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import type { PropertyRepository } from '@/features/properties/types/property-repository.types'
 
-const PropertyRepositoryContext = createContext<PropertyRepository | null>(null)
+export const PropertyRepositoryContext = createContext<PropertyRepository | null>(null)
 
 export function PropertyRepositoryProvider({
     repository,

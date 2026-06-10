@@ -42,7 +42,6 @@ export default function MisPublicacionesPage() {
         throw new Error(await response.text());
       }
       
-      // Refresh list to show changes
       refresh();
     } catch (e) {
       console.error("No se pudo cambiar el estado", e);
@@ -59,8 +58,6 @@ export default function MisPublicacionesPage() {
       setActionLoadingId(id);
       const supabase = createClient();
       
-      // Optionally we use property-manage with DELETE or simply property-status-update to 'deleted'
-      // Or we can delete it directly if RLS rules allow it
       const { error } = await supabase
         .from('properties')
         .delete()

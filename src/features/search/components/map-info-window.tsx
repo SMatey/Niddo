@@ -2,22 +2,11 @@
 
 import { useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import type { MapInfoWindowProps, PropertyItem, UserItem } from '../types/search.types'
-import { ROUTING_PATHS, CONTENT_MODES } from '../constants/search.constants'
+import type { PropertyItem, UserItem } from '../types/domain.types'
+import type { MapInfoWindowProps } from '../types/ui.types'
+import { ROUTING_PATHS, CONTENT_MODES, MAP_LABELS, MAP_VIEW_CONFIG } from '../constants/search.constants'
 
-function formatPriceLabel(item: PropertyItem | UserItem, isProperty: boolean): string | null {
-    if (isProperty) {
-        return (item as PropertyItem).price
-    }
-    const user = item as UserItem
-    if (user.minBudget || user.maxBudget) {
-        const min = user.minBudget ?? ''
-        const max = user.maxBudget ?? ''
-        const separator = user.minBudget && user.maxBudget ? ' - ' : ''
-        return `Budget: ${min}${separator}${max}`
-    }
-    return null
-}
+import { formatPriceLabel } from '../utils/formatters.utils'
 
 export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
     const router = useRouter()
@@ -35,7 +24,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
 
     const user = item as UserItem
     const isVerified = !isProperty && user.verified
-    const lifestyles = !isProperty ? (user.lifestyles ?? []).slice(0, 2) : []
+    const lifestyles = !isProperty ? (user.lifestyles ?? []).slice(0, MAP_VIEW_CONFIG.MAX_LIFESTYLES_IN_INFO_WINDOW) : []
 
     const handleClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
@@ -77,7 +66,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
                         <button
                             onClick={handleClose}
                             className="p-0.5 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
-                            aria-label="Cerrar"
+                            aria-label={MAP_LABELS.close}
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -108,7 +97,7 @@ export function MapInfoWindow({ point, onClose }: MapInfoWindowProps) {
                 onClick={handleClick}
                 className="block mt-2 p-2 -mx-2 -mb-2 rounded-lg hover:bg-slate-50 transition-colors duration-150 cursor-pointer text-center text-sm text-blue-600 hover:text-blue-700"
             >
-                Ver detalles
+                {MAP_LABELS.viewDetails}
             </a>
         </div>
     )

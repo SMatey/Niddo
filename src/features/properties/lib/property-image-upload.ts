@@ -1,5 +1,3 @@
-'use server'
-
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { PROPERTY_ACTIONS_MESSAGES } from '@/features/properties/constants/property-actions.constants'
 
@@ -78,7 +76,6 @@ export async function uploadPropertyImages({
       method: 'POST',
       body: formData,
       headers: {
-        // Do NOT set Content-Type manually, let the browser set it with the boundary!
         'Authorization': `Bearer ${token}`,
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       }
