@@ -34,3 +34,13 @@ export const MESSAGES_UI_TEXT = {
     deleteChat: 'Eliminar conversación'
   }
 } as const;
+
+export const MESSAGES_DB = {
+  TABLE: 'messages',
+  CONVERSATIONS_TABLE: 'conversations',
+} as const;
+
+export const MESSAGE_TYPES = {
+  TEXT: 'text',
+  IMAGE: 'image',
+} as const;
