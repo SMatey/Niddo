@@ -8,7 +8,7 @@ export const PROPERTY_PUBLICATION_LABELS = {
     photos: 'Fotos del lugar',
     amenities: 'Amenidades y lo que ofrece',
     houseRules: 'Normas de convivencia',
-    availability: 'Fechas de disponibilidad',
+    availability: 'Disponibilidad de la propiedad',
     preview: 'Vista previa',
   },
   labels: {
@@ -22,7 +22,6 @@ export const PROPERTY_PUBLICATION_LABELS = {
     amenityInput: 'Añadir amenidad',
     ruleInput: 'Añadir norma',
     availableFrom: 'Disponible desde',
-    availableTo: 'Disponible hasta',
     mapCoordinates: 'Coordenadas',
     navigationLink: 'Abrir en Google Maps',
     images: 'Sube fotos del inmueble',
@@ -53,9 +52,7 @@ export const PROPERTY_PUBLICATION_LABELS = {
   },
   helpers: {
     dateHint:
-      'Las fechas se ocultan automáticamente cuando expiran para evitar solicitudes en inmuebles no disponibles.',
-    expiredAvailability:
-      'La fecha de fin seleccionada ya pasó. Actualiza la disponibilidad para publicar.',
+      'La propiedad estará disponible a partir de la fecha que especifiques.',
     coordinatesMissing:
       'Selecciona un punto en el mapa para generar coordenadas de navegación.',
     noCoordinatesSelected: 'No hay coordenadas seleccionadas.',
@@ -70,7 +67,6 @@ export const PROPERTY_PUBLICATION_LABELS = {
     priceRequired: 'El precio es obligatorio.',
     locationRequired: 'La ubicación es obligatoria.',
     availableFromRequired: 'Selecciona la fecha de inicio.',
-    availableToRequired: 'Selecciona la fecha de fin.',
     coordinatesRequired:
       'Marca la ubicación en el mapa para guardar coordenadas.',
   },
@@ -79,7 +75,8 @@ export const PROPERTY_PUBLICATION_LABELS = {
     approximatePrice: 'Precio aproximado',
     location: 'Ubicación',
     availabilityDates: 'Fechas de disponibilidad',
-    selectValidRange: 'Selecciona un rango válido para que esta publicación aparezca como disponible.',
+    availabilityDate: 'Disponible desde',
+    selectValidRange: 'Disponible desde',
     navigationLink: 'Enlace de navegación',
     viewInGoogleMaps: 'Ver en Google Maps',
     activeRules: 'Normas activas',

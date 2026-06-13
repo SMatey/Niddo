@@ -1,22 +1,16 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useUser } from '@/features/users/hooks/use-user'
-import { UserProfileHeader } from '@/features/users/components/user-profile-header'
-import { UserStatsCard } from '@/features/users/components/user-stats-card'
-import { UserBudgetCard } from '@/features/users/components/user-budget-card'
-import { UserLifestylesCard } from '@/features/users/components/user-lifestyles-card'
-import { UserLocationCard } from '@/features/users/components/user-location-card'
-import { ProfileReviewsSection } from '@/features/reviews'
-import { MapProvider } from '@/features/search/providers/map-provider'
-
-import { USER_DETAIL_LABELS } from '@/features/users/constants/user-detail.constants'
+import { useUser } from '@/features/userprofile/hooks/use-user'
+import { UserProfileHeader } from '@/features/userprofile/components/user-profile-header'
+import { USER_DETAIL_LABELS } from '@/features/userprofile/constants/user-detail.constants'
 import { REPORT_FORM } from '@/features/reviews/constants/report-form.constants'
 import { ModeratedContentState } from '@/features/reviews/components/moderated-content-state'
 import { useReviewReportModeration } from '@/features/reviews/hooks/use-review-report-moderation'
 import { Button } from '@/shared/components/ui/button'
 import { DetailHeader } from '@/shared/components/ui/detail-header'
 import { FavoriteProfileButton } from '@/features/favorites/components/favorite-button-container'
+import { ProfileReviewsSection } from '@/features/reviews/profile-reviews/components/profile-reviews-section'
 
 function UserDetailLoadingState() {
   return (
@@ -51,6 +45,7 @@ function UserModerationErrorState({ onBack }: { onBack: () => void }) {
 
 function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
   const { data: user, isLoading } = useUser(id)
+  console.log("Datos del usuario:", user)
 
   if (isLoading) {
     return <UserDetailLoadingState />
@@ -75,16 +70,12 @@ function UserDetailContent({ id, onBack }: { id: string; onBack: () => void }) {
           onBack={onBack}
         />
 
-        <UserProfileHeader user={user} />
+        {/* Le inyectamos el componente de reseñas directamente al Header */}
+        <UserProfileHeader 
+          user={user} 
+          reviewsSection={<ProfileReviewsSection profileId={id} />}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UserStatsCard user={user} />
-          <UserBudgetCard user={user} />
-          <UserLifestylesCard user={user} />
-          <UserLocationCard user={user} />
-        </div>
-
-        <ProfileReviewsSection profileId={id} />
       </div>
     </main>
   )
@@ -114,9 +105,5 @@ export default function UserDetailPage() {
     )
   }
 
-  return (
-    <MapProvider>
-      <UserDetailContent id={id} onBack={() => router.back()} />
-    </MapProvider>
-  )
+  return <UserDetailContent id={id} onBack={() => router.back()} />
 }

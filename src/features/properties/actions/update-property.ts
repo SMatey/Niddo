@@ -1,3 +1,5 @@
+'use server'
+
 import { createServerClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { PublicationFormValues } from '@/features/properties/schemas/publication.schema'

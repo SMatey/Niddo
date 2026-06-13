@@ -2,11 +2,9 @@
 
 import { BudgetBadge } from '@/shared/components/ui/budget-badge'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
-import type { UserDetail } from '@/features/search/types/domain.types'
 
-interface UserBudgetCardProps {
-  user: UserDetail
-}
+// Importamos la interfaz desde el archivo centralizado
+import type { UserBudgetCardProps } from '../types/user-profile.types'
 
 export function UserBudgetCard({ user }: UserBudgetCardProps) {
   return (

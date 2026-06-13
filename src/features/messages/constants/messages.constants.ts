@@ -44,10 +44,3 @@ export const MESSAGE_TYPES = {
   TEXT: 'text',
   IMAGE: 'image',
 } as const;
-
-export const MESSAGES_ERRORS = {
-  SEND_FAILED: 'No se pudo enviar el mensaje. Intenta nuevamente.',
-  FETCH_FAILED: 'Error al cargar el historial de mensajes.',
-  UNAUTHORIZED: 'Debes iniciar sesión para acceder al chat.',
-  MISSING_FIELDS: 'Faltan datos requeridos para enviar el mensaje.',
-} as const;

@@ -10,6 +10,7 @@ export interface FilterState {
     minBudget: string
     maxBudget: string
     lifestyles: string[]
+    profileId?: string
 }
 
 export interface PropertyItem {
@@ -61,6 +62,7 @@ export interface PropertyDetail extends PropertyItem {
 export interface UserDetail extends UserItem {
     description?: string
     memberSince: string
+    email?: string
 }
 
 export interface Point {
