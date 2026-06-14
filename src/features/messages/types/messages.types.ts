@@ -1,3 +1,5 @@
+import { MESSAGE_TYPES } from '../constants/messages.constants';
+
 export type MessageType = 'text' | 'image';
 
 export interface ProfileSnippet {
@@ -8,6 +10,7 @@ export interface ProfileSnippet {
   status?: 'online' | 'offline';
 }
 
+// Interfaz original en camelCase (así tus otros componentes no se rompen)
 export interface Message {
   id: string;
   conversationId: string;
@@ -47,4 +50,11 @@ export interface UseMessagesResult {
   error: Error | null;
   sendMessage: (content: string, type?: MessageType) => Promise<void>;
   markAsRead: () => Promise<void>;
+}
+
+export interface SendMessagePayload {
+  conversationId: string;
+  receiverId: string;
+  content: string;
+  type?: MessageType;
 }
