@@ -36,6 +36,10 @@ export class SupabaseUserRepository implements UserRepository {
             queryParams.set(SEARCH_PARAMS.SW_LNG, String(bounds.swLng))
         }
 
+        if (filters?.profileId) {
+            queryParams.set('profileId', filters.profileId)
+        }
+
         const response = await fetch(`${functionUrl}?${queryParams}`, {
             headers: {
                 [SUPABASE_HEADERS.API_KEY]: this.apiKey,
