@@ -9,6 +9,7 @@ export interface FilterState {
     maxPrice: string
     minBudget: string
     maxBudget: string
+    /** Array of lifestyle tag IDs (e.g., 'early-bird', 'clean-freak') matching database IDs */
     lifestyles: string[]
     profileId?: string
 }
