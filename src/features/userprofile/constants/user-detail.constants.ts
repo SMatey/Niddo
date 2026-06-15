@@ -14,6 +14,7 @@ export const USER_DETAIL_LABELS = {
     trustLevel: 'Nivel de confianza',
     monthlyBudget: 'Presupuesto mensual',
     sendMessage: 'Enviar mensaje',
+    editProfile: 'Editar perfil',
     reviews: 'Reseñas',
     email: 'Correo',
     phone: 'Teléfono',

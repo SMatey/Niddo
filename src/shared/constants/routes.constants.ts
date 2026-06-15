@@ -12,5 +12,6 @@ export const ROUTES = {
   MESSAGES: '/mensajes',
   NOTIFICATIONS: '/notificaciones',
   SETTINGS: '/configuracion',
+  SETTINGS_PROFILE: '/configuracion?section=profile',
   PROFILE: '/perfil',
 } as const

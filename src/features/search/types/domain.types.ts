@@ -63,6 +63,7 @@ export interface UserDetail extends UserItem {
     description?: string
     memberSince: string
     email?: string
+    isOwnProfile?: boolean
 }
 
 export interface Point {

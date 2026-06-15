@@ -1,9 +1,11 @@
 'use client'
 
-import { MapPin, Mail, Shield } from 'lucide-react'
+import Link from 'next/link'
+import { MapPin, Mail, Shield, Pencil } from 'lucide-react'
 import { UserAvatar } from '@/shared/components/ui/user-avatar'
 import { Button } from '@/shared/components/ui/button'
 import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
+import { ROUTES } from '@/shared/constants/routes.constants'
 import type { UserBasicInfoCardProps } from '../types/user-profile.types'
 
 export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
@@ -53,11 +55,24 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
         </div>
       )}
 
-      <div className="border-t border-border pt-4 flex gap-2">
-        <Button className="flex-1 w-full">
-          {USER_DETAIL_LABELS.sendMessage}
-        </Button>
-      </div>
+      {!user.isOwnProfile && (
+        <div className="border-t border-border pt-4 flex gap-2">
+          <Button className="flex-1 w-full">
+            {USER_DETAIL_LABELS.sendMessage}
+          </Button>
+        </div>
+      )}
+
+      {user.isOwnProfile && (
+        <div className="border-t border-border pt-4 flex gap-2">
+          <Link href={ROUTES.SETTINGS_PROFILE} className="flex-1">
+            <Button className="w-full gap-2" variant="secondary">
+              <Pencil className="w-4 h-4" />
+              {USER_DETAIL_LABELS.editProfile}
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   )
 }
