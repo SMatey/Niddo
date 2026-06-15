@@ -1,13 +1,11 @@
 // supabase/functions/user-detail/index.ts
-// Edge Function para detalle de usuario
-// Implementar en Supabase: supabase functions deploy user-detail
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': req.headers.get('origin') ?? '*',
-    'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Credentials': 'true',
   }
 
@@ -31,7 +29,6 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Fetch tag labels
     const { data: tagData } = await supabase
       .from('lifestyle_tags')
       .select('id, label')
@@ -39,7 +36,6 @@ Deno.serve(async (req) => {
     const tagIdToLabel: Record<string, string> = {}
     ;(tagData ?? []).forEach(t => { tagIdToLabel[t.id] = t.label })
 
-    // Fetch profile from public.profiles
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('*')
@@ -54,19 +50,20 @@ Deno.serve(async (req) => {
     }
 
     let userEmail = undefined;
-    try {
-      const { data: authData, error: authError } = await supabase.auth.admin.getUserById(id);
-      if (!authError && authData?.user) {
-        userEmail = authData.user.email;
-      } else {
-        console.warn("No se encontró en auth.users o el ID no es UUID:", authError?.message);
+
+    if (profileData.show_email === true) {
+      try {
+        const { data: authData, error: authError } = await supabase.auth.admin.getUserById(id);
+        if (!authError && authData?.user) {
+          userEmail = authData.user.email;
+        } else {
+          console.warn("No se encontró en auth.users o el ID no es UUID:", authError?.message);
+        }
+      } catch (e) {
+        console.warn("Error al consultar auth.users:", e);
       }
-    } catch (e) {
-      console.warn("Error al consultar auth.users:", e);
     }
 
-
-    // Fetch profile lifestyle tags
     const { data: profileTags } = await supabase
       .from('profile_lifestyle_tags')
       .select('tag_id')
@@ -80,20 +77,23 @@ Deno.serve(async (req) => {
       name: profileData.name,
       age: profileData.age,
       bio: profileData.bio ?? undefined,
-      location: profileData.location ?? undefined,
       imageUrl: profileData.avatar ?? undefined,
       verified: profileData.is_verified,
       isFavorite: false,
       minBudget: profileData.budget_min ? `$${profileData.budget_min}` : undefined,
       maxBudget: profileData.budget_max ? `$${profileData.budget_max}` : undefined,
       confidenceScore: profileData.trust_score,
-      lat: profileData.latitude ?? undefined,
-      lng: profileData.longitude ?? undefined,
       lifestyles: tagLabels,
       description: profileData.bio ?? undefined,
       memberSince: profileData.joined_date,
-      // Se prioriza el email extraído de auth.users, si no existe usa el de profiles
-      email: userEmail ?? profileData.email ?? undefined,
+      
+      location: profileData.show_location !== false ? (profileData.location ?? undefined) : undefined,
+      lat: profileData.show_location !== false ? (profileData.latitude ?? undefined) : undefined,
+      lng: profileData.show_location !== false ? (profileData.longitude ?? undefined) : undefined,
+      
+      email: userEmail ?? undefined,
+      
+      allowMessages: profileData.allow_messages !== false,
     }
 
     return new Response(JSON.stringify(detail), {

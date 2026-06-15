@@ -7,6 +7,14 @@ import { PRIVACY_OPTIONS } from '../constants/privacy.constants'
 export function PrivacySection() {
   const { settings, isSaving, handleToggle, handleSave } = usePrivacy()
 
+  if (!settings) {
+    return (
+      <div className="flex h-40 items-center justify-center">
+        <p className="text-gray-500">Cargando opciones de privacidad...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <div>
