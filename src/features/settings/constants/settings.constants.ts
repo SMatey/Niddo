@@ -21,6 +21,8 @@ export const SETTINGS_MENU = [
   },
 ]
 
+export const VALID_SECTIONS = ['profile', 'verification', 'preferences', 'privacy'] as const
+
 export const SETTINGS_LABELS = {
   EDIT_PROFILE: {
     SECTION_TITLE: 'Editar Perfil',

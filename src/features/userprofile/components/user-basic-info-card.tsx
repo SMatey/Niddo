@@ -17,7 +17,7 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
           imageUrl={user.imageUrl}
           verified={user.verified}
           age={user.age}
-          size="lg"
+          size="xl"
         />
 
         <div className="mt-4 text-center w-full">

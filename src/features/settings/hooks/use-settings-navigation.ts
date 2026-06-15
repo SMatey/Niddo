@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-
-const VALID_SECTIONS = ['profile', 'verification', 'preferences', 'privacy']
+import { VALID_SECTIONS } from '../constants/settings.constants'
 
 export function useSettingsNavigation(defaultSection: string = 'profile') {
   const searchParams = useSearchParams()
   const sectionParam = searchParams.get('section')
-  const initialSection = sectionParam && VALID_SECTIONS.includes(sectionParam)
+  const initialSection = sectionParam && (VALID_SECTIONS as readonly string[]).includes(sectionParam)
     ? sectionParam
     : defaultSection
 
