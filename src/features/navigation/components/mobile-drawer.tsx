@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { LogOut } from 'lucide-react'
 import { UserAvatar } from './user-avatar'
-import type { MobileDrawerProps } from '../navbar.types'
+import type { MobileDrawerProps } from '../interface/navbar.types'
 
 export function MobileDrawer({
   isOpen,

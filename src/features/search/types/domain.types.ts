@@ -64,6 +64,7 @@ export interface UserDetail extends UserItem {
     description?: string
     memberSince: string
     email?: string
+    allowMessages?: boolean
 }
 
 export interface Point {

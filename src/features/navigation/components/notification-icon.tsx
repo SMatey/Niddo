@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
 import { ROUTES } from '@/shared/constants/routes.constants'
-import type { NotificationIconProps } from '../navbar.types'
+import type { NotificationIconProps } from '../interface/navbar.types'
 
 export function NotificationIcon({ unreadCount, href = ROUTES.NOTIFICATIONS }: NotificationIconProps) {
   return (

@@ -43,7 +43,6 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
         </div>
       </div>
 
-      {/* Contact Info */}
       {user.email && (
         <div className="space-y-1.5 text-left border-t border-border pt-3">
           <div className="flex items-center gap-2 text-xs">
@@ -53,11 +52,13 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
         </div>
       )}
 
-      <div className="border-t border-border pt-4 flex gap-2">
-        <Button className="flex-1 w-full">
-          {USER_DETAIL_LABELS.sendMessage}
-        </Button>
-      </div>
+      {user.allowMessages && (
+        <div className="border-t border-border pt-4 flex gap-2">
+          <Button className="flex-1 w-full">
+            {USER_DETAIL_LABELS.sendMessage}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
