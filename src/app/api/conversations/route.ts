@@ -157,6 +157,7 @@ export async function GET() {
 // Es idempotente: nunca crea dos conversaciones para el mismo par.
 // =============================================================
 export async function POST(request: Request) {
+  const step = { current: 'init' };
   try {
     const body = await request.json();
     const { targetUserId } = body;
@@ -166,6 +167,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Autenticar al usuario que hace la petición (vía cookies de sesión)
+    step.current = 'auth';
     const authClient = await createServerClient();
     const {
       data: { user },
@@ -177,6 +179,7 @@ export async function POST(request: Request) {
     }
 
     const currentUserId = user.id;
+    console.log('[POST /api/conversations] currentUserId:', currentUserId, 'targetUserId:', targetUserId);
 
     if (currentUserId === targetUserId) {
       return NextResponse.json(
@@ -187,16 +190,32 @@ export async function POST(request: Request) {
 
     // 2. Cliente con service role para deduplicar y crear con ambos participantes
     //    (necesario porque RLS solo deja ver las participaciones propias)
+    step.current = 'admin-client';
     const admin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Validar que el usuario destino exista
-    const { data: targetProfile, error: targetError } = await admin
-      .from('profiles')
-      .select('id')
-      .eq('id', targetUserId)
-      .maybeSingle();
+    // Validar que AMBOS usuarios tengan perfil (FK constraint en conversation_participants)
+    step.current = 'validate-profiles';
+    const [{ data: currentProfile, error: currentProfileError }, { data: targetProfile, error: targetError }] =
+      await Promise.all([
+        admin.from('profiles').select('id').eq('id', currentUserId).maybeSingle(),
+        admin.from('profiles').select('id').eq('id', targetUserId).maybeSingle(),
+      ]);
 
-    if (targetError) throw targetError;
+    if (currentProfileError) {
+      console.error('[POST /api/conversations] error al buscar perfil del usuario actual:', currentProfileError);
+      throw currentProfileError;
+    }
+    if (!currentProfile) {
+      console.error('[POST /api/conversations] el usuario autenticado no tiene perfil en profiles:', currentUserId);
+      return NextResponse.json(
+        { error: 'Tu perfil no está configurado. Completa el registro primero.' },
+        { status: 422 }
+      );
+    }
+    if (targetError) {
+      console.error('[POST /api/conversations] error al buscar perfil destino:', targetError);
+      throw targetError;
+    }
     if (!targetProfile) {
       return NextResponse.json({ error: 'El usuario destino no existe' }, { status: 404 });
     }
@@ -218,6 +237,10 @@ export async function POST(request: Request) {
 
       if (!byKey.error && byKey.data) return byKey.data.id;
 
+      if (byKey.error) {
+        console.log('[POST /api/conversations] participant_key lookup falló (columna probablemente inexistente):', byKey.error.code);
+      }
+
       // b) Fallback por intersección de participantes (no depende de la columna)
       const [{ data: myParts, error: myErr }, { data: targetParts, error: tgtErr }] =
         await Promise.all([
@@ -231,8 +254,14 @@ export async function POST(request: Request) {
             .eq('profile_id', targetUserId),
         ]);
 
-      if (myErr) throw myErr;
-      if (tgtErr) throw tgtErr;
+      if (myErr) {
+        console.error('[POST /api/conversations] error al buscar participaciones propias:', myErr);
+        throw myErr;
+      }
+      if (tgtErr) {
+        console.error('[POST /api/conversations] error al buscar participaciones del destino:', tgtErr);
+        throw tgtErr;
+      }
 
       const myConversationIds = new Set((myParts ?? []).map((r) => r.conversation_id));
       const shared = (targetParts ?? []).find((r) =>
@@ -243,6 +272,7 @@ export async function POST(request: Request) {
     };
 
     // 3. Deduplicar: si ya existe, reutilizarla
+    step.current = 'find-existing';
     const existingId = await findExistingConversationId();
     if (existingId) {
       console.log('[POST /api/conversations] reutilizando conversación', existingId);
@@ -250,6 +280,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Crear nueva conversación (con participant_key cuando la columna exista)
+    step.current = 'create-conversation';
     const now = new Date().toISOString();
 
     let newConversation: { id: string } | null = null;
@@ -262,6 +293,7 @@ export async function POST(request: Request) {
       .single());
 
     if (convError) {
+      console.log('[POST /api/conversations] error al insertar conversación (code:', convError.code, '):', convError.message);
       // 23505 = violación de índice único (carrera: otra petición la creó primero)
       if (convError.code === '23505') {
         const racedId = await findExistingConversationId();
@@ -270,20 +302,33 @@ export async function POST(request: Request) {
           return NextResponse.json({ conversationId: racedId, existing: true });
         }
       }
-      // 42703 = columna participant_key inexistente (migración no aplicada): reintentar sin ella
-      if (convError.code === '42703') {
+      // 42703 = error PostgreSQL de columna inexistente
+      // PGRST204 = PostgREST rechaza la columna antes de llegar a PG (schema cache)
+      // Ambos significan que la migración participant_key no está aplicada en la BD.
+      const isMissingColumn =
+        convError.code === '42703' ||
+        convError.code === 'PGRST204' ||
+        (convError.message ?? '').includes('participant_key');
+
+      if (isMissingColumn) {
+        console.log('[POST /api/conversations] reintentando sin participant_key (code:', convError.code, ')...');
         ({ data: newConversation, error: convError } = await admin
           .from('conversations')
           .insert({ created_at: now, updated_at: now })
           .select('id')
           .single());
+        if (convError) {
+          console.error('[POST /api/conversations] fallo también sin participant_key:', convError);
+        }
       }
       if (convError) throw convError;
     }
 
     const conversationId = newConversation!.id;
+    console.log('[POST /api/conversations] conversación creada con id:', conversationId);
 
     // 5. Agregar AMBOS participantes de forma atómica
+    step.current = 'insert-participants';
     const { error: participantsError } = await admin
       .from('conversation_participants')
       .insert([
@@ -292,15 +337,20 @@ export async function POST(request: Request) {
       ]);
 
     if (participantsError) {
+      console.error('[POST /api/conversations] error al insertar participantes:', participantsError);
       // Rollback manual: eliminar la conversación huérfana
       await admin.from('conversations').delete().eq('id', conversationId);
       throw participantsError;
     }
 
-    console.log('[POST /api/conversations] conversación creada', conversationId);
+    console.log('[POST /api/conversations] conversación lista', conversationId);
     return NextResponse.json({ conversationId, existing: false });
-  } catch (error) {
-    console.error('Error creating conversation:', error);
-    return NextResponse.json({ error: 'Failed to create conversation' }, { status: 500 });
+  } catch (error: any) {
+    console.error(`[POST /api/conversations] fallo en paso "${step.current}":`, error);
+    const detail = error?.message ?? String(error);
+    return NextResponse.json(
+      { error: 'Failed to create conversation', step: step.current, detail },
+      { status: 500 }
+    );
   }
 }

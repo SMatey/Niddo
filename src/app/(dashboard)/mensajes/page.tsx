@@ -155,6 +155,7 @@ export default function Page() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          console.error('[conversations API] paso:', errorData.step, '| detalle:', errorData.detail, '| respuesta completa:', errorData);
           throw new Error(errorData.error || 'No se pudo crear la conversación');
         }
 
