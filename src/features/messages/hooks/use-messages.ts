@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { MESSAGES_DB, MESSAGES_ERRORS } from '../constants/messages.constants';
 import { sendMessage as sendMessageService } from '../lib/supabase-messages';
@@ -20,23 +20,40 @@ export function useMessages(conversationId: string | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const supabaseRef = useRef(createClient());
+
+  // Agrega un mensaje al estado local evitando duplicados (por id).
+  // Lo usamos tanto para el realtime como para el "append optimista" del
+  // mensaje que el propio usuario acaba de enviar.
+  const addLocalMessage = useCallback(
+    (msg: Message) => {
+      // Solo nos interesa la conversación activa
+      if (!conversationId || msg.conversationId !== conversationId) return;
+      setMessages((current) =>
+        current.some((m) => m.id === msg.id) ? current : [...current, msg]
+      );
+    },
+    [conversationId]
+  );
 
   const sendMessage = useCallback(
     async (receiverId: string, content: string, type?: MessageType) => {
       if (!conversationId) return;
       try {
-        await sendMessageService({
+        const sent = await sendMessageService({
           conversationId,
           receiverId,
           content,
           type,
         });
+        // Append optimista: se ve de inmediato sin esperar al realtime
+        addLocalMessage(sent);
       } catch (err) {
         console.error('Error in useMessages:', err);
-        throw err; 
+        throw err;
       }
     },
-    [conversationId]
+    [conversationId, addLocalMessage]
   );
 
   useEffect(() => {
@@ -46,57 +63,89 @@ export function useMessages(conversationId: string | null) {
       return;
     }
 
-    const supabase = createClient();
-    setIsLoading(true);
+    let cancelled = false;
+    let channel: ReturnType<typeof supabaseRef.current.channel> | null = null;
+    const supabase = supabaseRef.current;
 
-    const fetchInitialMessages = async () => {
+    const setupMessages = async () => {
+      setIsLoading(true);
+
       try {
+        // Fetch inicial de mensajes
         const { data, error: fetchError } = await supabase
           .from(MESSAGES_DB.TABLE)
           .select('*')
           .eq('conversation_id', conversationId)
-          .order('created_at', { ascending: true }); 
+          .order('created_at', { ascending: true })
+          .limit(100);
 
         if (fetchError) throw fetchError;
-        
-        // Pasamos los datos crudos por nuestro traductor antes de guardarlos en el estado
+        if (cancelled) return;
+
         setMessages((data || []).map(mapSupabaseMessage));
+        setError(null);
+
+        // Realtime: nos suscribimos SIN filtro (igual que el sidebar, que sí
+        // funciona) y filtramos por conversación en el cliente. Así evitamos
+        // los problemas del filtro de postgres_changes por conversation_id.
+        const channelName = `chat_room_${conversationId}`;
+
+        // Limpiar cualquier canal previo con el mismo nombre (evita duplicados
+        // en re-montajes, p. ej. StrictMode en desarrollo)
+        const existing = supabase.getChannels().find((ch) => ch.topic === channelName);
+        if (existing) {
+          await supabase.removeChannel(existing);
+        }
+
+        channel = supabase.channel(channelName);
+
+        channel.on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: MESSAGES_DB.TABLE,
+          },
+          (payload) => {
+            const incoming = mapSupabaseMessage(payload.new);
+
+            // Ignorar mensajes de otras conversaciones
+            if (incoming.conversationId !== conversationId) return;
+
+            console.log('[useMessages] mensaje en tiempo real:', incoming.id);
+
+            setMessages((current) =>
+              current.some((m) => m.id === incoming.id) ? current : [...current, incoming]
+            );
+          }
+        );
+
+        channel.subscribe((status) => {
+          console.log(`[useMessages] canal ${channelName}:`, status);
+        });
       } catch (err) {
-        console.error(err);
-        setError(MESSAGES_ERRORS.FETCH_FAILED);
+        console.error('Error in useMessages:', err);
+        if (!cancelled) setError(MESSAGES_ERRORS.FETCH_FAILED);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
-    fetchInitialMessages();
-
-    const channel = supabase
-      .channel(`chat_room_${conversationId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT', 
-          schema: 'public',
-          table: MESSAGES_DB.TABLE,
-          filter: `conversation_id=eq.${conversationId}`, 
-        },
-        (payload) => {
-          // Traducimos el payload.new antes de inyectarlo en pantalla
-          setMessages((currentMessages) => [...currentMessages, mapSupabaseMessage(payload.new)]);
-        }
-      )
-      .subscribe();
+    setupMessages();
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
-  }, [conversationId]); 
+  }, [conversationId]);
 
   return {
     messages,
     isLoading,
     error,
     sendMessage,
+    addLocalMessage,
   };
 }

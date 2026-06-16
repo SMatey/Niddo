@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { MESSAGES_DB } from '../constants/messages.constants';
 import type { Conversation, Message, UseConversationsResult } from '../types/messages.types';
@@ -14,138 +14,148 @@ const mapSupabaseMessage = (row: any): Message => ({
   createdAt: row.created_at,
 });
 
+// Ordena conversaciones de la más reciente a la más antigua (por último
+// mensaje, o por updatedAt si todavía no hay mensajes).
+const sortByRecency = (list: Conversation[]): Conversation[] =>
+  [...list].sort((a, b) => {
+    const aTime = new Date(a.lastMessage?.createdAt ?? a.updatedAt).getTime();
+    const bTime = new Date(b.lastMessage?.createdAt ?? b.updatedAt).getTime();
+    return bTime - aTime;
+  });
+
 export function useConversations(): UseConversationsResult {
   const [data, setData] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Instanciamos el cliente usando useMemo para evitar recreaciones innecesarias
   const supabase = useMemo(() => createClient(), []);
+
+  // Usamos ref para poder llamar refresh desde dentro del canal
+  // sin que el closure quede stale
+  const refreshRef = useRef<() => Promise<void>>(async () => {});
 
   const refresh = useCallback(async () => {
     try {
-      setIsLoading(true);
       setError(null);
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user.id;
+      // Obtenemos las conversaciones desde el endpoint del servidor, que usa
+      // service role para incluir a TODOS los participantes (con su perfil) y
+      // el último mensaje. La query directa con el cliente no sirve aquí porque
+      // la RLS de conversation_participants solo deja ver la fila propia.
+      const response = await fetch('/api/conversations', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      });
 
-      if (!userId) throw new Error('Usuario no autenticado');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'No se pudieron cargar las conversaciones');
+      }
 
-      const { data: participantsData, error: fetchError } = await supabase
-        .from('conversation_participants')
-        .select(`
-          conversation_id,
-          unread_count,
-          conversations (
-            id,
-            created_at,
-            updated_at
-          )
-        `)
-        .eq('profile_id', userId);
+      const { conversations } = await response.json();
+      console.log('[useConversations] conversaciones recibidas:', conversations?.length ?? 0);
 
-      if (fetchError) throw fetchError;
-
-      const formattedConversations: Conversation[] = (participantsData || []).map((row: any) => ({
-        id: row.conversation_id,
-        createdAt: row.conversations.created_at,
-        updatedAt: row.conversations.updated_at,
-        participants: [
-          {
-            conversationId: row.conversation_id,
-            profileId: userId,
-            unreadCount: row.unread_count,
-          }
-        ],
-      }));
-
-      setData(formattedConversations);
+      setData(sortByRecency(conversations ?? []));
     } catch (err) {
-      console.error('Error fetching conversations:', err);
+      console.error('[useConversations] error al cargar conversaciones:', err);
       setError(err instanceof Error ? err : new Error('Error desconocido'));
     } finally {
       setIsLoading(false);
     }
-  }, [supabase]);
+  }, []);
+
+  // Mantenemos el ref sincronizado con la versión más reciente de refresh
+  useEffect(() => {
+    refreshRef.current = refresh;
+  }, [refresh]);
 
   useEffect(() => {
-    let channel: ReturnType<typeof supabase.channel>;
-    let currentUserId: string | undefined;
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const setupRealtime = async () => {
-      // 1. Obtenemos el ID del usuario con la sintaxis correcta de Supabase v2
+    const setup = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
-      currentUserId = sessionData.session?.user.id;
+      const userId = sessionData.session?.user.id ?? null;
 
-      // 2. Ejecutamos la carga inicial
-      await refresh();
+      // Carga inicial
+      await refreshRef.current();
 
-      if (!currentUserId) return;
+      // Si el efecto fue cancelado mientras esperábamos, no suscribimos
+      if (cancelled || !userId) return;
 
-      // 3. Establecemos la suscripción
-      channel = supabase
-        .channel('global_conversations_listener')
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: MESSAGES_DB.TABLE,
-          },
-          (payload) => {
-            const newMessage = mapSupabaseMessage(payload.new);
-            
-            setData((prevConversations) => {
-              const conversationExists = prevConversations.find(c => c.id === newMessage.conversationId);
+      const channelName = `conversations_rt_${userId}`;
 
-              if (conversationExists) {
-                const updatedConversations = prevConversations.map(conv => {
-                  if (conv.id === newMessage.conversationId) {
-                    const isForMe = newMessage.receiverId === currentUserId;
-                    const myParticipant = conv.participants[0]; 
-                    
-                    return {
-                      ...conv,
-                      lastMessage: newMessage,
-                      updatedAt: newMessage.createdAt,
-                      participants: [
-                        {
-                          ...myParticipant,
-                          unreadCount: isForMe ? myParticipant.unreadCount + 1 : myParticipant.unreadCount
-                        }
-                      ]
-                    };
-                  }
-                  return conv;
-                });
+      // Limpiar canal previo con el mismo nombre si existe
+      const existing = supabase.getChannels().find(ch => ch.topic === channelName);
+      if (existing) {
+        await supabase.removeChannel(existing);
+      }
 
-                return updatedConversations.sort(
-                  (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-                );
-              } else {
-                refresh();
-                return prevConversations;
-              }
-            });
-          }
-        )
-        .subscribe();
+      channel = supabase.channel(channelName);
+
+      channel.on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: MESSAGES_DB.TABLE,
+        },
+        (payload) => {
+          if (cancelled) return;
+
+          const newMessage = mapSupabaseMessage(payload.new);
+          console.log('[useConversations] nuevo mensaje en tiempo real:', newMessage.conversationId);
+
+          setData((prevConversations) => {
+            const conversationExists = prevConversations.find(
+              c => c.id === newMessage.conversationId
+            );
+
+            if (conversationExists) {
+              // Actualizamos lastMessage + unreadCount y reordenamos
+              const updated = prevConversations.map(conv => {
+                if (conv.id !== newMessage.conversationId) return conv;
+
+                const isForMe = newMessage.receiverId === userId;
+
+                return {
+                  ...conv,
+                  lastMessage: newMessage,
+                  updatedAt: newMessage.createdAt,
+                  // Preservamos TODOS los participantes, solo actualizamos unreadCount del actual
+                  participants: conv.participants.map(p =>
+                    p.profileId === userId
+                      ? { ...p, unreadCount: isForMe ? p.unreadCount + 1 : p.unreadCount }
+                      : p
+                  ),
+                };
+              });
+
+              return sortByRecency(updated);
+            } else {
+              // Conversación nueva: refetch completo desde el servidor
+              refreshRef.current();
+              return prevConversations;
+            }
+          });
+        }
+      );
+
+      await channel.subscribe();
     };
 
-    setupRealtime();
+    setup().catch(err => console.error('[useConversations] error en setup:', err));
 
     return () => {
+      cancelled = true;
       if (channel) {
         supabase.removeChannel(channel);
+        channel = null;
       }
     };
-  }, [refresh, supabase]);
+  // Solo se ejecuta una vez al montar; refresh se accede por ref
+  }, [supabase]);
 
-  return {
-    data,
-    isLoading,
-    error,
-    refresh,
-  };
+  return { data, isLoading, error, refresh };
 }

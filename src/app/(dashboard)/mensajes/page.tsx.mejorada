@@ -1,0 +1,153 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useMessages } from '@/features/messages/hooks/use-messages';
+import { useConversations } from '@/features/messages/hooks/use-conversations';
+import { ChatSidebar, ChatEmptyState, ActiveChatWindow } from '@/features/messages';
+import { Conversation } from '@/features/messages/types/messages.types';
+
+export default function MessagesPage() {
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  const supabase = createClient();
+
+  // Obtener el usuario actual de la sesión
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (session?.user?.id) {
+          setCurrentUserId(session.user.id);
+        }
+      } catch (err) {
+        console.error('Error fetching current user:', err);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    };
+
+    fetchCurrentUser();
+  }, [supabase]);
+
+  // Usar el hook de conversaciones
+  const {
+    data: conversations = [],
+    isLoading: isLoadingConversations,
+    error: conversationsError
+  } = useConversations();
+
+  // Usar el hook de mensajes para la conversación activa
+  const {
+    messages,
+    isLoading: isLoadingMessages,
+    error: messagesError,
+    sendMessage
+  } = useMessages(activeConversationId);
+
+  // Encontrar la conversación activa
+  const activeConversation = conversations.find(c => c.id === activeConversationId);
+
+  // Estado de carga global
+  const isLoading = isLoadingUser || isLoadingConversations;
+
+  // Manejador de envío de mensajes
+  const handleSendMessage = async (content: string) => {
+    if (!activeConversation || !currentUserId) return;
+
+    try {
+      // Encontrar el ID del otro participante
+      const otherParticipant = activeConversation.participants.find(
+        p => p.profileId !== currentUserId
+      );
+
+      if (!otherParticipant) {
+        console.error('No se encontró el otro participante');
+        return;
+      }
+
+      // Enviar el mensaje usando el hook
+      await sendMessage(otherParticipant.profileId, content);
+    } catch (err) {
+      console.error('Error al enviar mensaje:', err);
+    }
+  };
+
+  // Mostrar pantalla de carga
+  if (isLoading) {
+    return (
+      <div className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-white overflow-hidden items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 flex justify-center">
+            <div className="w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-600">Cargando mensajes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si el usuario no está autenticado
+  if (!currentUserId) {
+    return (
+      <div className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-white overflow-hidden items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-medium">Debes iniciar sesión para acceder a los mensajes</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si hay problemas cargando conversaciones
+  if (conversationsError) {
+    return (
+      <div className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-white overflow-hidden items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-medium">Error al cargar las conversaciones</p>
+          <p className="text-sm text-gray-500 mt-2">{conversationsError.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si hay problemas cargando mensajes
+  if (messagesError && activeConversationId) {
+    return (
+      <div className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-white overflow-hidden items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-medium">Error al cargar los mensajes</p>
+          <p className="text-sm text-gray-500 mt-2">{messagesError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-[calc(100vh-theme(spacing.16))] w-full bg-white overflow-hidden">
+      {/* Panel Izquierdo / Sidebar */}
+      <ChatSidebar
+        currentUserId={currentUserId}
+        conversations={conversations}
+        activeConversationId={activeConversationId || undefined}
+        onSelectConversation={(id) => setActiveConversationId(id)}
+      />
+
+      {/* Panel Derecho (Ventana de Chat o Empty state) */}
+      {!activeConversation ? (
+        <ChatEmptyState />
+      ) : (
+        <ActiveChatWindow
+          conversation={activeConversation}
+          messages={messages}
+          currentUserId={currentUserId}
+          onSendMessage={handleSendMessage}
+        />
+      )}
+    </div>
+  );
+}

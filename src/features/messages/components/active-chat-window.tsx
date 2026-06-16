@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Conversation, Message } from '../types/messages.types';
 import { ActiveChatWindowProps } from '../types/components.types';
 import { MESSAGES_UI_TEXT } from '../constants/messages.constants';
@@ -7,6 +8,13 @@ import { ChatMessageBubble } from './chat-message-bubble';
 import { ChatInputFooter } from './chat-input-footer';
 
 export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSendMessage }: ActiveChatWindowProps) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll al final cuando hay nuevos mensajes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const otherParticipant = conversation.participants.find(p => p.profileId !== currentUserId);
   const profile = otherParticipant?.profile;
 
@@ -66,6 +74,7 @@ export const ActiveChatWindow = ({ conversation, messages, currentUserId, onSend
             />
           ))
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Footer Area */}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { MapPin, Mail, Shield } from 'lucide-react'
 import { UserAvatar } from '@/shared/components/ui/user-avatar'
 import { Button } from '@/shared/components/ui/button'
@@ -7,6 +8,13 @@ import { USER_DETAIL_LABELS } from '../constants/user-detail.constants'
 import type { UserBasicInfoCardProps } from '../types/user-profile.types'
 
 export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
+  const router = useRouter()
+
+  const handleSendMessage = () => {
+    if (!user.id) return
+    router.push(`/mensajes?user=${user.id}`)
+  }
+
   return (
     <div className="bg-surface rounded-lg border border-border p-6 space-y-4">
       <div className="flex flex-col items-center">
@@ -15,7 +23,7 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
           imageUrl={user.imageUrl}
           verified={user.verified}
           age={user.age}
-          size="lg"
+          size="xl"
         />
 
         <div className="mt-4 text-center w-full">
@@ -52,13 +60,15 @@ export function UserBasicInfoCard({ user }: UserBasicInfoCardProps) {
         </div>
       )}
 
-      {user.allowMessages && (
-        <div className="border-t border-border pt-4 flex gap-2">
-          <Button className="flex-1 w-full">
-            {USER_DETAIL_LABELS.sendMessage}
-          </Button>
-        </div>
-      )}
+      <div className="border-t border-border pt-4 flex gap-2">
+        <Button 
+          className="flex-1 w-full" 
+          onClick={handleSendMessage}
+          disabled={!user.id}
+        >
+          {USER_DETAIL_LABELS.sendMessage}
+        </Button>
+      </div>
     </div>
   )
 }

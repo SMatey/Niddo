@@ -22,8 +22,28 @@ export async function sendMessage(payload: SendMessagePayload): Promise<Message>
     throw new Error(MESSAGES_ERRORS.UNAUTHORIZED);
   }
 
-  if (!payload.conversationId || !payload.receiverId || !payload.content) {
-    throw new Error(MESSAGES_ERRORS.MISSING_FIELDS);
+  // Validación mejorada de campos requeridos
+  if (!payload.conversationId?.trim()) {
+    throw new Error('ID de conversación requerido');
+  }
+
+  if (!payload.receiverId?.trim()) {
+    throw new Error('ID del receptor requerido');
+  }
+
+  if (!payload.content?.trim()) {
+    throw new Error('El contenido del mensaje no puede estar vacío');
+  }
+
+  // Validar longitud del contenido
+  const MAX_MESSAGE_LENGTH = 5000;
+  if (payload.content.length > MAX_MESSAGE_LENGTH) {
+    throw new Error(`El mensaje no puede exceder ${MAX_MESSAGE_LENGTH} caracteres`);
+  }
+
+  // Prevenir auto-envío
+  if (payload.receiverId === session.user.id) {
+    throw new Error('No puedes enviar un mensaje a ti mismo');
   }
 
   const { data, error } = await supabase
@@ -32,7 +52,7 @@ export async function sendMessage(payload: SendMessagePayload): Promise<Message>
       conversation_id: payload.conversationId,
       sender_id: session.user.id,
       receiver_id: payload.receiverId,
-      content: payload.content,
+      content: payload.content.trim(),
       type: payload.type || MESSAGE_TYPES.TEXT,
     })
     .select()
