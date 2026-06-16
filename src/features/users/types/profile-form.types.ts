@@ -17,3 +17,10 @@ export interface EditableProfile {
   budget_min?: number
   budget_max?: number
 }
+
+export type StatusType = 'success' | 'error' | 'info'
+
+export interface FormStatus {
+  type: StatusType
+  message: string
+}

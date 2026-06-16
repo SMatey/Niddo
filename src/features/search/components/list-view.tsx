@@ -4,23 +4,12 @@ import { FavoritePropertyButton, FavoriteProfileButton } from '@/features/favori
 import { CONTENT_MODES } from '../constants/search.constants'
 import { LIST_VIEW_CONSTANTS } from '../constants/list-view.constants'
 import type { PropertyItem, UserItem, ContentMode } from '../types/domain.types'
-import type { ListViewProps } from '../types/ui.types'
+import type { ListViewProps, PropertyListViewProps, CombinedListViewProps } from '../types/ui.types'
 import type { UserListItem } from './list-view.types'
 import { useAuth } from '@/features/auth/hooks/use-auth'
 import { useRoomiePreferences } from '@/features/users/hooks/use-roomie-preferences'
 
 export type { ContentMode }
-
-interface PropertyListViewProps {
-    properties?: PropertyItem[]
-    users?: UserItem[]
-    contentMode: ContentMode
-    onPropertyFavoriteToggle?: (id: string) => void
-    onUserFavoriteToggle?: (id: string) => void
-    isLoading?: boolean
-}
-
-type CombinedListViewProps = PropertyListViewProps | ListViewProps
 
 export function ListView(props: CombinedListViewProps) {
     const { isLoading } = props as any

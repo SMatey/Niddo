@@ -79,3 +79,6 @@ export const PROFILE_FORM = {
     PREVIEW_ALT: 'Vista previa de foto de perfil',
   },
 } as const
+
+export const PROFILE_CONTAINER_CLASS =
+  'mx-auto w-full max-w-3xl rounded-xl border border-border bg-surface p-6 md:p-8'

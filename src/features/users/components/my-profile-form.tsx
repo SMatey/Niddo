@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { useAuth } from '@/features/auth/hooks/use-auth'
-import { PROFILE_FORM } from '@/features/users/constants/profile-form.constants'
+import { PROFILE_FORM, PROFILE_CONTAINER_CLASS } from '@/features/users/constants/profile-form.constants'
 import { useMyProfile } from '@/features/users/hooks/use-my-profile'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -15,47 +15,8 @@ import {
   toProfileFormDefaults,
   type ProfileFormSchemaValues,
 } from '@/features/users/schemas/profile-form.schema'
-
-type StatusType = 'success' | 'error' | 'info'
-
-interface FormStatus {
-  type: StatusType
-  message: string
-}
-
-const PROFILE_CONTAINER_CLASS =
-  'mx-auto w-full max-w-3xl rounded-xl border border-border bg-surface p-6 md:p-8'
-
-const getInitialFromName = (nameCandidate?: string | null) => {
-  const fallbackLetter = 'U'
-  const normalizedName = nameCandidate?.trim()
-
-  if (!normalizedName) {
-    return fallbackLetter
-  }
-
-  return normalizedName.charAt(0).toUpperCase()
-}
-
-const fileToDataUrl = (file: File) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        resolve(reader.result)
-        return
-      }
-
-      reject(new Error(PROFILE_FORM.UI.SAVE_ERROR))
-    }
-
-    reader.onerror = () => {
-      reject(new Error(PROFILE_FORM.UI.SAVE_ERROR))
-    }
-
-    reader.readAsDataURL(file)
-  })
+import type { FormStatus } from '../types/profile-form.types'
+import { getInitialFromName, fileToDataUrl } from '../utils/profile-form.utils'
 
 export function MyProfileForm() {
   const { user, isInitialized } = useAuth()

@@ -86,3 +86,20 @@ export interface MatchScoreBadgeProps {
     score: number
     level?: MatchScoreLevel
 }
+
+export interface PropertyListViewProps {
+    properties?: PropertyItem[]
+    users?: UserItem[]
+    contentMode: ContentMode
+    onPropertyFavoriteToggle?: (id: string) => void
+    onUserFavoriteToggle?: (id: string) => void
+    isLoading?: boolean
+}
+
+export type CombinedListViewProps = PropertyListViewProps | ListViewProps
+
+export interface LocationMapSelectorProps {
+  onLocationSelect: (lat: number, lng: number) => void
+  initialLat?: number
+  initialLng?: number
+}

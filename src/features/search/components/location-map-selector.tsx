@@ -4,12 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 import { MAP_CONFIG } from '../constants/search.constants'
 import { MapLoadingState, useMap } from '@/features/search/providers/map-provider'
-
-interface LocationMapSelectorProps {
-  onLocationSelect: (lat: number, lng: number) => void
-  initialLat?: number
-  initialLng?: number
-}
+import type { LocationMapSelectorProps } from '../types/ui.types'
 
 export function LocationMapSelector({
   onLocationSelect,

@@ -24,6 +24,7 @@ export function UserCard({
     maxBudget,
     confidenceScore,
     lifestyles = [],
+    matchScore,
     className,
 }: UserCardProps) {
     return (
